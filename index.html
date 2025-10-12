@@ -1,1268 +1,1916 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>كشري أبو سمرة (نظام كامل - اطلب الان)</title>
-<style>
-:root{
-  --bg:#0f172a; --card:#0b1220; --muted:#94a3b8; --accent:#ff6b35; --gold:#ffd700; --success:#16a34a;
-}
-html,body{height:100%;margin:0;padding:0;font-family:Tahoma, Arial, sans-serif;background:var(--bg);color:#e6eef8}
-.container{max-width:1200px;margin:18px auto;padding:18px;display:grid;grid-template-columns:1fr;gap:18px}
-.header{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.brand{display:flex;flex-direction:column}
-.brand h1{margin:0;font-size:1.6rem;letter-spacing:0.4px}
-.brand p{margin:0;color:var(--muted);font-size:0.9rem}
-.controls{display:flex;gap:8px;align-items:center}
-.btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
-.btn.secondary{background:#374151;color:#fff}
-.card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6);border:1px solid rgba(255,215,0,0.06)}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>كشري أبو سمرة (نظام كامل - اطلب الان)</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #0b1220;
+      --muted: #94a3b8;
+      --accent: #ff6b35;
+      --gold: #ffd700;
+      --success: #16a34a;
+    }
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: Tahoma, Arial, sans-serif;
+      background: var(--bg);
+      color: #e6eef8;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 18px auto;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand {
+      display: flex;
+      flex-direction: column;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      letter-spacing: 0.4px;
+    }
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 0;
+      cursor: pointer;
+    }
+    .btn.secondary {
+      background: #374151;
+      color: #fff;
+    }
+    .card {
+      background: var(--card);
+      padding: 14px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
+      border: 1px solid rgba(255, 215, 0, 0.06);
+    }
 
-/* layout */
-.grid-2{display:grid;grid-template-columns:1fr;gap:18px}
-@media(max-width:980px){.grid-2{grid-template-columns:1fr}}
+    /* layout */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 980px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
 
-/* menu */
-.menu-section{margin-bottom:12px}
-.section-title{background:var(--gold);color:#1f2937;padding:10px;border-radius:8px;font-weight:bold;margin-bottom:10px;text-align:center;font-size:1rem}
-.menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-.menu-item{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:12px;border-radius:10px;border:1px solid rgba(255,215,0,0.04);display:flex;flex-direction:column;gap:8px;cursor:pointer;user-select:none}
-.menu-item h4{margin:0;color:#e6eef8;font-size:1rem}
-.price{color:var(--accent);font-weight:bold}
-.controls-small{display:flex;gap:6px;align-items:center}
-.qty-btn{width:30px;height:30px;border-radius:6px;border:0;background:rgba(255,255,255,0.03);color:#fff;cursor:pointer}
-.add-cart{background:var(--success);color:#fff;padding:8px;border-radius:8px;border:0;cursor:pointer}
+    /* menu */
+    .menu-section {
+      margin-bottom: 12px;
+    }
+    .section-title {
+      background: var(--gold);
+      color: #1f2937;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 1rem;
+    }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .menu-item {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 215, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .menu-item h4 {
+      margin: 0;
+      color: #e6eef8;
+      font-size: 1rem;
+    }
+    .price {
+      color: var(--accent);
+      font-weight: bold;
+    }
+    .controls-small {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .qty-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      border: 0;
+      background: rgba(255, 255, 255, 0.03);
+      color: #fff;
+      cursor: pointer;
+    }
+    .add-cart {
+      background: var(--success);
+      color: #fff;
+      padding: 8px;
+      border-radius: 8px;
+      border: 0;
+      cursor: pointer;
+    }
 
-/* cart panel - hidden by default */
-.cart-panel{position:fixed;top:0;right:-320px;width:300px;height:100vh;background:var(--card);padding:12px;border-left:1px solid rgba(255,0,0,0.4);transition:right 0.3s;z-index:999;overflow-y:auto;box-shadow:-6px 0 18px rgba(2,6,23,0.6)}
-.cart-panel.open{right:0}
-.cart-toggle{position:fixed;bottom:20px;right:20px;width:60px;height:60px;border-radius:50%;background:var(--accent);color:#fff;border:0;cursor:pointer;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:24px;display:flex;align-items:center;justify-content:center}
-.cart-title{font-weight:bold;margin-bottom:8px}
-.cart-items{max-height:calc(50vh - 100px);overflow:auto;margin-bottom:10px}
-.cart-item{display:flex;justify-content:space-between;gap:10px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.01);margin-bottom:8px}
+    /* cart panel - hidden by default */
+    .cart-panel {
+      position: fixed;
+      top: 0;
+      right: -320px;
+      width: 300px;
+      height: 100vh;
+      background: var(--card);
+      padding: 12px;
+      border-left: 1px solid rgba(255, 0, 0, 0.4);
+      transition: right 0.3s;
+      z-index: 999;
+      overflow-y: auto;
+      box-shadow: -6px 0 18px rgba(2, 6, 23, 0.6);
+    }
+    .cart-panel.open {
+      right: 0;
+    }
+    .cart-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      cursor: pointer;
+      z-index: 9999;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cart-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .cart-items {
+      max-height: calc(50vh - 100px);
+      overflow: auto;
+      margin-bottom: 10px;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.01);
+      margin-bottom: 8px;
+    }
 
-/* bottom cart when scrolled to bottom */
-.bottom-cart{display:none;background:var(--card);padding:12px;border-top:1px solid rgba(255,215,0,0.04);margin-top:20px}
-@media(max-width:600px){.cart-panel{width:100%;right:-100%}.cart-panel.open{right:0}}
+    /* bottom cart when scrolled to bottom */
+    .bottom-cart {
+      display: none;
+      background: var(--card);
+      padding: 12px;
+      border-top: 1px solid rgba(255, 215, 0, 0.04);
+      margin-top: 20px;
+    }
+    @media (max-width: 600px) {
+      .cart-panel {
+        width: 100%;
+        right: -100%;
+      }
+      .cart-panel.open {
+        right: 0;
+      }
+    }
 
-/* operator */
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.tab{padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.03);cursor:pointer}
-.tab.active{background:var(--accent);color:#fff}
-.tabContent{display:none}
-.tabContent:first-of-type{display:block}
-.orders-grid{display:flex;flex-direction:column;gap:12px}
-.order-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:12px;border-radius:10px;border:1px solid rgba(255,215,0,0.04);cursor:pointer}
-.order-details{display:none;margin-top:8px;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px}
-.order-details.open{display:block}
+    /* operator */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .tab {
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      cursor: pointer;
+    }
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+    }
+    .tabContent {
+      display: none;
+    }
+    .tabContent:first-of-type {
+      display: block;
+    }
+    .orders-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .order-card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 215, 0, 0.04);
+      cursor: pointer;
+    }
+    .order-details {
+      display: none;
+      margin-top: 8px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 8px;
+    }
+    .order-details.open {
+      display: block;
+    }
 
-/* small helpers */
-.input,textarea,select{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
-.small{font-size:0.85rem;color:var(--muted)}
-.kv{display:flex;gap:6px;align-items:center}
-.badge{padding:4px 8px;border-radius:999px;background:var(--gold);color:#1f2937;font-weight:bold;font-size:0.85rem}
-.notify{position:fixed;left:18px;bottom:18px;padding:10px;border-radius:10px;background:var(--success);color:#fff;display:none;z-index:9999}
-.footer{font-size:0.85rem;color:var(--muted);text-align:center;margin-top:10px}
+    /* small helpers */
+    .input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: transparent;
+      color: inherit;
+    }
+    .small {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .kv {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .badge {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--gold);
+      color: #1f2937;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+    .notify {
+      position: fixed;
+      left: 18px;
+      bottom: 18px;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--success);
+      color: #fff;
+      display: none;
+      z-index: 9999;
+    }
+    .footer {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 10px;
+    }
 
-/* offer badges */
-.offer-badge{background:#064e3b;color:#fff;padding:4px 8px;border-radius:8px;font-weight:bold;font-size:0.85rem}
+    /* offer badges */
+    .offer-badge {
+      background: #064e3b;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
 
-/* fixed operator button */
-#operatorQuickBtn{
-  position:fixed;
-  top:12px;
-  right:12px;
-  width:34px;
-  height:34px;
-  border-radius:50%;
-  background:#374151;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
-  font-size:18px;
-  cursor:pointer;
-  z-index:99999;
-  box-shadow:0 6px 18px rgba(2,6,23,0.6);
-  border:2px solid rgba(255,255,255,0.04);
-}
+    /* fixed operator button */
+    #operatorQuickBtn {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #374151;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+      cursor: pointer;
+      z-index: 99999;
+      box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.04);
+    }
 
-/* password modal */
-#pwdModal{
-  position:fixed;left:0;top:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:99998;
-}
-#pwdModal .modalCard{width:320px;background:var(--card);padding:16px;border-radius:10px;border:1px solid rgba(255,255,255,0.04)}
-#pwdModal .modalCard h3{margin:0 0 8px 0}
-#pwdModal .modalActions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+    /* password modal */
+    #pwdModal {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 99998;
+    }
+    #pwdModal .modalCard {
+      width: 320px;
+      background: var(--card);
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    #pwdModal .modalCard h3 {
+      margin: 0 0 8px 0;
+    }
+    #pwdModal .modalActions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
 
-/* epot modal */
-#epotModal{
-  position:fixed;left:0;top:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:99999;
-}
-#epotModal .modalCard{width:360px;background:var(--card);padding:16px;border-radius:10px;border:1px solid rgba(255,255,255,0.04)}
+    /* epot modal */
+    #epotModal {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 99999;
+    }
+    #epotModal .modalCard {
+      width: 360px;
+      background: var(--card);
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
 
-/* small inline buttons used inside cards */
-.btn.small-inline{padding:6px 8px;border-radius:6px;font-size:0.9rem}
+    /* small inline buttons used inside cards */
+    .btn.small-inline {
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
 
-/* responsive for small screens button position */
-@media(max-width:420px){
-  #operatorQuickBtn{right:10px;top:10px;width:40px;height:40px;font-size:22px}
-  .cart-toggle{bottom:80px}
-}
+    /* responsive for small screens button position */
+    @media (max-width: 420px) {
+      #operatorQuickBtn {
+        right: 10px;
+        top: 10px;
+        width: 40px;
+        height: 40px;
+        font-size: 22px;
+      }
+      .cart-toggle {
+        bottom: 80px;
+      }
+    }
 
-/* quantity modal */
-#qtyModal{
-  position:fixed;left:0;top:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:99998;
-}
-#qtyModal .modalCard{width:320px;background:var(--card);padding:16px;border-radius:10px;border:1px solid rgba(255,255,255,0.04)}
-#qtyModal .modalActions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
-</style>
+    /* quantity modal */
+    #qtyModal {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 99998;
+    }
+    #qtyModal .modalCard {
+      width: 320px;
+      background: var(--card);
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    #qtyModal .modalActions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+  </style>
+  <!-- مكتبات Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js"></script>
 </head>
 <body id="body">
-<div class="container">
-
-  <div class="header">
-    <div class="brand">
-      <h1>🍛 كشري أبو سمرة</h1>
-      <p class="small">نظام طلبات محلي (عميل + مشغل) — كل التغييرات تحفظ محليًا</p>
-    </div>
-
-    <div class="controls">
-      <!-- kept empty for future top controls -->
-    </div>
-  </div>
-
-  <div id="mainCustomer" class="card">
-    <div class="grid-2">
-      <div>
-        <div id="menuContainer"></div>
+  <div class="container">
+    <div class="header">
+      <div class="brand">
+        <h1>🍛 كشري أبو سمرة</h1>
+        <p class="small">نظام طلبات محلي (عميل + مشغل) — كل التغييرات تحفظ محليًا</p>
+      </div>
+      <div class="controls">
+        <!-- kept empty for future top controls -->
       </div>
     </div>
 
-    <aside class="cart-panel" id="cartPanel">
-      <div class="cart-title">🛒 سلة المشتريات</div>
-      <div class="small" id="cartCustomerInfo">ضيف — لم تسجل بعد</div>
-      <div class="cart-items" id="cartItems"></div>
-      <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
-        <div class="badge" id="cartTotal">0 ج</div>
-        <div class="small" style="flex:1">الإجمالي</div>
-      </div>
-
-      <div style="margin-bottom:8px">
-        <label class="small">اختر عرض (اختياري)</label>
-        <select id="applyOffer" class="input"></select>
-      </div>
-
-      <div style="display:flex;gap:8px">
-        <button class="add-cart" id="checkoutBtn" style="flex:1">اتمام الطلب</button>
-        <button class="btn secondary" id="clearCartBtn" style="padding-inline:10px">تفريغ</button>
-      </div>
-
-      <div style="margin-top:10px;font-size:0.9rem;color:var(--muted)">
-        الدفع نقدًا عند الاستلام أو تحويل فودافون كاش — يمكن تفعيل بطاقة/فوري لاحقًا
-      </div>
-    </aside>
-
-    <button class="cart-toggle" id="cartToggle">🛒</button>
-
-    <div class="bottom-cart" id="bottomCart"></div>
-
-    <div id="checkoutSection" class="card" style="margin-top:12px;display:none">
-      <div class="section-title">معلومات التوصيل & الدفع</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <input id="orderName" class="input" placeholder="الاسم" />
-        <input id="orderPhone" class="input" placeholder="الهاتف" />
-        <input id="orderAddress" class="input" placeholder="العنوان (تفصيل)" style="grid-column:1/3"/>
-        <select id="orderPayment" class="input">
-          <option value="cash">نقدًا عند الاستلام</option>
-          <option value="vodafone">تحويل فودافون كاش</option>
-          <option value="card">بطاقة (غير مفعل)</option>
-          <option value="fawry">فوري (غير مفعل)</option>
-        </select>
-        <textarea id="orderNotes" class="input" placeholder="ملاحظات (اختياري)" style="grid-column:1/3"></textarea>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button class="add-cart" id="confirmOrderBtn" style="flex:1">تأكيد الطلب</button>
-        <button class="btn secondary" id="cancelCheckoutBtn">إلغاء</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="mainOperator" class="card" style="display:none">
-    <div id="operatorLoginPanel">
-      <div style="display:flex;gap:8px;align-items:center">
-        <div style="flex:1">
-          <div class="small">دخول المشغل</div>
-          <input id="operatorPasswordInput" class="input" placeholder="كلمة المرور" />
+    <div id="mainCustomer" class="card">
+      <div class="grid-2">
+        <div>
+          <div id="menuContainer"></div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          <button class="btn" id="operatorLoginBtn">دخول</button>
-          <button class="btn secondary" id="showPwdBtn">عرض كلمة المرور</button>
+      </div>
+
+      <aside class="cart-panel" id="cartPanel">
+        <div class="cart-title">🛒 سلة المشتريات</div>
+        <div class="small" id="cartCustomerInfo">ضيف — لم تسجل بعد</div>
+        <div class="cart-items" id="cartItems"></div>
+        <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 8px">
+          <div class="badge" id="cartTotal">0 ج</div>
+          <div class="small" style="flex: 1">الإجمالي</div>
+        </div>
+
+        <div style="margin-bottom: 8px">
+          <label class="small">اختر عرض (اختياري)</label>
+          <select id="applyOffer" class="input"></select>
+        </div>
+
+        <div style="display: flex; gap: 8px">
+          <button class="add-cart" id="checkoutBtn" style="flex: 1">اتمام الطلب</button>
+          <button class="btn secondary" id="clearCartBtn" style="padding-inline: 10px">تفريغ</button>
+        </div>
+
+        <div style="margin-top: 10px; font-size: 0.9rem; color: var(--muted)">
+          الدفع نقدًا عند الاستلام أو تحويل فودافون كاش — يمكن تفعيل بطاقة/فوري لاحقًا
+        </div>
+      </aside>
+
+      <button class="cart-toggle" id="cartToggle">🛒</button>
+
+      <div class="bottom-cart" id="bottomCart"></div>
+
+      <div id="checkoutSection" class="card" style="margin-top: 12px; display: none">
+        <div class="section-title">معلومات التوصيل & الدفع</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+          <input id="orderName" class="input" placeholder="الاسم" />
+          <input id="orderPhone" class="input" placeholder="الهاتف" />
+          <input id="orderAddress" class="input" placeholder="العنوان (تفصيل)" style="grid-column: 1/3" />
+          <select id="orderPayment" class="input">
+            <option value="cash">نقدًا عند الاستلام</option>
+            <option value="vodafone">تحويل فودافون كاش</option>
+            <option value="card">بطاقة (غير مفعل)</option>
+            <option value="fawry">فوري (غير مفعل)</option>
+          </select>
+          <textarea id="orderNotes" class="input" placeholder="ملاحظات (اختياري)" style="grid-column: 1/3"></textarea>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 10px">
+          <button class="add-cart" id="confirmOrderBtn" style="flex: 1">تأكيد الطلب</button>
+          <button class="btn secondary" id="cancelCheckoutBtn">إلغاء</button>
         </div>
       </div>
     </div>
 
-    <div id="operatorDashboard" style="display:none;margin-top:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="display:flex;align-items:center;gap:12px">
-          <div class="kv">
-            <div class="badge">Operator</div>
-            <div class="small" style="margin-inline-start:8px" id="operatorHint">مسجل الدخول</div>
+    <div id="mainOperator" class="card" style="display: none">
+      <div id="operatorLoginPanel">
+        <div style="display: flex; gap: 8px; align-items: center">
+          <div style="flex: 1">
+            <div class="small">دخول المشغل</div>
+            <input id="operatorPasswordInput" class="input" placeholder="كلمة المرور" />
           </div>
-        </div>
-
-        <div style="display:flex;gap:8px">
-          <button class="btn secondary" id="operatorLogoutBtn">تسجيل خروج</button>
-        </div>
-      </div>
-
-      <div style="margin-top:12px" class="card">
-        <div class="tabs" id="opTabs">
-          <div class="tab active" data-tab="ordersTab">الطلبات</div>
-          <div class="tab" data-tab="epotTab">EPOT</div>
-        </div>
-
-        <div id="ordersTab" class="tabContent">
-          <div class="section-title">إدارة الطلبات</div>
-          <div class="orders-grid" id="ordersGrid"></div>
-        </div>
-
-        <div id="epotTab" class="tabContent" style="display:none">
-          <div class="section-title">EPOT — الإيرادات و صلاحيات التعديل</div>
-          <div id="epotLockedNotice" class="small">مقفول — للوصول اضغط فتح EPOT وأدخل كلمة المرور.</div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button class="btn" id="openEpotBtn">فتح EPOT</button>
-            <button class="btn secondary" id="lockEpotBtn" style="display:none">قفل EPOT</button>
-          </div>
-          <div id="epotContent" style="display:none;margin-top:10px">
-            <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px">
-              <div class="card small"><div class="small">إجمالي الإيرادات (ج)</div><div id="epotTotal" style="font-weight:bold;font-size:1.4rem">0</div></div>
-              <div style="flex:1">
-                <div class="small">تغيير كلمة مرور EPOT</div>
-                <div style="display:flex;gap:8px;margin-top:6px">
-                  <input id="newEpotPwd" class="input" placeholder="كلمة مرور جديدة" />
-                  <button class="btn" id="setEpotPwdBtn">تحديث</button>
-                </div>
-              </div>
-            </div>
-
-            <div style="margin-top:12px">
-              <h4 class="section-title">إدارة الأصناف</h4>
-              <div style="display:flex;gap:12px;margin-bottom:12px;align-items:center">
-                <input id="newItemName" class="input" placeholder="اسم الصنف" style="flex:1" />
-                <input id="newItemPrice" class="input" placeholder="السعر" type="number" min="0" style="width:120px" />
-                <select id="newItemCategory" class="input" style="width:150px"></select>
-                <button class="btn" id="addItemBtn">إضافة صنف</button>
-                <button class="btn secondary" id="exportDataBtn">تصدير البيانات</button>
-              </div>
-              <div id="manageItemsList"></div>
-            </div>
-
-            <div style="margin-top:12px">
-              <h4 class="section-title">إدارة العروض</h4>
-              <div style="display:flex;gap:12px;flex-wrap:wrap">
-                <div style="flex:1;min-width:320px">
-                  <div id="activeOffersList"></div>
-                </div>
-                <div style="width:320px">
-                  <h4 class="small">إنشاء عرض جديد</h4>
-                  <input id="offerName" class="input" placeholder="اسم العرض" />
-                  <input id="offerDiscount" class="input" placeholder="نسبة الخصم (%)" type="number" min="0" max="100" />
-                  <button class="btn" id="createOfferBtn">إنشاء العرض</button>
-                  <div class="small" id="offerNotice" style="color:var(--muted)">إنشاء/إلغاء العروض يحتاج صلاحية EPOT.</div>
-                </div>
-              </div>
-            </div>
-            
-            <div style="margin-top:12px">
-              <h4 class="section-title">التقارير</h4>
-              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:12px">
-                <div class="card small"><div class="small">طلبات اليوم</div><div id="rToday" style="font-weight:bold;font-size:1.4rem">0</div></div>
-                <div class="card small"><div class="small">إيراد اليوم (ج)</div><div id="rRevenue" style="font-weight:bold;font-size:1.4rem">0</div></div>
-                <div class="card small"><div class="small">إجمالي الطلبات</div><div id="rTotal" style="font-weight:bold;font-size:1.4rem">0</div></div>
-                <div class="card small"><div class="small">الأكثر طلبًا</div><div id="rTop" style="font-weight:bold;font-size:1.4rem">-</div></div>
-              </div>
-              <div id="popularList"></div>
-            </div>
-            <div>
-              <h4 class="small">سجل الطلبات</h4>
-              <div id="epotOrdersList" style="margin-top:8px"></div>
-            </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <button class="btn" id="operatorLoginBtn">دخول</button>
+            <button class="btn secondary" id="showPwdBtn">عرض كلمة المرور</button>
           </div>
         </div>
       </div>
+
+      <div id="operatorDashboard" style="display: none; margin-top: 12px">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <div class="kv">
+              <div class="badge">Operator</div>
+              <div class="small" style="margin-inline-start: 8px" id="operatorHint">مسجل الدخول</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px">
+            <button class="btn secondary" id="operatorLogoutBtn">تسجيل خروج</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 12px" class="card">
+          <div class="tabs" id="opTabs">
+            <div class="tab active" data-tab="ordersTab">الطلبات</div>
+            <div class="tab" data-tab="epotTab">EPOT</div>
+          </div>
+
+          <div id="ordersTab" class="tabContent">
+            <div class="section-title">إدارة الطلبات</div>
+            <div class="orders-grid" id="ordersGrid"></div>
+          </div>
+
+          <div id="epotTab" class="tabContent" style="display: none">
+            <div class="section-title">EPOT — الإيرادات و صلاحيات التعديل</div>
+            <div id="epotLockedNotice" class="small">مقفول — للوصول اضغط فتح EPOT وأدخل كلمة المرور.</div>
+            <div style="display: flex; gap: 8px; margin-top: 8px">
+              <button class="btn" id="openEpotBtn">فتح EPOT</button>
+              <button class="btn secondary" id="lockEpotBtn" style="display: none">قفل EPOT</button>
+            </div>
+            <div id="epotContent" style="display: none; margin-top: 10px">
+              <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 8px">
+                <div class="card small">
+                  <div class="small">إجمالي الإيرادات (ج)</div>
+                  <div id="epotTotal" style="font-weight: bold; font-size: 1.4rem">0</div>
+                </div>
+                <div style="flex: 1">
+                  <div class="small">تغيير كلمة مرور EPOT</div>
+                  <div style="display: flex; gap: 8px; margin-top: 6px">
+                    <input id="newEpotPwd" class="input" placeholder="كلمة مرور جديدة" />
+                    <button class="btn" id="setEpotPwdBtn">تحديث</button>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top: 12px">
+                <h4 class="section-title">إدارة الأصناف</h4>
+                <div style="display: flex; gap: 12px; margin-bottom: 12px; align-items: center">
+                  <input id="newItemName" class="input" placeholder="اسم الصنف" style="flex: 1" />
+                  <input id="newItemPrice" class="input" placeholder="السعر" type="number" min="0" style="width: 120px" />
+                  <select id="newItemCategory" class="input" style="width: 150px"></select>
+                  <button class="btn" id="addItemBtn">إضافة صنف</button>
+                  <button class="btn secondary" id="exportDataBtn">تصدير البيانات</button>
+                </div>
+                <div id="manageItemsList"></div>
+              </div>
+
+              <div style="margin-top: 12px">
+                <h4 class="section-title">إدارة العروض</h4>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap">
+                  <div style="flex: 1; min-width: 320px">
+                    <div id="activeOffersList"></div>
+                  </div>
+                  <div style="width: 320px">
+                    <h4 class="small">إنشاء عرض جديد</h4>
+                    <input id="offerName" class="input" placeholder="اسم العرض" />
+                    <input id="offerDiscount" class="input" placeholder="نسبة الخصم (%)" type="number" min="0" max="100" />
+                    <button class="btn" id="createOfferBtn">إنشاء العرض</button>
+                    <div class="small" id="offerNotice" style="color: var(--muted)">إنشاء/إلغاء العروض يحتاج صلاحية EPOT.</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top: 12px">
+                <h4 class="section-title">التقارير</h4>
+                <div
+                  style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px"
+                >
+                  <div class="card small">
+                    <div class="small">طلبات اليوم</div>
+                    <div id="rToday" style="font-weight: bold; font-size: 1.4rem">0</div>
+                  </div>
+                  <div class="card small">
+                    <div class="small">إيراد اليوم (ج)</div>
+                    <div id="rRevenue" style="font-weight: bold; font-size: 1.4rem">0</div>
+                  </div>
+                  <div class="card small">
+                    <div class="small">إجمالي الطلبات</div>
+                    <div id="rTotal" style="font-weight: bold; font-size: 1.4rem">0</div>
+                  </div>
+                  <div class="card small">
+                    <div class="small">الأكثر طلبًا</div>
+                    <div id="rTop" style="font-weight: bold; font-size: 1.4rem">-</div>
+                  </div>
+                </div>
+                <div id="popularList"></div>
+              </div>
+              <div>
+                <h4 class="small">سجل الطلبات</h4>
+                <div id="epotOrdersList" style="margin-top: 8px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="notify" class="notify"></div>
+    <div class="footer small">هذا ملف مستقل. كل البيانات مخزنة محليًا في متصفحك. يمكنك تحميله وتشغيله محليًا.</div>
+  </div>
+
+  <div id="operatorQuickBtn" title="دخول المشغل">!</div>
+
+  <div id="pwdModal">
+    <div class="modalCard">
+      <h3>دخول المشغل</h3>
+      <div class="small" style="margin-bottom: 8px">أدخل كلمة المرور للمشغل</div>
+      <input id="quickPwdInput" class="input" type="password" placeholder="كلمة المرور" />
+      <div class="modalActions">
+        <button class="btn secondary" id="cancelPwdBtn">إلغاء</button>
+        <button class="btn" id="submitPwdBtn">دخول</button>
+      </div>
     </div>
   </div>
 
-  <div id="notify" class="notify"></div>
-  <div class="footer small">هذا ملف مستقل. كل البيانات مخزنة محليًا في متصفحك. يمكنك تحميله وتشغيله محليًا.</div>
-</div>
-
-<div id="operatorQuickBtn" title="دخول المشغل">!</div>
-
-<div id="pwdModal">
-  <div class="modalCard">
-    <h3>دخول المشغل</h3>
-    <div class="small" style="margin-bottom:8px">أدخل كلمة المرور للمشغل</div>
-    <input id="quickPwdInput" class="input" type="password" placeholder="كلمة المرور" />
-    <div class="modalActions">
-      <button class="btn secondary" id="cancelPwdBtn">إلغاء</button>
-      <button class="btn" id="submitPwdBtn">دخول</button>
+  <div id="epotModal">
+    <div class="modalCard">
+      <h3>فتح EPOT</h3>
+      <div class="small" style="margin-bottom: 8px">أدخل كلمة مرور EPOT للوصول لصلاحيات التعديل والإيرادات</div>
+      <input id="epotPwdInput" class="input" type="password" placeholder="كلمة مرور EPOT" />
+      <div class="modalActions">
+        <button class="btn secondary" id="cancelEpotBtn">إلغاء</button>
+        <button class="btn" id="unlockEpotBtn">فتح</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="epotModal">
-  <div class="modalCard">
-    <h3>فتح EPOT</h3>
-    <div class="small" style="margin-bottom:8px">أدخل كلمة مرور EPOT للوصول لصلاحيات التعديل والإيرادات</div>
-    <input id="epotPwdInput" class="input" type="password" placeholder="كلمة مرور EPOT" />
-    <div class="modalActions">
-      <button class="btn secondary" id="cancelEpotBtn">إلغاء</button>
-      <button class="btn" id="unlockEpotBtn">فتح</button>
+  <div id="qtyModal">
+    <div class="modalCard">
+      <h3>تحديد الكمية</h3>
+      <input id="customQty" class="input" type="number" min="1" placeholder="أدخل الكمية" />
+      <div class="modalActions">
+        <button class="btn secondary" id="cancelQtyBtn">إلغاء</button>
+        <button class="btn" id="addCustomQtyBtn">وضع في السلة</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="qtyModal">
-  <div class="modalCard">
-    <h3>تحديد الكمية</h3>
-    <input id="customQty" class="input" type="number" min="1" placeholder="أدخل الكمية" />
-    <div class="modalActions">
-      <button class="btn secondary" id="cancelQtyBtn">إلغاء</button>
-      <button class="btn" id="addCustomQtyBtn">وضع في السلة</button>
-    </div>
-  </div>
-</div>
+  <script>
+    // --- إعداد Firebase ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDdK_slp4ysFLYHknvwgpmqfcWQszB1rxs",
+      authDomain: "koshary-abosamra.firebaseapp.com",
+      databaseURL: "https://koshary-abosamra-default-rtdb.firebaseio.com",
+      projectId: "koshary-abosamra",
+      storageBucket: "koshary-abosamra.firebasestorage.app",
+      messagingSenderId: "803911056967",
+      appId: "1:803911056967:web:da1d8533ffe6c0fbc53b62",
+      measurementId: "G-2TVX0F48Y8"
+    };
 
-<script>
-// --- Configuration for real-time sync ---
-const SYNC_CONFIG = window.SYNC_CONFIG || {
-  useWebSocket: false,
-  wsUrl: ''
-};
+    // تهيئة Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-// --- Utilities and storage helpers ---
-const LS_KEYS = {
-  MENU: 'tk_menu_v1',
-  ORDERS: 'tk_orders_v1',
-  OFFERS: 'tk_offers_v1',
-  OP_PWD: 'tk_op_pwd_v1',
-  CUST: 'tk_cust_v1',
-  ORDER_COUNTER:'tk_order_counter_v1',
-  EPOT_PWD: 'tk_epot_pwd_v1'
-};
-function saveLS(key, data){ localStorage.setItem(key, JSON.stringify(data)); }
-function loadLS(key, fallback){ try{ const r = localStorage.getItem(key); return r ? JSON.parse(r) : fallback; }catch(e){return fallback;} }
-function generateId(prefix='ID'){ return prefix + '-' + Date.now().toString(36) + '-' + Math.floor(Math.random()*900).toString(36); }
+    // --- Configuration for real-time sync ---
+    const SYNC_CONFIG = window.SYNC_CONFIG || {
+      useWebSocket: false,
+      wsUrl: ''
+    };
 
-// --- Default data ---
-const DEFAULT_MENU = {
-  "الكشري": [
-    {id:'k-mini', name:'علبة ميني', price:17, available:true, sold:0},
-    {id:'k-large', name:'علبة لارج', price:20, available:true, sold:0},
-    {id:'k-shaqia', name:'علبة شقية', price:25, available:true, sold:0},
-    {id:'k-mftria', name:'علبه مفترية', price:30, available:true,sold:0},
-    {id:'k-abo', name:'علبة أبو سمرة', price:35,available:true,sold:0},
-    {id:'k-triple', name:'علبة تريبل', price:40,available:true,sold:0}
-  ],
-  "إضافات الكشري":[
-    {id:'add-tqliya',name:'تقليه',price:9,available:true,sold:0},
-    {id:'add-salsa',name:'صلصة',price:6,available:true,sold:0},
-    {id:'add-dokka',name:'دقة',price:4,available:true,sold:0},
-    {id:'add-shata',name:'شطة',price:4,available:true,sold:0},
-    {id:'add-ads',name:'عدس',price:6,available:true,sold:0}
-  ],
-  "الإضافات الجانبية":[
-    {id:'side-qaramisho',name:'قراميشو (توست)',price:9,available:true,sold:0},
-    {id:'side-mkhlal',name:'مخلل مشكل',price:8,available:true,sold:0},
-    {id:'side-slt-kh',name:'سلطة خضراء',price:8,available:true,sold:0},
-    {id:'side-khyar',name:'خيار متبل',price:8,available:true,sold:0},
-    {id:'side-tmatem',name:'طماطم متبله',price:8,available:true,sold:0}
-  ],
-  "الطواجن":[
-    {id:'t-mkr',name:'طاجن مكرونة سادة',price:27,available:true,sold:0},
-    {id:'t-mkr-lhm',name:'طاجن مكرونة باللحمة',price:45,available:true,sold:0},
-    {id:'t-mkr-dj',name:'طاجن مكرونة بالدجاج',price:47,available:true,sold:0}
-  ],
-  "طواجن ميكس":[
-    {id:'mix-sada',name:'طاجن ميكس سادة',price:47,available:true,sold:0},
-    {id:'mix-lhm',name:'طاجن ميكس باللحمة',price:65,available:true,sold:0},
-    {id:'mix-dj',name:'طاجن ميكس بالدجاج',price:65,available:true,sold:0}
-  ],
-  "طواجن موزاريلا":[
-    {id:'moz-sada',name:'طاجن مكرونة سادة موزاريلا',price:47,available:true,sold:0},
-    {id:'moz-lhm',name:'طاجن مكرونة لحمة موزاريلا',price:65,available:true,sold:0},
-    {id:'moz-dj',name:'طاجن مكرونة بلدجاج موزاريلا',price:65,available:true,sold:0}
-  ],
-  "حلو أبوسمرة":[
-    {id:'hlb-kebir',name:'أرز باللبن كبير',price:18,available:true,sold:0},
-    {id:'hlb-forn',name:'أرز باللبن فرن',price:20,available:true,sold:0},
-    {id:'hlb-koshry',name:'كشري الحلو',price:22,available:true,sold:0},
-    {id:'hlb-qar3',name:'أرز باللبن بالقرع',price:25,available:true,sold:0}
-  ],
-  "مشروبات":[
-    {id:'water-s',name:'مياه صغيرة',price:6,available:true,sold:0},
-    {id:'water-l',name:'مياه كبيرة',price:10,available:true,sold:0},
-    {id:'pepsi',name:'ببيج كولا',price:18,available:true,sold:0},
-    {id:'slsh-tot',name:'عصير سلاش توت',price:10,available:true,sold:0},
-    {id:'slsh-lmna',name:'عصير سلاش (ليمون – نعناع)',price:18,available:true,sold:0}
-  ]
-};
+    // --- Utilities and storage helpers ---
+    const LS_KEYS = {
+      MENU: 'tk_menu_v1',
+      ORDERS: 'tk_orders_v1',
+      OFFERS: 'tk_offers_v1',
+      OP_PWD: 'tk_op_pwd_v1',
+      CUST: 'tk_cust_v1',
+      ORDER_COUNTER: 'tk_order_counter_v1',
+      EPOT_PWD: 'tk_epot_pwd_v1'
+    };
+    function saveLS(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+    function loadLS(key, fallback) { try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : fallback; } catch (e) { return fallback; } }
+    function generateId(prefix = 'ID') { return prefix + '-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 900).toString(36); }
 
-// --- State ---
-let menu = loadLS(LS_KEYS.MENU, DEFAULT_MENU);
-let orders = loadLS(LS_KEYS.ORDERS, []);
-let offers = loadLS(LS_KEYS.OFFERS, []);
-let operatorPassword = localStorage.getItem(LS_KEYS.OP_PWD) || 'admin123';
-let currentCustomer = loadLS(LS_KEYS.CUST, null);
-let orderCounter = Number(localStorage.getItem(LS_KEYS.ORDER_COUNTER) || Date.now()%100000);
-let epotPassword = localStorage.getItem(LS_KEYS.EPOT_PWD) || 'epot123';
-let epotAuthenticated = false;
+    // --- Default data ---
+    const DEFAULT_MENU = {
+      "الكشري": [
+        { id: 'k-mini', name: 'علبة ميني', price: 17, available: true, sold: 0 },
+        { id: 'k-large', name: 'علبة لارج', price: 20, available: true, sold: 0 },
+        { id: 'k-shaqia', name: 'علبة شقية', price: 25, available: true, sold: 0 },
+        { id: 'k-mftria', name: 'علبه مفترية', price: 30, available: true, sold: 0 },
+        { id: 'k-abo', name: 'علبة أبو سمرة', price: 35, available: true, sold: 0 },
+        { id: 'k-triple', name: 'علبة تريبل', price: 40, available: true, sold: 0 }
+      ],
+      "إضافات الكشري": [
+        { id: 'add-tqliya', name: 'تقليه', price: 9, available: true, sold: 0 },
+        { id: 'add-salsa', name: 'صلصة', price: 6, available: true, sold: 0 },
+        { id: 'add-dokka', name: 'دقة', price: 4, available: true, sold: 0 },
+        { id: 'add-shata', name: 'شطة', price: 4, available: true, sold: 0 },
+        { id: 'add-ads', name: 'عدس', price: 6, available: true, sold: 0 }
+      ],
+      "الإضافات الجانبية": [
+        { id: 'side-qaramisho', name: 'قراميشو (توست)', price: 9, available: true, sold: 0 },
+        { id: 'side-mkhlal', name: 'مخلل مشكل', price: 8, available: true, sold: 0 },
+        { id: 'side-slt-kh', name: 'سلطة خضراء', price: 8, available: true, sold: 0 },
+        { id: 'side-khyar', name: 'خيار متبل', price: 8, available: true, sold: 0 },
+        { id: 'side-tmatem', name: 'طماطم متبله', price: 8, available: true, sold: 0 }
+      ],
+      "الطواجن": [
+        { id: 't-mkr', name: 'طاجن مكرونة سادة', price: 27, available: true, sold: 0 },
+        { id: 't-mkr-lhm', name: 'طاجن مكرونة باللحمة', price: 45, available: true, sold: 0 },
+        { id: 't-mkr-dj', name: 'طاجن مكرونة بالدجاج', price: 47, available: true, sold: 0 }
+      ],
+      "طواجن ميكس": [
+        { id: 'mix-sada', name: 'طاجن ميكس سادة', price: 47, available: true, sold: 0 },
+        { id: 'mix-lhm', name: 'طاجن ميكس باللحمة', price: 65, available: true, sold: 0 },
+        { id: 'mix-dj', name: 'طاجن ميكس بالدجاج', price: 65, available: true, sold: 0 }
+      ],
+      "طواجن موزاريلا": [
+        { id: 'moz-sada', name: 'طاجن مكرونة سادة موزاريلا', price: 47, available: true, sold: 0 },
+        { id: 'moz-lhm', name: 'طاجن مكرونة لحمة موزاريلا', price: 65, available: true, sold: 0 },
+        { id: 'moz-dj', name: 'طاجن مكرونة بلدجاج موزاريلا', price: 65, available: true, sold: 0 }
+      ],
+      "حلو أبوسمرة": [
+        { id: 'hlb-kebir', name: 'أرز باللبن كبير', price: 18, available: true, sold: 0 },
+        { id: 'hlb-forn', name: 'أرز باللبن فرن', price: 20, available: true, sold: 0 },
+        { id: 'hlb-koshry', name: 'كشري الحلو', price: 22, available: true, sold: 0 },
+        { id: 'hlb-qar3', name: 'أرز باللبن بالقرع', price: 25, available: true, sold: 0 }
+      ],
+      "مشروبات": [
+        { id: 'water-s', name: 'مياه صغيرة', price: 6, available: true, sold: 0 },
+        { id: 'water-l', name: 'مياه كبيرة', price: 10, available: true, sold: 0 },
+        { id: 'pepsi', name: 'ببيج كولا', price: 18, available: true, sold: 0 },
+        { id: 'slsh-tot', name: 'عصير سلاش توت', price: 10, available: true, sold: 0 },
+        { id: 'slsh-lmna', name: 'عصير سلاش (ليمون – نعناع)', price: 18, available: true, sold: 0 }
+      ]
+    };
 
-// --- DOM refs ---
-const menuContainer = document.getElementById('menuContainer');
-const cartItemsEl = document.getElementById('cartItems');
-const cartTotalEl = document.getElementById('cartTotal');
-const cartCustomerInfo = document.getElementById('cartCustomerInfo');
-const checkoutBtn = document.getElementById('checkoutBtn');
-const checkoutSection = document.getElementById('checkoutSection');
-const confirmOrderBtn = document.getElementById('confirmOrderBtn');
-const cancelCheckoutBtn = document.getElementById('cancelCheckoutBtn');
-const orderName = document.getElementById('orderName');
-const orderPhone = document.getElementById('orderPhone');
-const orderAddress = document.getElementById('orderAddress');
-const orderPayment = document.getElementById('orderPayment');
-const orderNotes = document.getElementById('orderNotes');
-const applyOfferSelect = document.getElementById('applyOffer');
-const cartPanel = document.getElementById('cartPanel');
-const bottomCart = document.getElementById('bottomCart');
-const cartToggle = document.getElementById('cartToggle');
+    // --- State ---
+    let menu = loadLS(LS_KEYS.MENU, DEFAULT_MENU);
+    let orders = loadLS(LS_KEYS.ORDERS, []);
+    let offers = loadLS(LS_KEYS.OFFERS, []);
+    let operatorPassword = localStorage.getItem(LS_KEYS.OP_PWD) || 'admin123';
+    let currentCustomer = loadLS(LS_KEYS.CUST, null);
+    let orderCounter = Number(localStorage.getItem(LS_KEYS.ORDER_COUNTER) || Date.now() % 100000);
+    let epotPassword = localStorage.getItem(LS_KEYS.EPOT_PWD) || 'epot123';
+    let epotAuthenticated = false;
 
-const mainCustomer = document.getElementById('mainCustomer');
-const mainOperator = document.getElementById('mainOperator');
-const operatorLoginPanel = document.getElementById('operatorLoginPanel');
-const operatorDashboard = document.getElementById('operatorDashboard');
-const operatorHint = document.getElementById('operatorHint');
+    // --- DOM refs ---
+    const menuContainer = document.getElementById('menuContainer');
+    const cartItemsEl = document.getElementById('cartItems');
+    const cartTotalEl = document.getElementById('cartTotal');
+    const cartCustomerInfo = document.getElementById('cartCustomerInfo');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const checkoutSection = document.getElementById('checkoutSection');
+    const confirmOrderBtn = document.getElementById('confirmOrderBtn');
+    const cancelCheckoutBtn = document.getElementById('cancelCheckoutBtn');
+    const orderName = document.getElementById('orderName');
+    const orderPhone = document.getElementById('orderPhone');
+    const orderAddress = document.getElementById('orderAddress');
+    const orderPayment = document.getElementById('orderPayment');
+    const orderNotes = document.getElementById('orderNotes');
+    const applyOfferSelect = document.getElementById('applyOffer');
+    const cartPanel = document.getElementById('cartPanel');
+    const bottomCart = document.getElementById('bottomCart');
+    const cartToggle = document.getElementById('cartToggle');
 
-const operatorQuickBtn = document.getElementById('operatorQuickBtn');
-const pwdModal = document.getElementById('pwdModal');
-const quickPwdInput = document.getElementById('quickPwdInput');
-const submitPwdBtn = document.getElementById('submitPwdBtn');
-const cancelPwdBtn = document.getElementById('cancelPwdBtn');
+    const mainCustomer = document.getElementById('mainCustomer');
+    const mainOperator = document.getElementById('mainOperator');
+    const operatorLoginPanel = document.getElementById('operatorLoginPanel');
+    const operatorDashboard = document.getElementById('operatorDashboard');
+    const operatorHint = document.getElementById('operatorHint');
 
-const operatorLoginBtn = document.getElementById('operatorLoginBtn');
-const operatorPasswordInput = document.getElementById('operatorPasswordInput');
-const operatorLogoutBtn = document.getElementById('operatorLogoutBtn');
-const exportDataBtn = document.getElementById('exportDataBtn');
-const showPwdBtn = document.getElementById('showPwdBtn');
+    const operatorQuickBtn = document.getElementById('operatorQuickBtn');
+    const pwdModal = document.getElementById('pwdModal');
+    const quickPwdInput = document.getElementById('quickPwdInput');
+    const submitPwdBtn = document.getElementById('submitPwdBtn');
+    const cancelPwdBtn = document.getElementById('cancelPwdBtn');
 
-const opTabs = document.getElementById('opTabs');
-const ordersGrid = document.getElementById('ordersGrid');
-const rToday = document.getElementById('rToday');
-const rRevenue = document.getElementById('rRevenue');
-const rTotal = document.getElementById('rTotal');
-const rTop = document.getElementById('rTop');
-const activeOffersList = document.getElementById('activeOffersList');
-const createOfferBtn = document.getElementById('createOfferBtn');
-const offerName = document.getElementById('offerName');
-const offerDiscount = document.getElementById('offerDiscount');
-const popularList = document.getElementById('popularList');
+    const operatorLoginBtn = document.getElementById('operatorLoginBtn');
+    const operatorPasswordInput = document.getElementById('operatorPasswordInput');
+    const operatorLogoutBtn = document.getElementById('operatorLogoutBtn');
+    const exportDataBtn = document.getElementById('exportDataBtn');
+    const showPwdBtn = document.getElementById('showPwdBtn');
 
-const epotModal = document.getElementById('epotModal');
-const epotPwdInput = document.getElementById('epotPwdInput');
-const cancelEpotBtn = document.getElementById('cancelEpotBtn');
-const unlockEpotBtn = document.getElementById('unlockEpotBtn');
-const openEpotBtn = document.getElementById('openEpotBtn');
-const lockEpotBtn = document.getElementById('lockEpotBtn');
-const epotContent = document.getElementById('epotContent');
-const epotLockedNotice = document.getElementById('epotLockedNotice');
-const epotTotal = document.getElementById('epotTotal');
-const epotOrdersList = document.getElementById('epotOrdersList');
-const newEpotPwd = document.getElementById('newEpotPwd');
-const setEpotPwdBtn = document.getElementById('setEpotPwdBtn');
-const offerNotice = document.getElementById('offerNotice');
+    const opTabs = document.getElementById('opTabs');
+    const ordersGrid = document.getElementById('ordersGrid');
+    const rToday = document.getElementById('rToday');
+    const rRevenue = document.getElementById('rRevenue');
+    const rTotal = document.getElementById('rTotal');
+    const rTop = document.getElementById('rTop');
+    const activeOffersList = document.getElementById('activeOffersList');
+    const createOfferBtn = document.getElementById('createOfferBtn');
+    const offerName = document.getElementById('offerName');
+    const offerDiscount = document.getElementById('offerDiscount');
+    const popularList = document.getElementById('popularList');
 
-// manage items refs
-const newItemName = document.getElementById('newItemName');
-const newItemPrice = document.getElementById('newItemPrice');
-const newItemCategory = document.getElementById('newItemCategory');
-const addItemBtn = document.getElementById('addItemBtn');
-const manageItemsList = document.getElementById('manageItemsList');
+    const epotModal = document.getElementById('epotModal');
+    const epotPwdInput = document.getElementById('epotPwdInput');
+    const cancelEpotBtn = document.getElementById('cancelEpotBtn');
+    const unlockEpotBtn = document.getElementById('unlockEpotBtn');
+    const openEpotBtn = document.getElementById('openEpotBtn');
+    const lockEpotBtn = document.getElementById('lockEpotBtn');
+    const epotContent = document.getElementById('epotContent');
+    const epotLockedNotice = document.getElementById('epotLockedNotice');
+    const epotTotal = document.getElementById('epotTotal');
+    const epotOrdersList = document.getElementById('epotOrdersList');
+    const newEpotPwd = document.getElementById('newEpotPwd');
+    const setEpotPwdBtn = document.getElementById('setEpotPwdBtn');
+    const offerNotice = document.getElementById('offerNotice');
 
-// quantity modal refs
-const qtyModal = document.getElementById('qtyModal');
-const customQty = document.getElementById('customQty');
-const addCustomQtyBtn = document.getElementById('addCustomQtyBtn');
-const cancelQtyBtn = document.getElementById('cancelQtyBtn');
+    // manage items refs
+    const newItemName = document.getElementById('newItemName');
+    const newItemPrice = document.getElementById('newItemPrice');
+    const newItemCategory = document.getElementById('newItemCategory');
+    const addItemBtn = document.getElementById('addItemBtn');
+    const manageItemsList = document.getElementById('manageItemsList');
 
-// cart runtime
-let cart = [];
-let isOperatorAuthenticated = false;
-let currentItemForQty = null;
-let openOrderId = null;
+    // quantity modal refs
+    const qtyModal = document.getElementById('qtyModal');
+    const customQty = document.getElementById('customQty');
+    const addCustomQtyBtn = document.getElementById('addCustomQtyBtn');
+    const cancelQtyBtn = document.getElementById('cancelQtyBtn');
 
-// --- Sync runtime ---
-let bc = null;
-let ws = null;
+    // cart runtime
+    let cart = [];
+    let isOperatorAuthenticated = false;
+    let currentItemForQty = null;
+    let openOrderId = null;
 
-// --- Init ---
-window.onload = function() {
-  init();
-};
+    // --- Sync runtime ---
+    let bc = null;
+    let ws = null;
 
-function init() {
-  // Safety checks for event listeners
-  if (checkoutBtn) checkoutBtn.addEventListener('click', openCheckout);
-  if (cancelCheckoutBtn) cancelCheckoutBtn.addEventListener('click', () => checkoutSection.style.display='none');
-  if (confirmOrderBtn) confirmOrderBtn.addEventListener('click', confirmOrder);
+    // --- Init ---
+    window.onload = function () {
+      init();
+    };
 
-  if (createOfferBtn) createOfferBtn.addEventListener('click', createOffer);
+    function init() {
+      // Safety checks for event listeners
+      if (checkoutBtn) checkoutBtn.addEventListener('click', openCheckout);
+      if (cancelCheckoutBtn)
+        cancelCheckoutBtn.addEventListener('click', () => (checkoutSection.style.display = 'none'));
+      if (confirmOrderBtn) confirmOrderBtn.addEventListener('click', confirmOrder);
 
-  if (exportDataBtn) exportDataBtn.addEventListener('click', exportAllData);
+      if (createOfferBtn) createOfferBtn.addEventListener('click', createOffer);
 
-  if (operatorQuickBtn) operatorQuickBtn.addEventListener('click', onOperatorQuickClick);
-  if (submitPwdBtn) submitPwdBtn.addEventListener('click', onSubmitQuickPwd);
-  if (cancelPwdBtn) cancelPwdBtn.addEventListener('click', () => { pwdModal.style.display='none'; quickPwdInput.value=''; });
+      if (exportDataBtn) exportDataBtn.addEventListener('click', exportAllData);
 
-  if (operatorLoginBtn) operatorLoginBtn.addEventListener('click', operatorLogin);
-  if (operatorLogoutBtn) operatorLogoutBtn.addEventListener('click', operatorLogout);
-  if (showPwdBtn) showPwdBtn.addEventListener('click', () => alert('كلمة مرور المشغل الحالية: ' + operatorPassword));
+      if (operatorQuickBtn) operatorQuickBtn.addEventListener('click', onOperatorQuickClick);
+      if (submitPwdBtn) submitPwdBtn.addEventListener('click', onSubmitQuickPwd);
+      if (cancelPwdBtn)
+        cancelPwdBtn.addEventListener('click', () => {
+          pwdModal.style.display = 'none';
+          quickPwdInput.value = '';
+        });
 
-  if (openEpotBtn) openEpotBtn.addEventListener('click', () => { epotModal.style.display='flex'; epotPwdInput.value=''; epotPwdInput.focus(); });
-  if (cancelEpotBtn) cancelEpotBtn.addEventListener('click', () => { epotModal.style.display='none'; });
-  if (unlockEpotBtn) unlockEpotBtn.addEventListener('click', unlockEpot);
-  if (lockEpotBtn) lockEpotBtn.addEventListener('click', lockEpot);
-  if (setEpotPwdBtn) setEpotPwdBtn.addEventListener('click', setNewEpotPwd);
+      if (operatorLoginBtn) operatorLoginBtn.addEventListener('click', operatorLogin);
+      if (operatorLogoutBtn) operatorLogoutBtn.addEventListener('click', operatorLogout);
+      if (showPwdBtn)
+        showPwdBtn.addEventListener('click', () => alert('كلمة مرور المشغل الحالية: ' + operatorPassword));
 
-  if (opTabs) opTabs.addEventListener('click', (e) => {
-    if(e.target && e.target.dataset.tab){
-      document.querySelectorAll('#opTabs .tab').forEach(t => t.classList.remove('active'));
-      e.target.classList.add('active');
-      document.querySelectorAll('.tabContent').forEach(tc => tc.style.display='none');
-      document.getElementById(e.target.dataset.tab).style.display='block';
-      if(e.target.dataset.tab === 'epotTab') {
-        if(epotAuthenticated) showEpotContent();
+      if (openEpotBtn)
+        openEpotBtn.addEventListener('click', () => {
+          epotModal.style.display = 'flex';
+          epotPwdInput.value = '';
+          epotPwdInput.focus();
+        });
+      if (cancelEpotBtn) cancelEpotBtn.addEventListener('click', () => (epotModal.style.display = 'none'));
+      if (unlockEpotBtn) unlockEpotBtn.addEventListener('click', unlockEpot);
+      if (lockEpotBtn) lockEpotBtn.addEventListener('click', lockEpot);
+      if (setEpotPwdBtn) setEpotPwdBtn.addEventListener('click', setNewEpotPwd);
+
+      if (opTabs)
+        opTabs.addEventListener('click', (e) => {
+          if (e.target && e.target.dataset.tab) {
+            document.querySelectorAll('#opTabs .tab').forEach((t) => t.classList.remove('active'));
+            e.target.classList.add('active');
+            document.querySelectorAll('.tabContent').forEach((tc) => (tc.style.display = 'none'));
+            document.getElementById(e.target.dataset.tab).style.display = 'block';
+            if (e.target.dataset.tab === 'epotTab') {
+              if (epotAuthenticated) showEpotContent();
+            }
+            if (e.target.dataset.tab === 'ordersTab') {
+              renderOrders();
+            }
+          }
+        });
+
+      if (addCustomQtyBtn) addCustomQtyBtn.addEventListener('click', addCustomQty);
+      if (cancelQtyBtn)
+        cancelQtyBtn.addEventListener('click', () => {
+          qtyModal.style.display = 'none';
+          currentItemForQty = null;
+        });
+
+      if (cartToggle)
+        cartToggle.addEventListener('click', () => {
+          cartPanel.classList.toggle('open');
+        });
+
+      if (document.getElementById('clearCartBtn'))
+        document.getElementById('clearCartBtn').addEventListener('click', () => {
+          cart = [];
+          updateCartDisplay();
+          notify('تم تفريغ السلة', 'info');
+        });
+
+      if (addItemBtn) addItemBtn.addEventListener('click', addNewItem);
+
+      window.addEventListener('scroll', handleScrollForCart);
+
+      syncMenuFromFirebase();
+      syncOffersFromFirebase();
+      syncOrdersFromFirebase();
+
+      renderMenu();
+      renderApplyOffers();
+      renderOffers();
+      populateCategories();
+      saveState();
+      renderOrders();
+      updateReports();
+      initSync();
+      updateEditControls();
+    }
+
+    // --- Sync ---
+    function initSync() {
+      try {
+        bc = new BroadcastChannel('talabat_sync');
+        bc.addEventListener('message', (ev) => handleSyncMessage(ev.data, false));
+      } catch (e) {
+        bc = null;
       }
-      if(e.target.dataset.tab === 'ordersTab') {
-        renderOrders();
+
+      if (SYNC_CONFIG.useWebSocket && SYNC_CONFIG.wsUrl) {
+        try {
+          ws = new WebSocket(SYNC_CONFIG.wsUrl);
+          ws.addEventListener('open', () => {
+            console.log('WS connected');
+            ws.send(JSON.stringify({ type: 'hello', payload: { host: location.hostname } }));
+          });
+          ws.addEventListener('message', (ev) => {
+            try {
+              const data = JSON.parse(ev.data);
+              handleSyncMessage(data, true);
+            } catch (e) {
+              console.warn('Bad WS message', e);
+            }
+          });
+          ws.addEventListener('close', () => {
+            console.log('WS closed, reconnect in 3s');
+            setTimeout(initSync, 3000);
+          });
+          ws.addEventListener('error', (err) => {
+            console.warn('WS error', err);
+          });
+        } catch (e) {
+          console.warn('WS init failed', e);
+          ws = null;
+        }
       }
     }
-  });
 
-  if (addCustomQtyBtn) addCustomQtyBtn.addEventListener('click', addCustomQty);
-  if (cancelQtyBtn) cancelQtyBtn.addEventListener('click', () => { qtyModal.style.display='none'; currentItemForQty = null; });
+    function broadcast(msg) {
+      msg._from = location.hostname + ':' + Date.now();
+      if (bc)
+        try {
+          bc.postMessage(msg);
+        } catch (e) {}
+      if (ws && ws.readyState === WebSocket.OPEN)
+        try {
+          ws.send(JSON.stringify(msg));
+        } catch (e) {}
+    }
 
-  if (cartToggle) cartToggle.addEventListener('click', () => {
-    cartPanel.classList.toggle('open');
-  });
+    function handleSyncMessage(msg, fromServer) {
+      if (!msg || !msg.type) return;
+      try {
+        if (msg.type === 'order_created') {
+          const ord = msg.payload;
+          if (!ord || !ord.id) return;
+          if (!orders.find((o) => o.id === ord.id)) {
+            orders.unshift(ord);
+            saveState();
+            renderOrders();
+            updateReports();
+            notify('طلب جديد وصل من النظام: ' + ord.id, 'info');
+            openOrderId = ord.id;
+            toggleOrderDetails(ord.id);
+          }
+        } else if (msg.type === 'menu_update') {
+          if (msg.payload) {
+            menu = msg.payload;
+            saveState();
+            renderMenu();
+            notify('تم تحديث القائمة من المستخدم الآخر', 'info');
+          }
+        } else if (msg.type === 'offer_update') {
+          if (msg.payload) {
+            offers = msg.payload;
+            saveState();
+            renderOffers();
+            renderApplyOffers();
+            notify('تم تحديث العروض من المستخدم الآخر', 'info');
+          }
+        } else if (msg.type === 'order_status_update') {
+          const p = msg.payload;
+          if (p && p.id) {
+            const ord = orders.find((o) => o.id === p.id);
+            if (ord) {
+              ord.status = p.status;
+              saveState();
+              renderOrders();
+              updateReports();
+              notify('تغير حالة طلب عبر الشبكة: ' + p.id, 'info');
+            }
+          }
+        }
+      } catch (e) {
+        console.error('handleSyncMessage error', e);
+      }
+    }
 
-  if (document.getElementById('clearCartBtn')) document.getElementById('clearCartBtn').addEventListener('click', ()=>{ cart=[]; updateCartDisplay(); notify('تم تفريغ السلة','info'); });
+    // --- Firebase Sync Functions ---
+    function syncMenuFromFirebase() {
+      database.ref('menu').on('value', (snapshot) => {
+        const data = snapshot.val();
+        menu = data || DEFAULT_MENU;
+        saveLS(LS_KEYS.MENU, menu);
+        renderMenu();
+        renderManageItems();
+        populateCategories();
+        notify('تم تحديث القائمة من السحابة', 'info');
+      }, (error) => {
+        console.error("Firebase error: ", error);
+        menu = DEFAULT_MENU;
+        renderMenu();
+        notify('خطأ في الاتصال بقاعدة البيانات، استخدام البيانات المحلية', 'warning');
+      });
+    }
 
-  if (addItemBtn) addItemBtn.addEventListener('click', addNewItem);
+    function syncOffersFromFirebase() {
+      database.ref('offers').on('value', (snapshot) => {
+        const data = snapshot.val();
+        offers = data ? Object.values(data) : [];
+        saveLS(LS_KEYS.OFFERS, offers);
+        renderOffers();
+        renderApplyOffers();
+        notify('تم تحديث العروض من السحابة', 'info');
+      }, (error) => {
+        console.error("Firebase error: ", error);
+        offers = [];
+        renderOffers();
+        renderApplyOffers();
+        notify('خطأ في الاتصال بقاعدة البيانات، استخدام البيانات المحلية', 'warning');
+      });
+    }
 
-  window.addEventListener('scroll', handleScrollForCart);
-
-  renderMenu();
-  renderApplyOffers();
-  renderOffers();
-  populateCategories();
-  saveState();
-  renderOrders();
-  updateReports();
-  initSync();
-  updateEditControls();
-}
-
-// --- Sync ---
-function initSync(){
-  try {
-    bc = new BroadcastChannel('talabat_sync');
-    bc.addEventListener('message', ev => handleSyncMessage(ev.data, false));
-  } catch(e){ bc = null; }
-
-  if(SYNC_CONFIG.useWebSocket && SYNC_CONFIG.wsUrl){
-    try {
-      ws = new WebSocket(SYNC_CONFIG.wsUrl);
-      ws.addEventListener('open', () => { console.log('WS connected'); ws.send(JSON.stringify({type:'hello', payload: {host: location.hostname}})); });
-      ws.addEventListener('message', ev => { try { const data = JSON.parse(ev.data); handleSyncMessage(data, true); } catch(e){ console.warn('Bad WS message', e); } });
-      ws.addEventListener('close', () => { console.log('WS closed, reconnect in 3s'); setTimeout(initSync,3000); });
-      ws.addEventListener('error', (err) => { console.warn('WS error', err); });
-    } catch(e){ console.warn('WS init failed', e); ws = null; }
-  }
-}
-
-function broadcast(msg){
-  msg._from = location.hostname + ':' + Date.now();
-  if(bc) try{ bc.postMessage(msg); }catch(e){}
-  if(ws && ws.readyState === WebSocket.OPEN) try{ ws.send(JSON.stringify(msg)); }catch(e){}
-}
-
-function handleSyncMessage(msg, fromServer){
-  if(!msg || !msg.type) return;
-  try {
-    if(msg.type === 'order_created'){
-      const ord = msg.payload;
-      if(!ord || !ord.id) return;
-      if(!orders.find(o=>o.id===ord.id)){
-        orders.unshift(ord);
-        saveState();
+    function syncOrdersFromFirebase() {
+      database.ref('orders').on('value', (snapshot) => {
+        const data = snapshot.val();
+        orders = data ? Object.values(data) : [];
+        saveLS(LS_KEYS.ORDERS, orders);
         renderOrders();
         updateReports();
-        notify('طلب جديد وصل من النظام: ' + ord.id, 'info');
-        openOrderId = ord.id;
-        toggleOrderDetails(ord.id);
+        renderEpot();
+        notify('تم تحديث الطلبات من السحابة', 'info');
+      }, (error) => {
+        console.error("Firebase error: ", error);
+        orders = [];
+        renderOrders();
+        updateReports();
+        renderEpot();
+        notify('خطأ في الاتصال بقاعدة البيانات، استخدام البيانات المحلية', 'warning');
+      });
+    }
+
+    // --- Menu rendering ---
+    function renderMenu() {
+      if (!menuContainer) return;
+      menuContainer.innerHTML = '';
+      Object.keys(menu).forEach((cat) => {
+        const sec = document.createElement('div');
+        sec.className = 'menu-section';
+        sec.innerHTML = `<div class="section-title">${cat}</div><div class="menu-grid" id="grid-${cat}"></div>`;
+        menuContainer.appendChild(sec);
+        const grid = sec.querySelector('.menu-grid');
+        menu[cat].forEach((item) => {
+          const card = document.createElement('div');
+          card.className = 'menu-item';
+          card.dataset.id = item.id;
+          card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h4>${item.name}</h4>
+              <div class="small">${item.available ? '' : '<span class="small" style="color:#f97316">غير متوفر</span>'}</div>
+            </div>
+            <div class="price">${item.price} ج</div>
+            <div>
+              <button class="add-cart" ${!item.available ? 'disabled' : ''}>إضافة للسلة</button>
+            </div>
+          `;
+          card.addEventListener('click', () => {
+            if (item.available) addToCart(item.id, 1);
+          });
+          let timeout;
+          card.addEventListener('mousedown', () => {
+            timeout = setTimeout(() => {
+              currentItemForQty = item.id;
+              customQty.value = 1;
+              qtyModal.style.display = 'flex';
+              customQty.focus();
+            }, 500);
+          });
+          card.addEventListener('mouseup', () => clearTimeout(timeout));
+          card.addEventListener('mouseleave', () => clearTimeout(timeout));
+          grid.appendChild(card);
+        });
+      });
+    }
+
+    // --- Custom qty add ---
+    function addCustomQty() {
+      const qty = Number(customQty.value);
+      if (isNaN(qty) || qty <= 0 || !currentItemForQty) return;
+      addToCart(currentItemForQty, qty);
+      qtyModal.style.display = 'none';
+      currentItemForQty = null;
+    }
+
+    // --- Cart ---
+    function addToCart(itemId, qty) {
+      const it = findItemById(itemId);
+      if (!it || !it.available) {
+        notify('الصنف غير متاح', 'error');
+        return;
       }
-    } else if(msg.type === 'menu_update'){
-      if(msg.payload){ menu = msg.payload; saveState(); renderMenu(); notify('تم تحديث القائمة من المستخدم الآخر','info'); }
-    } else if(msg.type === 'offer_update'){
-      if(msg.payload){ offers = msg.payload; saveState(); renderOffers(); renderApplyOffers(); notify('تم تحديث العروض من المستخدم الآخر','info'); }
-    } else if(msg.type === 'order_status_update'){
-      const p = msg.payload;
-      if(p && p.id){
-        const ord = orders.find(o=>o.id===p.id);
-        if(ord){ ord.status = p.status; saveState(); renderOrders(); updateReports(); notify('تغير حالة طلب عبر الشبكة: '+p.id,'info'); }
+      const existing = cart.find((c) => c.id === it.id);
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({ id: it.id, name: it.name, price: it.price, qty });
+      }
+      updateCartDisplay();
+      notify(`${it.name} تمت إضافته للسلة`, 'success');
+      cartPanel.classList.add('open');
+    }
+
+    function updateCartDisplay() {
+      if (!cartItemsEl) return;
+      cartItemsEl.innerHTML = '';
+      bottomCart.innerHTML = cartItemsEl.innerHTML;
+      if (cart.length === 0) {
+        cartItemsEl.innerHTML = '<div class="small" style="text-align: center; padding: 8px; color: var(--muted)">السلة فارغة</div>';
+        cartTotalEl.textContent = '0 ج';
+        return;
+      }
+      let total = 0;
+      cart.forEach((c, idx) => {
+        const line = document.createElement('div');
+        line.className = 'cart-item';
+        const itemTotal = c.qty * c.price;
+        total += itemTotal;
+        line.innerHTML = `<div><strong>${c.name}</strong><div class="small">${c.qty} × ${c.price} ج</div></div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px">
+            <div style="font-weight: bold">${itemTotal} ج</div>
+            <div style="display: flex; gap: 6px">
+              <button class="small" style="background: transparent; border: 0; color: var(--muted); cursor: pointer" onclick="cartDecrease(${idx})">-</button>
+              <button class="small" style="background: transparent; border: 0; color: var(--muted); cursor: pointer" onclick="cartIncrease(${idx})">+</button>
+              <button class="small" style="background: #dc2626; color: #fff; border-radius: 6px; padding: 4px 8px; border: 0; cursor: pointer" onclick="cartRemove(${idx})">حذف</button>
+            </div>
+          </div>`;
+        cartItemsEl.appendChild(line);
+      });
+      const offerId = applyOfferSelect.value;
+      let final = total;
+      if (offerId) {
+        const of = offers.find((o) => o.id === offerId);
+        if (of) {
+          final = Math.round(total * (1 - of.discount / 100));
+        }
+      }
+      cartTotalEl.textContent = `${final} ج`;
+    }
+
+    function cartRemove(idx) {
+      cart.splice(idx, 1);
+      updateCartDisplay();
+      saveState();
+    }
+    function cartIncrease(idx) {
+      cart[idx].qty++;
+      updateCartDisplay();
+    }
+    function cartDecrease(idx) {
+      if (cart[idx].qty > 1) {
+        cart[idx].qty--;
+      } else cart.splice(idx, 1);
+      updateCartDisplay();
+      saveState();
+    }
+
+    // --- Scroll handler for bottom cart ---
+    function handleScrollForCart() {
+      const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50;
+      if (bottom && cart.length > 0) {
+        bottomCart.style.display = 'block';
+        bottomCart.innerHTML = cartPanel.innerHTML;
+      } else {
+        bottomCart.style.display = 'none';
       }
     }
-  } catch(e){
-    console.error('handleSyncMessage error', e);
-  }
-}
 
-// --- Menu rendering ---
-function renderMenu(){
-  if (!menuContainer) return;
-  menuContainer.innerHTML = '';
-  Object.keys(menu).forEach(cat => {
-    const sec = document.createElement('div');
-    sec.className = 'menu-section';
-    sec.innerHTML = `<div class="section-title">${cat}</div><div class="menu-grid" id="grid-${cat}"></div>`;
-    menuContainer.appendChild(sec);
-    const grid = sec.querySelector('.menu-grid');
-    menu[cat].forEach(item => {
-      const card = document.createElement('div');
-      card.className = 'menu-item';
-      card.dataset.id = item.id;
-      card.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <h4>${item.name}</h4>
-          <div class="small">${item.available ? '' : '<span class="small" style="color:#f97316">غير متوفر</span>'}</div>
-        </div>
-        <div class="price">${item.price} ج</div>
-        <div>
-          <button class="add-cart" ${!item.available ? 'disabled' : ''}>إضافة للسلة</button>
-        </div>
-      `;
-      card.addEventListener('click', () => {
-        if(item.available) addToCart(item.id, 1);
+    // --- Checkout flow ---
+    function openCheckout() {
+      if (cart.length === 0) {
+        notify('السلة فارغة', 'warning');
+        return;
+      }
+      if (currentCustomer) {
+        orderName.value = currentCustomer.name || '';
+        orderPhone.value = currentCustomer.phone || '';
+      }
+      checkoutSection.style.display = 'block';
+      checkoutSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function confirmOrder() {
+      const name = orderName.value.trim();
+      const phone = orderPhone.value.trim();
+      const address = orderAddress.value.trim();
+      const payment = orderPayment.value;
+      const notes = orderNotes.value.trim();
+      const offerId = applyOfferSelect.value;
+      if (!name || !phone || !address) {
+        notify('أكمل بيانات الطلب', 'warning');
+        return;
+      }
+      currentCustomer = { name, phone };
+      saveState();
+      cartCustomerInfo.textContent = `${name} — ${phone}`;
+      const orderId = 'ORD-' + ++orderCounter;
+      localStorage.setItem(LS_KEYS.ORDER_COUNTER, String(orderCounter));
+      const totalBefore = cart.reduce((s, c) => s + c.price * c.qty, 0);
+      let total = totalBefore;
+      let appliedOffer = null;
+      if (offerId) {
+        const o = offers.find((x) => x.id === offerId);
+        if (o) {
+          appliedOffer = { id: o.id, name: o.name, discount: o.discount };
+          total = Math.round(total * (1 - o.discount / 100));
+        }
+      }
+
+      const newOrder = {
+        id: orderId,
+        customer: { name, phone, address },
+        items: cart.map((c) => ({ id: c.id, name: c.name, price: c.price, qty: c.qty })),
+        totalBefore,
+        total,
+        payment,
+        notes,
+        status: 'received',
+        createdAt: new Date().toLocaleString('ar-EG'),
+        date: new Date().toDateString(),
+        appliedOffer
+      };
+
+      newOrder.items.forEach((it) => {
+        const mItem = findItemById(it.id);
+        if (mItem) {
+          mItem.sold = (mItem.sold || 0) + it.qty;
+        }
       });
-      let timeout;
-      card.addEventListener('mousedown', () => {
-        timeout = setTimeout(() => {
-          currentItemForQty = item.id;
-          customQty.value = 1;
-          qtyModal.style.display = 'flex';
-          customQty.focus();
-        }, 500);
-      });
-      card.addEventListener('mouseup', () => clearTimeout(timeout));
-      card.addEventListener('mouseleave', () => clearTimeout(timeout));
-      grid.appendChild(card);
-    });
-  });
-}
 
-// --- Custom qty add ---
-function addCustomQty(){
-  const qty = Number(customQty.value);
-  if(isNaN(qty) || qty <= 0 || !currentItemForQty) return;
-  addToCart(currentItemForQty, qty);
-  qtyModal.style.display = 'none';
-  currentItemForQty = null;
-}
+      database
+        .ref('orders/' + orderId)
+        .set(newOrder)
+        .then(() => {
+          database.ref('menu').set(menu);
+          orders.unshift(newOrder);
+          saveState();
+          cart = [];
+          updateCartDisplay();
+          checkoutSection.style.display = 'none';
+          cartPanel.classList.remove('open');
+          notify(`تم تسجيل الطلب ${orderId}`, 'success');
+          renderOrders();
+          updateReports();
+        })
+        .catch((error) => {
+          notify('خطأ في حفظ الطلب: ' + error.message, 'error');
+        });
 
-// --- Cart ---
-function addToCart(itemId, qty){
-  const it = findItemById(itemId);
-  if(!it || !it.available){ notify('الصنف غير متاح','error'); return; }
-  const existing = cart.find(c => c.id === it.id);
-  if(existing){ existing.qty += qty; } else { cart.push({id:it.id, name:it.name, price:it.price, qty}); }
-  updateCartDisplay();
-  notify(`${it.name} تمت إضافته للسلة`,'success');
-  cartPanel.classList.add('open');
-}
+      broadcast({ type: 'order_created', payload: newOrder });
+    }
 
-function updateCartDisplay(){
-  if (!cartItemsEl) return;
-  cartItemsEl.innerHTML = '';
-  bottomCart.innerHTML = cartItemsEl.innerHTML;
-  if(cart.length===0){ 
-    cartItemsEl.innerHTML = '<div class="small" style="text-align:center;padding:8px;color:var(--muted)">السلة فارغة</div>'; 
-    cartTotalEl.textContent='0 ج'; 
-    return; 
-  }
-  let total = 0;
-  cart.forEach((c, idx) => {
-    const line = document.createElement('div');
-    line.className = 'cart-item';
-    const itemTotal = c.qty * c.price;
-    total += itemTotal;
-    line.innerHTML = `<div><strong>${c.name}</strong><div class="small">${c.qty} × ${c.price} ج</div></div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-        <div style="font-weight:bold">${itemTotal} ج</div>
-        <div style="display:flex;gap:6px">
-          <button class="small" style="background:transparent;border:0;color:var(--muted);cursor:pointer" onclick="cartDecrease(${idx})">-</button>
-          <button class="small" style="background:transparent;border:0;color:var(--muted);cursor:pointer" onclick="cartIncrease(${idx})">+</button>
-          <button class="small" style="background:#dc2626;color:#fff;border-radius:6px;padding:4px 8px;border:0;cursor:pointer" onclick="cartRemove(${idx})">حذف</button>
-        </div>
-      </div>`;
-    cartItemsEl.appendChild(line);
-  });
-  const offerId = applyOfferSelect.value;
-  let final = total;
-  if(offerId){
-    const of = offers.find(o=>o.id===offerId);
-    if(of){ final = Math.round(total * (1 - of.discount/100)); }
-  }
-  cartTotalEl.textContent = `${final} ج`;
-}
+    // --- Operator logic ---
+    function onOperatorQuickClick() {
+      if (!isOperatorAuthenticated) {
+        pwdModal.style.display = 'flex';
+        quickPwdInput.value = '';
+        quickPwdInput.focus();
+      } else {
+        if (mainOperator.style.display === 'none') {
+          mainOperator.style.display = 'block';
+          mainCustomer.style.display = 'none';
+        } else {
+          mainOperator.style.display = 'none';
+          mainCustomer.style.display = 'block';
+        }
+      }
+    }
 
-function cartRemove(idx){ cart.splice(idx,1); updateCartDisplay(); saveState(); }
-function cartIncrease(idx){ cart[idx].qty++; updateCartDisplay(); }
-function cartDecrease(idx){ if(cart[idx].qty>1){ cart[idx].qty--; } else cart.splice(idx,1); updateCartDisplay(); saveState(); }
+    function onSubmitQuickPwd() {
+      const v = quickPwdInput.value || '';
+      if (v === operatorPassword) {
+        isOperatorAuthenticated = true;
+        pwdModal.style.display = 'none';
+        quickPwdInput.value = '';
+        mainOperator.style.display = 'block';
+        mainCustomer.style.display = 'none';
+        operatorLoginPanel.style.display = 'none';
+        operatorDashboard.style.display = 'block';
+        operatorHint.textContent = 'مشغل مؤمن';
+        notify('دخول المشغل ناجح', 'success');
+        renderOrders();
+        renderOffers();
+        updateReports();
+        updateEditControls();
+      } else {
+        notify('كلمة المرور خاطئة', 'error');
+      }
+    }
 
-// --- Scroll handler for bottom cart ---
-function handleScrollForCart(){
-  const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50;
-  if(bottom && cart.length > 0){
-    bottomCart.style.display = 'block';
-    bottomCart.innerHTML = cartPanel.innerHTML;
-  } else {
-    bottomCart.style.display = 'none';
-  }
-}
+    function operatorLogin() {
+      const val = operatorPasswordInput.value;
+      if (val === operatorPassword) {
+        isOperatorAuthenticated = true;
+        operatorLoginPanel.style.display = 'none';
+        operatorDashboard.style.display = 'block';
+        operatorHint.textContent = 'مشغل مؤمن';
+        notify('دخول المشغل ناجح', 'success');
+        renderOrders();
+        renderOffers();
+        updateReports();
+        updateEditControls();
+      } else {
+        notify('كلمة المرور خاطئة', 'error');
+      }
+    }
 
-// --- Checkout flow ---
-function openCheckout(){
-  if(cart.length===0){ notify('السلة فارغة','warning'); return; }
-  if(currentCustomer){
-    orderName.value = currentCustomer.name || '';
-    orderPhone.value = currentCustomer.phone || '';
-  }
-  checkoutSection.style.display='block';
-  checkoutSection.scrollIntoView({behavior:'smooth'});
-}
-
-function confirmOrder(){
-  const name = orderName.value.trim();
-  const phone = orderPhone.value.trim();
-  const address = orderAddress.value.trim();
-  const payment = orderPayment.value;
-  const notes = orderNotes.value.trim();
-  const offerId = applyOfferSelect.value;
-  if(!name||!phone||!address){ notify('أكمل بيانات الطلب','warning'); return; }
-  currentCustomer = {name, phone};
-  saveState();
-  cartCustomerInfo.textContent = `${name} — ${phone}`;
-  const orderId = 'ORD-' + ( ++orderCounter );
-  localStorage.setItem(LS_KEYS.ORDER_COUNTER, String(orderCounter));
-  const totalBefore = cart.reduce((s,c)=>s + c.price*c.qty,0);
-  let total = totalBefore;
-  let appliedOffer = null;
-  if(offerId){
-    const o = offers.find(x=>x.id===offerId);
-    if(o){ appliedOffer = {id:o.id,name:o.name,discount:o.discount}; total = Math.round(total*(1 - o.discount/100)); }
-  }
-
-  const newOrder = {
-    id:orderId,
-    customer:{name,phone,address},
-    items: cart.map(c=>({id:c.id,name:c.name,price:c.price,qty:c.qty})),
-    totalBefore, total, payment, notes, status:'received', createdAt:new Date().toLocaleString('ar-EG'), date: new Date().toDateString(), appliedOffer
-  };
-
-  newOrder.items.forEach(it => {
-    const mItem = findItemById(it.id);
-    if(mItem){ mItem.sold = (mItem.sold||0) + it.qty; }
-  });
-
-  orders.unshift(newOrder);
-  saveState();
-  cart = [];
-  updateCartDisplay();
-  checkoutSection.style.display='none';
-  cartPanel.classList.remove('open');
-  notify(`تم تسجيل الطلب ${orderId}`,'success');
-  renderOrders();
-  updateReports();
-
-  broadcast({type:'order_created', payload:newOrder});
-}
-
-// --- Operator logic ---
-function onOperatorQuickClick(){
-  if(!isOperatorAuthenticated){
-    pwdModal.style.display='flex';
-    quickPwdInput.value = '';
-    quickPwdInput.focus();
-  } else {
-    if(mainOperator.style.display === 'none'){
-      mainOperator.style.display = 'block';
-      mainCustomer.style.display = 'none';
-    } else {
+    function operatorLogout() {
+      isOperatorAuthenticated = false;
+      operatorLoginPanel.style.display = 'block';
+      operatorDashboard.style.display = 'none';
+      operatorHint.textContent = 'مسجل بالخارج';
       mainOperator.style.display = 'none';
       mainCustomer.style.display = 'block';
+      epotAuthenticated = false;
+      updateEditControls();
+      notify('تم تسجيل الخروج', 'info');
     }
-  }
-}
 
-function onSubmitQuickPwd(){
-  const v = quickPwdInput.value || '';
-  if(v === operatorPassword){
-    isOperatorAuthenticated = true;
-    pwdModal.style.display='none';
-    quickPwdInput.value='';
-    mainOperator.style.display = 'block';
-    mainCustomer.style.display = 'none';
-    operatorLoginPanel.style.display = 'none';
-    operatorDashboard.style.display = 'block';
-    operatorHint.textContent = 'مشغل مؤمن';
-    notify('دخول المشغل ناجح','success');
-    renderOrders();
-    renderOffers();
-    updateReports();
-    updateEditControls();
-  } else {
-    notify('كلمة المرور خاطئة','error');
-  }
-}
+    // --- EPOT ---
+    function unlockEpot() {
+      const v = epotPwdInput.value || '';
+      if (v === epotPassword) {
+        epotAuthenticated = true;
+        epotModal.style.display = 'none';
+        notify('تم فتح EPOT', 'success');
+        showEpotContent();
+        updateEditControls();
+      } else {
+        notify('كلمة مرور EPOT خاطئة', 'error');
+      }
+    }
+    function lockEpot() {
+      epotAuthenticated = false;
+      updateEditControls();
+      epotContent.style.display = 'none';
+      epotLockedNotice.style.display = 'block';
+      lockEpotBtn.style.display = 'none';
+      openEpotBtn.style.display = 'inline-block';
+      notify('تم قفل EPOT', 'info');
+    }
+    function showEpotContent() {
+      epotLockedNotice.style.display = 'none';
+      epotContent.style.display = 'block';
+      lockEpotBtn.style.display = 'inline-block';
+      openEpotBtn.style.display = 'none';
+      renderEpot();
+      renderManageItems();
+      populateCategories();
+    }
+    function setNewEpotPwd() {
+      const v = newEpotPwd.value.trim();
+      if (!v) {
+        notify('ادخل كلمة مرور جديدة', 'warning');
+        return;
+      }
+      epotPassword = v;
+      localStorage.setItem(LS_KEYS.EPOT_PWD, epotPassword);
+      newEpotPwd.value = '';
+      notify('تم تحديث كلمة مرور EPOT', 'success');
+    }
 
-function operatorLogin(){
-  const val = operatorPasswordInput.value;
-  if(val === operatorPassword){
-    isOperatorAuthenticated = true;
-    operatorLoginPanel.style.display = 'none';
-    operatorDashboard.style.display = 'block';
-    operatorHint.textContent = 'مشغل مؤمن';
-    notify('دخول المشغل ناجح','success');
-    renderOrders();
-    renderOffers();
-    updateReports();
-    updateEditControls();
-  } else {
-    notify('كلمة المرور خاطئة','error');
-  }
-}
-
-function operatorLogout(){
-  isOperatorAuthenticated = false;
-  operatorLoginPanel.style.display = 'block';
-  operatorDashboard.style.display = 'none';
-  operatorHint.textContent = 'مسجل بالخارج';
-  mainOperator.style.display = 'none';
-  mainCustomer.style.display = 'block';
-  epotAuthenticated = false;
-  updateEditControls();
-  notify('تم تسجيل الخروج','info');
-}
-
-// --- EPOT ---
-function unlockEpot(){
-  const v = epotPwdInput.value || '';
-  if(v === epotPassword){
-    epotAuthenticated = true;
-    epotModal.style.display = 'none';
-    notify('تم فتح EPOT','success');
-    showEpotContent();
-    updateEditControls();
-  } else {
-    notify('كلمة مرور EPOT خاطئة','error');
-  }
-}
-function lockEpot(){
-  epotAuthenticated = false;
-  updateEditControls();
-  epotContent.style.display = 'none';
-  epotLockedNotice.style.display = 'block';
-  lockEpotBtn.style.display = 'none';
-  openEpotBtn.style.display = 'inline-block';
-  notify('تم قفل EPOT','info');
-}
-function showEpotContent(){
-  epotLockedNotice.style.display = 'none';
-  epotContent.style.display = 'block';
-  lockEpotBtn.style.display = 'inline-block';
-  openEpotBtn.style.display = 'none';
-  renderEpot();
-  renderManageItems();
-  populateCategories();
-}
-function setNewEpotPwd(){
-  const v = newEpotPwd.value.trim();
-  if(!v){ notify('ادخل كلمة مرور جديدة','warning'); return; }
-  epotPassword = v;
-  localStorage.setItem(LS_KEYS.EPOT_PWD, epotPassword);
-  newEpotPwd.value = '';
-  notify('تم تحديث كلمة مرور EPOT','success');
-}
-
-// --- Render orders for operator ---
-function renderOrders(){
-  if (!ordersGrid) return;
-  ordersGrid.innerHTML = '';
-  if(orders.length===0){ ordersGrid.innerHTML='<div class="small" style="text-align:center">لا توجد طلبات</div>'; return; }
-  orders.forEach(o => {
-    const card = document.createElement('div');
-    card.className = 'order-card';
-    card.dataset.id = o.id;
-    card.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div><strong>طلب رقم: ${o.id}</strong></div>
-          <div class="small">العميل: ${o.customer.name} - ${o.customer.phone}</div>
-          <div class="small">التاريخ: ${o.createdAt}</div>
-        </div>
-        <div><span class="badge">${o.status}</span></div>
-      </div>
-      <div class="order-details" id="details-${o.id}">
-        <div style="margin-top:8px">
-          <div><strong>الاسم:</strong> ${o.customer.name} — <strong>الهاتف:</strong> ${o.customer.phone}</div>
-          <div class="small">العنوان: ${o.customer.address}</div>
-          <div class="small">الطريقة: ${o.payment}</div>
-          ${o.notes ? `<div class="small">ملاحظات: ${o.notes}</div>` : ''}
-        </div>
-        <div style="margin-top:10px;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px">
-          ${o.items.map(i => `<div style="display:flex;justify-content:space-between"><div>${i.name} × ${i.qty}</div><div>${i.price*i.qty} ج</div></div>`).join('')}
-          <div style="margin-top:8px;font-weight:bold">الإجمالي: ${o.total} ج</div>
-        </div>
-        <div style="margin-top:10px;display:flex;gap:8px">
-          ${o.status==='received' ? `<button class="btn" onclick="changeOrderStatus('${o.id}','preparing')">قيد التحضير</button>` : '' }
-          ${o.status==='preparing' ? `<button class="btn" onclick="changeOrderStatus('${o.id}','ready')">جاهز للتسليم</button>` : '' }
-          ${o.status==='ready' ? `<button class="btn secondary" onclick="changeOrderStatus('${o.id}','delivered')">تم التسليم</button>` : '' }
-          <button class="btn secondary" onclick="printOrder('${o.id}')">طباعة/تفاصيل</button>
-        </div>
-      </div>
-    `;
-    card.addEventListener('click', () => toggleOrderDetails(o.id));
-    ordersGrid.appendChild(card);
-    if(openOrderId === o.id) toggleOrderDetails(o.id);
-  });
-}
-
-function toggleOrderDetails(id){
-  const details = document.getElementById(`details-${id}`);
-  if(details.classList.contains('open')){
-    details.classList.remove('open');
-  } else {
-    document.querySelectorAll('.order-details.open').forEach(d => d.classList.remove('open'));
-    details.classList.add('open');
-  }
-}
-
-function changeOrderStatus(orderId, newStatus){
-  const ord = orders.find(o=>o.id===orderId);
-  if(!ord) return;
-  ord.status = newStatus;
-  saveState();
-  renderOrders();
-  updateReports();
-  notify(`تم تغيير حالة ${orderId} إلى ${newStatus}`,'success');
-  if(newStatus === 'delivered') {
-    const details = document.getElementById(`details-${orderId}`);
-    if(details) details.classList.remove('open');
-  }
-
-  broadcast({type:'order_status_update', payload:{id: orderId, status: newStatus}});
-}
-
-function printOrder(orderId){
-  const ord = orders.find(o=>o.id===orderId);
-  if(!ord) return;
-  const win = window.open('','_blank');
-  win.document.write(`<pre>${JSON.stringify(ord,null,2)}</pre>`);
-}
-
-// --- Offers ---
-function renderApplyOffers(){
-  if (!applyOfferSelect) return;
-  applyOfferSelect.innerHTML = '<option value="">لا يوجد</option>';
-  offers.forEach(o => {
-    const opt = document.createElement('option');
-    opt.value = o.id; opt.textContent = `${o.name} — ${o.discount}%`;
-    applyOfferSelect.appendChild(opt);
-  });
-}
-
-function renderOffers(){
-  if (!activeOffersList) return;
-  activeOffersList.innerHTML = '';
-  if(offers.length===0){ activeOffersList.innerHTML = '<div class="small">لا توجد عروض</div>'; return; }
-  offers.forEach(o => {
-    const d = document.createElement('div');
-    d.className = 'card small';
-    d.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>${o.name}</strong><div class="small">خصم ${o.discount}%</div></div>
-      <div><button class="btn secondary" onclick="removeOffer('${o.id}')">إلغاء</button></div>
-    </div>`;
-    activeOffersList.appendChild(d);
-  });
-  renderApplyOffers();
-}
-
-function createOffer(){
-  if(!checkEditAuth()){ notify('مطلوب صلاحية EPOT لإنشاء عروض','warning'); epotModal.style.display='flex'; return; }
-  const name = offerName.value.trim();
-  const discount = Number(offerDiscount.value);
-  if(!name || isNaN(discount) || discount<0 || discount>100){ notify('ادخل بيانات صحيحة','warning'); return; }
-  const id = generateId('offer');
-  offers.push({id,name,discount,created:new Date().toLocaleDateString('ar-EG')});
-  saveState();
-  offerName.value=''; offerDiscount.value='';
-  renderOffers();
-  notify('تم إنشاء العرض','success');
-  broadcast({type:'offer_update', payload: offers});
-}
-
-function removeOffer(id){
-  if(!checkEditAuth()){ notify('مطلوب صلاحية EPOT لإلغاء العروض','warning'); epotModal.style.display='flex'; return; }
-  offers = offers.filter(o=>o.id!==id);
-  saveState(); renderOffers(); notify('تم إلغاء العرض','info');
-  broadcast({type:'offer_update', payload: offers});
-}
-
-// --- Helpers ---
-function findItemById(id){
-  for(const cat of Object.keys(menu)){
-    const found = menu[cat].find(i=>i.id===id);
-    if(found) return found;
-  }
-  return null;
-}
-
-function populateCategories(){
-  if (!newItemCategory) return;
-  newItemCategory.innerHTML = '';
-  Object.keys(menu).forEach(cat => {
-    const opt = document.createElement('option');
-    opt.value = cat;
-    opt.textContent = cat;
-    newItemCategory.appendChild(opt);
-  });
-}
-
-// --- Manage Items ---
-function renderManageItems(){
-  if (!manageItemsList) return;
-  manageItemsList.innerHTML = '';
-  Object.keys(menu).forEach(cat => {
-    const catSection = document.createElement('div');
-    catSection.style.marginBottom = '16px';
-    catSection.innerHTML = `<h4 class="small" style="color:var(--gold);margin-bottom:8px">${cat}</h4>`;
-    
-    menu[cat].forEach(item => {
-      const itemCard = document.createElement('div');
-      itemCard.className = 'card small';
-      itemCard.style.marginBottom = '8px';
-      itemCard.style.padding = '10px';
-      itemCard.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-          <div style="flex:1">
-            <input class="input" value="${item.name}" id="name_${item.id}" style="margin-bottom:6px" />
-            <div style="display:flex;gap:8px;align-items:center">
-              <input class="input" type="number" value="${item.price}" id="price_${item.id}" style="width:100px" />
-              <span class="small">ج</span>
-              <span class="small" style="color:var(--muted)">مبيع: ${item.sold || 0}</span>
-              <span class="badge" style="background:${item.available ? 'var(--success)' : '#dc2626'}">${item.available ? 'متاح' : 'غير متاح'}</span>
+    // --- Render orders for operator ---
+    function renderOrders() {
+      if (!ordersGrid) return;
+      ordersGrid.innerHTML = '';
+      if (orders.length === 0) {
+        ordersGrid.innerHTML = '<div class="small" style="text-align: center">لا توجد طلبات</div>';
+        return;
+      }
+      orders.forEach((o) => {
+        const card = document.createElement('div');
+        card.className = 'order-card';
+        card.dataset.id = o.id;
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center">
+            <div>
+              <div><strong>طلب رقم: ${o.id}</strong></div>
+              <div class="small">العميل: ${o.customer.name} - ${o.customer.phone}</div>
+              <div class="small">التاريخ: ${o.createdAt}</div>
+            </div>
+            <div><span class="badge">${o.status}</span></div>
+          </div>
+          <div class="order-details" id="details-${o.id}">
+            <div style="margin-top: 8px">
+              <div><strong>الاسم:</strong> ${o.customer.name} — <strong>الهاتف:</strong> ${o.customer.phone}</div>
+              <div class="small">العنوان: ${o.customer.address}</div>
+              <div class="small">الطريقة: ${o.payment}</div>
+              ${o.notes ? `<div class="small">ملاحظات: ${o.notes}</div>` : ''}
+            </div>
+            <div style="margin-top: 10px; padding: 8px; background: rgba(255, 255, 255, 0.02); border-radius: 8px">
+              ${o.items
+                .map(
+                  (i) => `<div style="display: flex; justify-content: space-between"><div>${i.name} × ${i.qty}</div><div>${i.price * i.qty} ج</div></div>`
+                )
+                .join('')}
+              <div style="margin-top: 8px; font-weight: bold">الإجمالي: ${o.total} ج</div>
+            </div>
+            <div style="margin-top: 10px; display: flex; gap: 8px">
+              ${
+                o.status === 'received'
+                  ? `<button class="btn" onclick="changeOrderStatus('${o.id}', 'preparing')">قيد التحضير</button>`
+                  : ''
+              }
+              ${
+                o.status === 'preparing'
+                  ? `<button class="btn" onclick="changeOrderStatus('${o.id}', 'ready')">جاهز للتسليم</button>`
+                  : ''
+              }
+              ${
+                o.status === 'ready'
+                  ? `<button class="btn secondary" onclick="changeOrderStatus('${o.id}', 'delivered')">تم التسليم</button>`
+                  : ''
+              }
+              <button class="btn secondary" onclick="printOrder('${o.id}')">طباعة/تفاصيل</button>
             </div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <button class="btn small-inline" onclick="saveItemChanges('${cat}','${item.id}')">حفظ</button>
-            <button class="btn secondary small-inline" onclick="toggleItemAvailability('${cat}','${item.id}')">${item.available ? 'إيقاف' : 'تفعيل'}</button>
-            <button class="btn secondary small-inline" style="background:#dc2626" onclick="deleteItem('${cat}','${item.id}')">حذف</button>
+        `;
+        card.addEventListener('click', () => toggleOrderDetails(o.id));
+        ordersGrid.appendChild(card);
+        if (openOrderId === o.id) toggleOrderDetails(o.id);
+      });
+    }
+
+    function toggleOrderDetails(id) {
+      const details = document.getElementById(`details-${id}`);
+      if (details.classList.contains('open')) {
+        details.classList.remove('open');
+      } else {
+        document.querySelectorAll('.order-details.open').forEach((d) => d.classList.remove('open'));
+        details.classList.add('open');
+      }
+    }
+
+    function changeOrderStatus(orderId, newStatus) {
+      const ord = orders.find((o) => o.id === orderId);
+      if (!ord) return;
+      ord.status = newStatus;
+
+      database
+        .ref('orders/' + orderId)
+        .update({ status: newStatus })
+        .then(() => {
+          saveState();
+          renderOrders();
+          updateReports();
+          notify(`تم تغيير حالة ${orderId} إلى ${newStatus}`, 'success');
+          if (newStatus === 'delivered') {
+            const details = document.getElementById(`details-${orderId}`);
+            if (details) details.classList.remove('open');
+          }
+        })
+        .catch((error) => {
+          notify('خطأ في تحديث الحالة: ' + error.message, 'error');
+        });
+
+      broadcast({ type: 'order_status_update', payload: { id: orderId, status: newStatus } });
+    }
+
+    function printOrder(orderId) {
+      const ord = orders.find((o) => o.id === orderId);
+      if (!ord) return;
+      const win = window.open('', '_blank');
+      win.document.write(`<pre>${JSON.stringify(ord, null, 2)}</pre>`);
+    }
+
+    // --- Offers ---
+    function renderApplyOffers() {
+      if (!applyOfferSelect) return;
+      applyOfferSelect.innerHTML = '<option value="">لا يوجد</option>';
+      offers.forEach((o) => {
+        const opt = document.createElement('option');
+        opt.value = o.id;
+        opt.textContent = `${o.name} — ${o.discount}%`;
+        applyOfferSelect.appendChild(opt);
+      });
+    }
+
+    function renderOffers() {
+      if (!activeOffersList) return;
+      activeOffersList.innerHTML = '';
+      if (offers.length === 0) {
+        activeOffersList.innerHTML = '<div class="small">لا توجد عروض</div>';
+        return;
+      }
+      offers.forEach((o) => {
+        const d = document.createElement('div');
+        d.className = 'card small';
+        d.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: center">
+          <div><strong>${o.name}</strong><div class="small">خصم ${o.discount}%</div></div>
+          <div><button class="btn secondary" onclick="removeOffer('${o.id}')">إلغاء</button></div>
+        </div>`;
+        activeOffersList.appendChild(d);
+      });
+      renderApplyOffers();
+    }
+
+    function createOffer() {
+      if (!checkEditAuth()) {
+        notify('مطلوب صلاحية EPOT لإنشاء عروض', 'warning');
+        epotModal.style.display = 'flex';
+        return;
+      }
+      const name = offerName.value.trim();
+      const discount = Number(offerDiscount.value);
+      if (!name || isNaN(discount) || discount < 0 || discount > 100) {
+        notify('ادخل بيانات صحيحة', 'warning');
+        return;
+      }
+      const id = generateId('offer');
+      const newOffer = { id, name, discount, created: new Date().toLocaleDateString('ar-EG') };
+      offers.push(newOffer);
+
+      database
+        .ref('offers/' + id)
+        .set(newOffer)
+        .then(() => {
+          saveState();
+          offerName.value = '';
+          offerDiscount.value = '';
+          renderOffers();
+          notify('تم إنشاء العرض', 'success');
+        })
+        .catch((error) => {
+          notify('خطأ في إنشاء العرض: ' + error.message, 'error');
+        });
+
+      broadcast({ type: 'offer_update', payload: offers });
+    }
+
+    function removeOffer(id) {
+      if (!checkEditAuth()) {
+        notify('مطلوب صلاحية EPOT لإلغاء العروض', 'warning');
+        epotModal.style.display = 'flex';
+        return;
+      }
+      offers = offers.filter((o) => o.id !== id);
+
+      database
+        .ref('offers/' + id)
+        .remove()
+        .then(() => {
+          saveState();
+          renderOffers();
+          notify('تم إلغاء العرض', 'info');
+        })
+        .catch((error) => {
+          notify('خطأ في إلغاء العرض: ' + error.message, 'error');
+        });
+
+      broadcast({ type: 'offer_update', payload: offers });
+    }
+
+    // --- Manage Items ---
+    function renderManageItems() {
+      if (!manageItemsList) return;
+      manageItemsList.innerHTML = '';
+      Object.keys(menu).forEach((cat) => {
+        const catSection = document.createElement('div');
+        catSection.style.marginBottom = '16px';
+        catSection.innerHTML = `<h4 class="small" style="color: var(--gold); margin-bottom: 8px">${cat}</h4>`;
+
+        menu[cat].forEach((item) => {
+          const itemCard = document.createElement('div');
+          itemCard.className = 'card small';
+          itemCard.style.marginBottom = '8px';
+          itemCard.style.padding = '10px';
+          itemCard.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px">
+              <div style="flex: 1">
+                <input class="input" value="${item.name}" id="name_${item.id}" style="margin-bottom: 6px" />
+                <div style="display: flex; gap: 8px; align-items: center">
+                  <input class="input" type="number" value="${item.price}" id="price_${item.id}" style="width: 100px" />
+                  <span class="small">ج</span>
+                  <span class="small" style="color: var(--muted)">مبيع: ${item.sold || 0}</span>
+                  <span class="badge" style="background: ${item.available ? 'var(--success)' : '#dc2626'}">${item.available ? 'متاح' : 'غير متاح'}</span>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <button class="btn small-inline" onclick="saveItemChanges('${item.id}')">حفظ</button>
+                <button class="btn small-inline" style="background: #dc2626; color: #fff" onclick="removeItem('${item.id}')">حذف</button>
+              </div>
+            </div>
+          `;
+          manageItemsList.appendChild(catSection);
+          catSection.appendChild(itemCard);
+        });
+      });
+    }
+
+    function addNewItem() {
+      if (!checkEditAuth()) {
+        notify('مطلوب صلاحية EPOT لإضافة أصناف', 'warning');
+        epotModal.style.display = 'flex';
+        return;
+      }
+      const name = newItemName.value.trim();
+      const price = Number(newItemPrice.value);
+      const category = newItemCategory.value;
+      if (!name || isNaN(price) || price < 0 || !category) {
+        notify('ادخل بيانات صحيحة', 'warning');
+        return;
+      }
+      const id = generateId('item');
+      const newItem = { id, name, price, available: true, sold: 0 };
+      if (!menu[category]) menu[category] = [];
+      menu[category].push(newItem);
+
+      database
+               .ref('menu/' + category)
+        .set(menu[category])
+        .then(() => {
+          saveState();
+          newItemName.value = '';
+          newItemPrice.value = '';
+          renderMenu();
+          renderManageItems();
+          notify('تم إضافة الصنف', 'success');
+        })
+        .catch((error) => {
+          notify('خطأ في إضافة الصنف: ' + error.message, 'error');
+        });
+
+      broadcast({ type: 'menu_update', payload: menu });
+    }
+
+    function saveItemChanges(itemId) {
+      if (!checkEditAuth()) {
+        notify('مطلوب صلاحية EPOT لتعديل الأصناف', 'warning');
+        epotModal.style.display = 'flex';
+        return;
+      }
+      const name = document.getElementById(`name_${itemId}`).value.trim();
+      const price = Number(document.getElementById(`price_${itemId}`).value);
+      if (!name || isNaN(price) || price < 0) {
+        notify('ادخل بيانات صحيحة', 'warning');
+        return;
+      }
+      for (const cat in menu) {
+        const item = menu[cat].find((i) => i.id === itemId);
+        if (item) {
+          item.name = name;
+          item.price = price;
+          break;
+        }
+      }
+
+      database
+        .ref('menu')
+        .set(menu)
+        .then(() => {
+          saveState();
+          renderMenu();
+          renderManageItems();
+          notify('تم تحديث الصنف', 'success');
+        })
+        .catch((error) => {
+          notify('خطأ في تحديث الصنف: ' + error.message, 'error');
+        });
+
+      broadcast({ type: 'menu_update', payload: menu });
+    }
+
+    function removeItem(itemId) {
+      if (!checkEditAuth()) {
+        notify('مطلوب صلاحية EPOT لحذف الأصناف', 'warning');
+        epotModal.style.display = 'flex';
+        return;
+      }
+      for (const cat in menu) {
+        const idx = menu[cat].findIndex((i) => i.id === itemId);
+        if (idx !== -1) {
+          menu[cat].splice(idx, 1);
+          break;
+        }
+      }
+
+      database
+        .ref('menu')
+        .set(menu)
+        .then(() => {
+          saveState();
+          renderMenu();
+          renderManageItems();
+          notify('تم حذف الصنف', 'success');
+        })
+        .catch((error) => {
+          notify('خطأ في حذف الصنف: ' + error.message, 'error');
+        });
+
+      broadcast({ type: 'menu_update', payload: menu });
+    }
+
+    function populateCategories() {
+      if (!newItemCategory) return;
+      newItemCategory.innerHTML = '';
+      Object.keys(menu).forEach((cat) => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        newItemCategory.appendChild(opt);
+      });
+    }
+
+    // --- Reports ---
+    function updateReports() {
+      if (!rToday || !rRevenue || !rTotal || !rTop || !popularList) return;
+      const today = new Date().toDateString();
+      const todayOrders = orders.filter((o) => o.date === today);
+      rToday.textContent = todayOrders.length;
+      rRevenue.textContent = todayOrders.reduce((s, o) => s + o.total, 0);
+      rTotal.textContent = orders.length;
+
+      const itemSales = {};
+      orders.forEach((o) =>
+        o.items.forEach((i) => {
+          itemSales[i.id] = (itemSales[i.id] || 0) + i.qty;
+        })
+      );
+      const topItem = Object.entries(itemSales).reduce(
+        (max, curr) => (curr[1] > max[1] ? curr : max),
+        ['-', 0]
+      );
+      rTop.textContent = topItem[0] !== '-' ? findItemById(topItem[0]).name : '-';
+      popularList.innerHTML = '';
+      const topItems = Object.entries(itemSales)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([id, qty]) => {
+          const item = findItemById(id);
+          return item ? `${item.name} (${qty} مرة)` : '';
+        })
+        .filter((x) => x);
+      if (topItems.length > 0) {
+        popularList.innerHTML = `<ul style="margin: 0; padding: 0 0 0 16px">${topItems
+          .map((i) => `<li class="small">${i}</li>`)
+          .join('')}</ul>`;
+      }
+    }
+
+    // --- EPOT Orders ---
+    function renderEpot() {
+      if (!epotOrdersList || !epotTotal) return;
+      epotOrdersList.innerHTML = '';
+      const totalRevenue = orders.reduce((s, o) => s + o.total, 0);
+      epotTotal.textContent = totalRevenue;
+      orders.forEach((o) => {
+        const card = document.createElement('div');
+        card.className = 'card small';
+        card.style.marginBottom = '8px';
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center">
+            <div><strong>طلب: ${o.id}</strong><div class="small">${o.createdAt}</div></div>
+            <div><span class="badge">${o.status}</span></div>
           </div>
-        </div>
-      `;
-      catSection.appendChild(itemCard);
-    });
-    
-    manageItemsList.appendChild(catSection);
-  });
-}
+          <div style="margin-top: 8px">
+            <div class="small">الإجمالي: ${o.total} ج</div>
+            <div class="small">الدفع: ${o.payment}</div>
+          </div>
+        `;
+        epotOrdersList.appendChild(card);
+      });
+    }
 
-function addNewItem(){
-  if(!checkEditAuth()){ notify('مطلوب صلاحية EPOT','warning'); return; }
-  const name = newItemName.value.trim();
-  const price = Number(newItemPrice.value);
-  const cat = newItemCategory.value;
-  
-  if(!name || isNaN(price) || price < 0){
-    notify('أدخل بيانات صحيحة','warning');
-    return;
-  }
-  
-  const id = generateId('item');
-  if(!menu[cat]) menu[cat] = [];
-  
-  menu[cat].push({
-    id,
-    name,
-    price,
-    available: true,
-    sold: 0
-  });
-  
-  saveState();
-  newItemName.value = '';
-  newItemPrice.value = '';
-  renderMenu();
-  renderManageItems();
-  notify('تم إضافة الصنف','success');
-  broadcast({type:'menu_update', payload: menu});
-}
+    // --- Export ---
+    function exportAllData() {
+      const data = {
+        menu,
+        orders,
+        offers,
+        stats: {
+          totalOrders: orders.length,
+          totalRevenue: orders.reduce((s, o) => s + o.total, 0),
+          todayOrders: orders.filter((o) => o.date === new Date().toDateString()).length
+        }
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `koshary_abosamra_backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      notify('تم تصدير البيانات بنجاح', 'success');
+    }
 
-function saveItemChanges(cat, id){
-  if(!checkEditAuth()){ notify('مطلوب صلاحية EPOT','warning'); return; }
-  const nameEl = document.getElementById('name_' + id);
-  const priceEl = document.getElementById('price_' + id);
-  
-  if(!nameEl || !priceEl) return;
-  
-  const newName = nameEl.value.trim();
-  const newPrice = Number(priceEl.value);
-  
-  if(!newName || isNaN(newPrice) || newPrice < 0){
-    notify('بيانات غير صحيحة','warning');
-    return;
-  }
-  
-  const item = menu[cat].find(i => i.id === id);
-  if(item){
-    item.name = newName;
-    item.price = newPrice;
-    saveState();
-    renderMenu();
-    renderManageItems();
-    notify('تم تحديث الصنف','success');
-    broadcast({type:'menu_update', payload: menu});
-  }
-}
+    // --- Helpers ---
+    function findItemById(id) {
+      for (const cat in menu) {
+        const item = menu[cat].find((i) => i.id === id);
+        if (item) return item;
+      }
+      return null;
+    }
 
-function toggleItemAvailability(cat, id){
-  if(!checkEditAuth()){ notify('مطلوب صلاحية EPOT','warning'); return; }
-  const item = menu[cat].find(i => i.id === id);
-  if(item){
-    item.available = !item.available;
-    saveState();
-    renderMenu();
-    renderManageItems();
-    notify(item.available ? 'تم التفعيل' : 'تم الإيقاف','info');
-    broadcast({type:'menu_update', payload: menu});
-  }
-}
+    function saveState() {
+      saveLS(LS_KEYS.MENU, menu);
+      saveLS(LS_KEYS.ORDERS, orders);
+      saveLS(LS_KEYS.OFFERS, offers);
+      saveLS(LS_KEYS.CUST, currentCustomer);
+    }
 
-function deleteItem(cat, id){
-  if(!checkEditAuth()){ notify('مطلوب صلاحية EPOT','warning'); return; }
-  if(!confirm('هل أنت متأكد من حذف هذا الصنف؟')) return;
-  
-  menu[cat] = menu[cat].filter(i => i.id !== id);
-  if(menu[cat].length === 0) delete menu[cat];
-  
-  saveState();
-  renderMenu();
-  renderManageItems();
-  populateCategories();
-  notify('تم حذف الصنف','info');
-  broadcast({type:'menu_update', payload: menu});
-}
+    function notify(msg, type = 'info') {
+      const notifyEl = document.getElementById('notify');
+      if (!notifyEl) return;
+      notifyEl.textContent = msg;
+      notifyEl.style.background = type === 'error' ? '#dc2626' : type === 'warning' ? '#f59e0b' : '#16a34a';
+      notifyEl.style.display = 'block';
+      setTimeout(() => (notifyEl.style.display = 'none'), 3000);
+    }
 
-function saveState(){
-  saveLS(LS_KEYS.MENU, menu);
-  saveLS(LS_KEYS.ORDERS, orders);
-  saveLS(LS_KEYS.OFFERS, offers);
-  localStorage.setItem(LS_KEYS.OP_PWD, operatorPassword);
-  localStorage.setItem(LS_KEYS.ORDER_COUNTER, String(orderCounter));
-  if(currentCustomer) saveLS(LS_KEYS.CUST,currentCustomer);
-  localStorage.setItem(LS_KEYS.EPOT_PWD, epotPassword);
-}
+    function checkEditAuth() {
+      return isOperatorAuthenticated && epotAuthenticated;
+    }
 
-function exportAllData(){
-  const data = {menu,orders,offers,operatorPassword};
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download='koshary_abosamra_export.json'; a.click(); URL.revokeObjectURL(url);
-  notify('تم تصدير البيانات','success');
-}
+    function updateEditControls() {
+      const editControls = [addItemBtn, newItemName, newItemPrice, newItemCategory, createOfferBtn, offerName, offerDiscount];
+      editControls.forEach((el) => {
+        if (el) el.disabled = !checkEditAuth();
+      });
+      offerNotice.style.display = checkEditAuth() ? 'none' : 'block';
+    }
 
-// --- Reports ---
-function updateReports(){
-  if (!rToday || !rRevenue || !rTotal || !rTop || !popularList) return;
-  const today = new Date().toDateString();
-  const todayOrders = orders.filter(o=>o.date === today);
-  const rev = todayOrders.reduce((s,o)=>s + (o.total||0),0);
-  rToday.textContent = todayOrders.length;
-  rRevenue.textContent = rev;
-  rTotal.textContent = orders.length;
-  const counts = {};
-  orders.forEach(o => o.items.forEach(it => counts[it.name] = (counts[it.name]||0)+it.qty));
-  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  rTop.textContent = sorted.length? sorted[0][0] : '-';
-  popularList.innerHTML = '';
-  sorted.slice(0,6).forEach(([name,c],i) => {
-    const d = document.createElement('div'); d.className='card small'; d.style.marginBottom='8px';
-    d.innerHTML = `<div style="display:flex;justify-content:space-between"><div>${i+1}. ${name}</div><div class="badge">${c} طلب</div></div>`;
-    popularList.appendChild(d);
-  });
-}
-
-// --- EPOT render ---
-function renderEpot(){
-  if (!epotTotal || !epotOrdersList) return;
-  const totalRev = orders.reduce((s,o)=>s+(o.total||0),0);
-  epotTotal.textContent = totalRev + ' ج';
-  epotOrdersList.innerHTML = '';
-  if(orders.length===0){ epotOrdersList.innerHTML = '<div class="small">لا توجد طلبات</div>'; return; }
-  orders.forEach(o => {
-    const d = document.createElement('div'); d.className = 'card small'; d.style.marginBottom='8px';
-    d.innerHTML = `<div style="display:flex;justify-content:space-between"><div>${o.id} — ${o.customer.name}</div><div>${o.total} ج</div></div>
-      <div class="small">حالة: ${o.status} — ${o.createdAt}</div>`;
-    epotOrdersList.appendChild(d);
-  });
-}
-
-// --- Edit control helpers ---
-function checkEditAuth(){ return isOperatorAuthenticated && epotAuthenticated; }
-
-function updateEditControls(){
-  if(checkEditAuth()){
-    if(createOfferBtn) createOfferBtn.disabled = false;
-    if(offerNotice) offerNotice.textContent = 'مسموح: يمكنك إنشاء/إلغاء العروض';
-  } else {
-    if(createOfferBtn) createOfferBtn.disabled = true;
-    if(offerNotice) offerNotice.textContent = 'إنشاء/إلغاء العروض يحتاج صلاحية EPOT.';
-  }
-}
-
-// --- Notifications ---
-function notify(msg,type='success'){ 
-  const el = document.getElementById('notify'); 
-  el.style.display='block'; 
-  el.style.background = (type==='success'?'#16a34a': type==='error' ? '#dc2626' : type==='warning' ? '#f59e0b' : '#0ea5a4'); 
-  el.textContent = msg; 
-  setTimeout(() => el.style.display='none',3000); 
-}
-
-// --- Global functions for onclick handlers ---
-window.changeOrderStatus = changeOrderStatus;
-window.printOrder = printOrder;
-window.removeOffer = removeOffer;
-window.cartRemove = cartRemove;
-window.cartIncrease = cartIncrease;
-window.cartDecrease = cartDecrease;
-window.saveItemChanges = saveItemChanges;
-window.toggleItemAvailability = toggleItemAvailability;
-window.deleteItem = deleteItem;
-</script>
+    // --- Global event listeners ---
+    window.cartIncrease = cartIncrease;
+    window.cartDecrease = cartDecrease;
+    window.cartRemove = cartRemove;
+    window.changeOrderStatus = changeOrderStatus;
+    window.printOrder = printOrder;
+    window.saveItemChanges = saveItemChanges;
+    window.removeItem = removeItem;
+  </script>
 </body>
 </html>
