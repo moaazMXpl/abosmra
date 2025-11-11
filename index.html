@@ -74,7 +74,6 @@
       box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
       border: 1px solid rgba(255, 215, 0, 0.06);
     }
-
     /* layout */
     .grid-2 {
       display: grid;
@@ -86,7 +85,6 @@
         grid-template-columns: 1fr;
       }
     }
-
     /* menu */
     .menu-section {
       margin-bottom: 12px;
@@ -148,7 +146,6 @@
       border: 0;
       cursor: pointer;
     }
-
     /* cart panel - hidden by default */
     .cart-panel {
       position: fixed;
@@ -203,7 +200,6 @@
       background: rgba(255, 255, 255, 0.01);
       margin-bottom: 8px;
     }
-
     /* bottom cart when scrolled to bottom */
     .bottom-cart {
       display: none;
@@ -221,7 +217,6 @@
         right: 0;
       }
     }
-
     /* operator */
     .tabs {
       display: flex;
@@ -267,7 +262,6 @@
     .order-details.open {
       display: block;
     }
-
     /* small helpers */
     .input,
     textarea,
@@ -313,7 +307,6 @@
       text-align: center;
       margin-top: 10px;
     }
-
     /* offer badges */
     .offer-badge {
       background: #064e3b;
@@ -323,7 +316,6 @@
       font-weight: bold;
       font-size: 0.85rem;
     }
-
     /* fixed operator button */
     #operatorQuickBtn {
       position: fixed;
@@ -344,7 +336,6 @@
       box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
       border: 2px solid rgba(255, 255, 255, 0.04);
     }
-
     /* password modal */
     #pwdModal {
       position: fixed;
@@ -374,7 +365,6 @@
       justify-content: flex-end;
       margin-top: 12px;
     }
-
     /* epot modal */
     #epotModal {
       position: fixed;
@@ -395,14 +385,12 @@
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.04);
     }
-
     /* small inline buttons used inside cards */
     .btn.small-inline {
       padding: 6px 8px;
       border-radius: 6px;
       font-size: 0.9rem;
     }
-
     /* responsive for small screens button position */
     @media (max-width: 420px) {
       #operatorQuickBtn {
@@ -416,7 +404,6 @@
         bottom: 80px;
       }
     }
-
     /* quantity modal */
     #qtyModal {
       position: fixed;
@@ -444,9 +431,9 @@
       margin-top: 12px;
     }
   </style>
-  <!-- مكتبات Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js"></script>
+  <!-- مكتبات Firebase - تغيير إلى compat builds للتوافق مع v10 -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 </head>
 <body id="body">
   <div class="container">
@@ -459,14 +446,12 @@
         <!-- kept empty for future top controls -->
       </div>
     </div>
-
     <div id="mainCustomer" class="card">
       <div class="grid-2">
         <div>
           <div id="menuContainer"></div>
         </div>
       </div>
-
       <aside class="cart-panel" id="cartPanel">
         <div class="cart-title">🛒 سلة المشتريات</div>
         <div class="small" id="cartCustomerInfo">ضيف — لم تسجل بعد</div>
@@ -475,26 +460,20 @@
           <div class="badge" id="cartTotal">0 ج</div>
           <div class="small" style="flex: 1">الإجمالي</div>
         </div>
-
         <div style="margin-bottom: 8px">
           <label class="small">اختر عرض (اختياري)</label>
           <select id="applyOffer" class="input"></select>
         </div>
-
         <div style="display: flex; gap: 8px">
           <button class="add-cart" id="checkoutBtn" style="flex: 1">اتمام الطلب</button>
           <button class="btn secondary" id="clearCartBtn" style="padding-inline: 10px">تفريغ</button>
         </div>
-
         <div style="margin-top: 10px; font-size: 0.9rem; color: var(--muted)">
           الدفع نقدًا عند الاستلام أو تحويل فودافون كاش — يمكن تفعيل بطاقة/فوري لاحقًا
         </div>
       </aside>
-
       <button class="cart-toggle" id="cartToggle">🛒</button>
-
       <div class="bottom-cart" id="bottomCart"></div>
-
       <div id="checkoutSection" class="card" style="margin-top: 12px; display: none">
         <div class="section-title">معلومات التوصيل & الدفع</div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
@@ -515,7 +494,6 @@
         </div>
       </div>
     </div>
-
     <div id="mainOperator" class="card" style="display: none">
       <div id="operatorLoginPanel">
         <div style="display: flex; gap: 8px; align-items: center">
@@ -529,7 +507,6 @@
           </div>
         </div>
       </div>
-
       <div id="operatorDashboard" style="display: none; margin-top: 12px">
         <div style="display: flex; justify-content: space-between; align-items: center">
           <div style="display: flex; align-items: center; gap: 12px">
@@ -538,23 +515,19 @@
               <div class="small" style="margin-inline-start: 8px" id="operatorHint">مسجل الدخول</div>
             </div>
           </div>
-
           <div style="display: flex; gap: 8px">
             <button class="btn secondary" id="operatorLogoutBtn">تسجيل خروج</button>
           </div>
         </div>
-
         <div style="margin-top: 12px" class="card">
           <div class="tabs" id="opTabs">
             <div class="tab active" data-tab="ordersTab">الطلبات</div>
             <div class="tab" data-tab="epotTab">EPOT</div>
           </div>
-
           <div id="ordersTab" class="tabContent">
             <div class="section-title">إدارة الطلبات</div>
             <div class="orders-grid" id="ordersGrid"></div>
           </div>
-
           <div id="epotTab" class="tabContent" style="display: none">
             <div class="section-title">EPOT — الإيرادات و صلاحيات التعديل</div>
             <div id="epotLockedNotice" class="small">مقفول — للوصول اضغط فتح EPOT وأدخل كلمة المرور.</div>
@@ -576,7 +549,6 @@
                   </div>
                 </div>
               </div>
-
               <div style="margin-top: 12px">
                 <h4 class="section-title">إدارة الأصناف</h4>
                 <div style="display: flex; gap: 12px; margin-bottom: 12px; align-items: center">
@@ -588,7 +560,6 @@
                 </div>
                 <div id="manageItemsList"></div>
               </div>
-
               <div style="margin-top: 12px">
                 <h4 class="section-title">إدارة العروض</h4>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap">
@@ -604,7 +575,6 @@
                   </div>
                 </div>
               </div>
-
               <div style="margin-top: 12px">
                 <h4 class="section-title">التقارير</h4>
                 <div
@@ -638,13 +608,10 @@
         </div>
       </div>
     </div>
-
     <div id="notify" class="notify"></div>
     <div class="footer small">هذا ملف مستقل. كل البيانات مخزنة محليًا في متصفحك. يمكنك تحميله وتشغيله محليًا.</div>
   </div>
-
   <div id="operatorQuickBtn" title="دخول المشغل">!</div>
-
   <div id="pwdModal">
     <div class="modalCard">
       <h3>دخول المشغل</h3>
@@ -656,7 +623,6 @@
       </div>
     </div>
   </div>
-
   <div id="epotModal">
     <div class="modalCard">
       <h3>فتح EPOT</h3>
@@ -668,7 +634,6 @@
       </div>
     </div>
   </div>
-
   <div id="qtyModal">
     <div class="modalCard">
       <h3>تحديد الكمية</h3>
@@ -679,7 +644,6 @@
       </div>
     </div>
   </div>
-
   <script>
     // --- إعداد Firebase ---
     const firebaseConfig = {
@@ -692,17 +656,14 @@
       appId: "1:803911056967:web:da1d8533ffe6c0fbc53b62",
       measurementId: "G-2TVX0F48Y8"
     };
-
     // تهيئة Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-
     // --- Configuration for real-time sync ---
     const SYNC_CONFIG = window.SYNC_CONFIG || {
       useWebSocket: false,
       wsUrl: ''
     };
-
     // --- Utilities and storage helpers ---
     const LS_KEYS = {
       MENU: 'tk_menu_v1',
@@ -716,7 +677,6 @@
     function saveLS(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
     function loadLS(key, fallback) { try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : fallback; } catch (e) { return fallback; } }
     function generateId(prefix = 'ID') { return prefix + '-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 900).toString(36); }
-
     // --- Default data ---
     const DEFAULT_MENU = {
       "الكشري": [
@@ -770,7 +730,6 @@
         { id: 'slsh-lmna', name: 'عصير سلاش (ليمون – نعناع)', price: 18, available: true, sold: 0 }
       ]
     };
-
     // --- State ---
     let menu = loadLS(LS_KEYS.MENU, DEFAULT_MENU);
     let orders = loadLS(LS_KEYS.ORDERS, []);
@@ -780,7 +739,6 @@
     let orderCounter = Number(localStorage.getItem(LS_KEYS.ORDER_COUNTER) || Date.now() % 100000);
     let epotPassword = localStorage.getItem(LS_KEYS.EPOT_PWD) || 'epot123';
     let epotAuthenticated = false;
-
     // --- DOM refs ---
     const menuContainer = document.getElementById('menuContainer');
     const cartItemsEl = document.getElementById('cartItems');
@@ -799,25 +757,21 @@
     const cartPanel = document.getElementById('cartPanel');
     const bottomCart = document.getElementById('bottomCart');
     const cartToggle = document.getElementById('cartToggle');
-
     const mainCustomer = document.getElementById('mainCustomer');
     const mainOperator = document.getElementById('mainOperator');
     const operatorLoginPanel = document.getElementById('operatorLoginPanel');
     const operatorDashboard = document.getElementById('operatorDashboard');
     const operatorHint = document.getElementById('operatorHint');
-
     const operatorQuickBtn = document.getElementById('operatorQuickBtn');
     const pwdModal = document.getElementById('pwdModal');
     const quickPwdInput = document.getElementById('quickPwdInput');
     const submitPwdBtn = document.getElementById('submitPwdBtn');
     const cancelPwdBtn = document.getElementById('cancelPwdBtn');
-
     const operatorLoginBtn = document.getElementById('operatorLoginBtn');
     const operatorPasswordInput = document.getElementById('operatorPasswordInput');
     const operatorLogoutBtn = document.getElementById('operatorLogoutBtn');
     const exportDataBtn = document.getElementById('exportDataBtn');
     const showPwdBtn = document.getElementById('showPwdBtn');
-
     const opTabs = document.getElementById('opTabs');
     const ordersGrid = document.getElementById('ordersGrid');
     const rToday = document.getElementById('rToday');
@@ -829,7 +783,6 @@
     const offerName = document.getElementById('offerName');
     const offerDiscount = document.getElementById('offerDiscount');
     const popularList = document.getElementById('popularList');
-
     const epotModal = document.getElementById('epotModal');
     const epotPwdInput = document.getElementById('epotPwdInput');
     const cancelEpotBtn = document.getElementById('cancelEpotBtn');
@@ -843,46 +796,37 @@
     const newEpotPwd = document.getElementById('newEpotPwd');
     const setEpotPwdBtn = document.getElementById('setEpotPwdBtn');
     const offerNotice = document.getElementById('offerNotice');
-
     // manage items refs
     const newItemName = document.getElementById('newItemName');
     const newItemPrice = document.getElementById('newItemPrice');
     const newItemCategory = document.getElementById('newItemCategory');
     const addItemBtn = document.getElementById('addItemBtn');
     const manageItemsList = document.getElementById('manageItemsList');
-
     // quantity modal refs
     const qtyModal = document.getElementById('qtyModal');
     const customQty = document.getElementById('customQty');
     const addCustomQtyBtn = document.getElementById('addCustomQtyBtn');
     const cancelQtyBtn = document.getElementById('cancelQtyBtn');
-
     // cart runtime
     let cart = [];
     let isOperatorAuthenticated = false;
     let currentItemForQty = null;
     let openOrderId = null;
-
     // --- Sync runtime ---
     let bc = null;
     let ws = null;
-
     // --- Init ---
     window.onload = function () {
       init();
     };
-
     function init() {
       // Safety checks for event listeners
       if (checkoutBtn) checkoutBtn.addEventListener('click', openCheckout);
       if (cancelCheckoutBtn)
         cancelCheckoutBtn.addEventListener('click', () => (checkoutSection.style.display = 'none'));
       if (confirmOrderBtn) confirmOrderBtn.addEventListener('click', confirmOrder);
-
       if (createOfferBtn) createOfferBtn.addEventListener('click', createOffer);
-
       if (exportDataBtn) exportDataBtn.addEventListener('click', exportAllData);
-
       if (operatorQuickBtn) operatorQuickBtn.addEventListener('click', onOperatorQuickClick);
       if (submitPwdBtn) submitPwdBtn.addEventListener('click', onSubmitQuickPwd);
       if (cancelPwdBtn)
@@ -890,12 +834,10 @@
           pwdModal.style.display = 'none';
           quickPwdInput.value = '';
         });
-
       if (operatorLoginBtn) operatorLoginBtn.addEventListener('click', operatorLogin);
       if (operatorLogoutBtn) operatorLogoutBtn.addEventListener('click', operatorLogout);
       if (showPwdBtn)
         showPwdBtn.addEventListener('click', () => alert('كلمة مرور المشغل الحالية: ' + operatorPassword));
-
       if (openEpotBtn)
         openEpotBtn.addEventListener('click', () => {
           epotModal.style.display = 'flex';
@@ -906,7 +848,6 @@
       if (unlockEpotBtn) unlockEpotBtn.addEventListener('click', unlockEpot);
       if (lockEpotBtn) lockEpotBtn.addEventListener('click', lockEpot);
       if (setEpotPwdBtn) setEpotPwdBtn.addEventListener('click', setNewEpotPwd);
-
       if (opTabs)
         opTabs.addEventListener('click', (e) => {
           if (e.target && e.target.dataset.tab) {
@@ -922,34 +863,27 @@
             }
           }
         });
-
       if (addCustomQtyBtn) addCustomQtyBtn.addEventListener('click', addCustomQty);
       if (cancelQtyBtn)
         cancelQtyBtn.addEventListener('click', () => {
           qtyModal.style.display = 'none';
           currentItemForQty = null;
         });
-
       if (cartToggle)
         cartToggle.addEventListener('click', () => {
           cartPanel.classList.toggle('open');
         });
-
       if (document.getElementById('clearCartBtn'))
         document.getElementById('clearCartBtn').addEventListener('click', () => {
           cart = [];
           updateCartDisplay();
           notify('تم تفريغ السلة', 'info');
         });
-
       if (addItemBtn) addItemBtn.addEventListener('click', addNewItem);
-
       window.addEventListener('scroll', handleScrollForCart);
-
       syncMenuFromFirebase();
       syncOffersFromFirebase();
       syncOrdersFromFirebase();
-
       renderMenu();
       renderApplyOffers();
       renderOffers();
@@ -960,7 +894,6 @@
       initSync();
       updateEditControls();
     }
-
     // --- Sync ---
     function initSync() {
       try {
@@ -969,7 +902,6 @@
       } catch (e) {
         bc = null;
       }
-
       if (SYNC_CONFIG.useWebSocket && SYNC_CONFIG.wsUrl) {
         try {
           ws = new WebSocket(SYNC_CONFIG.wsUrl);
@@ -998,7 +930,6 @@
         }
       }
     }
-
     function broadcast(msg) {
       msg._from = location.hostname + ':' + Date.now();
       if (bc)
@@ -1010,7 +941,6 @@
           ws.send(JSON.stringify(msg));
         } catch (e) {}
     }
-
     function handleSyncMessage(msg, fromServer) {
       if (!msg || !msg.type) return;
       try {
@@ -1058,7 +988,6 @@
         console.error('handleSyncMessage error', e);
       }
     }
-
     // --- Firebase Sync Functions ---
     function syncMenuFromFirebase() {
       database.ref('menu').on('value', (snapshot) => {
@@ -1076,7 +1005,6 @@
         notify('خطأ في الاتصال بقاعدة البيانات، استخدام البيانات المحلية', 'warning');
       });
     }
-
     function syncOffersFromFirebase() {
       database.ref('offers').on('value', (snapshot) => {
         const data = snapshot.val();
@@ -1093,7 +1021,6 @@
         notify('خطأ في الاتصال بقاعدة البيانات، استخدام البيانات المحلية', 'warning');
       });
     }
-
     function syncOrdersFromFirebase() {
       database.ref('orders').on('value', (snapshot) => {
         const data = snapshot.val();
@@ -1112,7 +1039,6 @@
         notify('خطأ في الاتصال بقاعدة البيانات، استخدام البيانات المحلية', 'warning');
       });
     }
-
     // --- Menu rendering ---
     function renderMenu() {
       if (!menuContainer) return;
@@ -1155,7 +1081,6 @@
         });
       });
     }
-
     // --- Custom qty add ---
     function addCustomQty() {
       const qty = Number(customQty.value);
@@ -1164,7 +1089,6 @@
       qtyModal.style.display = 'none';
       currentItemForQty = null;
     }
-
     // --- Cart ---
     function addToCart(itemId, qty) {
       const it = findItemById(itemId);
@@ -1182,7 +1106,6 @@
       notify(`${it.name} تمت إضافته للسلة`, 'success');
       cartPanel.classList.add('open');
     }
-
     function updateCartDisplay() {
       if (!cartItemsEl) return;
       cartItemsEl.innerHTML = '';
@@ -1219,7 +1142,6 @@
       }
       cartTotalEl.textContent = `${final} ج`;
     }
-
     function cartRemove(idx) {
       cart.splice(idx, 1);
       updateCartDisplay();
@@ -1236,7 +1158,6 @@
       updateCartDisplay();
       saveState();
     }
-
     // --- Scroll handler for bottom cart ---
     function handleScrollForCart() {
       const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50;
@@ -1247,7 +1168,6 @@
         bottomCart.style.display = 'none';
       }
     }
-
     // --- Checkout flow ---
     function openCheckout() {
       if (cart.length === 0) {
@@ -1261,7 +1181,6 @@
       checkoutSection.style.display = 'block';
       checkoutSection.scrollIntoView({ behavior: 'smooth' });
     }
-
     function confirmOrder() {
       const name = orderName.value.trim();
       const phone = orderPhone.value.trim();
@@ -1288,7 +1207,6 @@
           total = Math.round(total * (1 - o.discount / 100));
         }
       }
-
       const newOrder = {
         id: orderId,
         customer: { name, phone, address },
@@ -1302,14 +1220,12 @@
         date: new Date().toDateString(),
         appliedOffer
       };
-
       newOrder.items.forEach((it) => {
         const mItem = findItemById(it.id);
         if (mItem) {
           mItem.sold = (mItem.sold || 0) + it.qty;
         }
       });
-
       database
         .ref('orders/' + orderId)
         .set(newOrder)
@@ -1328,10 +1244,8 @@
         .catch((error) => {
           notify('خطأ في حفظ الطلب: ' + error.message, 'error');
         });
-
       broadcast({ type: 'order_created', payload: newOrder });
     }
-
     // --- Operator logic ---
     function onOperatorQuickClick() {
       if (!isOperatorAuthenticated) {
@@ -1348,7 +1262,6 @@
         }
       }
     }
-
     function onSubmitQuickPwd() {
       const v = quickPwdInput.value || '';
       if (v === operatorPassword) {
@@ -1369,7 +1282,6 @@
         notify('كلمة المرور خاطئة', 'error');
       }
     }
-
     function operatorLogin() {
       const val = operatorPasswordInput.value;
       if (val === operatorPassword) {
@@ -1386,7 +1298,6 @@
         notify('كلمة المرور خاطئة', 'error');
       }
     }
-
     function operatorLogout() {
       isOperatorAuthenticated = false;
       operatorLoginPanel.style.display = 'block';
@@ -1398,7 +1309,6 @@
       updateEditControls();
       notify('تم تسجيل الخروج', 'info');
     }
-
     // --- EPOT ---
     function unlockEpot() {
       const v = epotPwdInput.value || '';
@@ -1441,7 +1351,6 @@
       newEpotPwd.value = '';
       notify('تم تحديث كلمة مرور EPOT', 'success');
     }
-
     // --- Render orders for operator ---
     function renderOrders() {
       if (!ordersGrid) return;
@@ -1503,7 +1412,6 @@
         if (openOrderId === o.id) toggleOrderDetails(o.id);
       });
     }
-
     function toggleOrderDetails(id) {
       const details = document.getElementById(`details-${id}`);
       if (details.classList.contains('open')) {
@@ -1513,12 +1421,10 @@
         details.classList.add('open');
       }
     }
-
     function changeOrderStatus(orderId, newStatus) {
       const ord = orders.find((o) => o.id === orderId);
       if (!ord) return;
       ord.status = newStatus;
-
       database
         .ref('orders/' + orderId)
         .update({ status: newStatus })
@@ -1535,17 +1441,14 @@
         .catch((error) => {
           notify('خطأ في تحديث الحالة: ' + error.message, 'error');
         });
-
       broadcast({ type: 'order_status_update', payload: { id: orderId, status: newStatus } });
     }
-
     function printOrder(orderId) {
       const ord = orders.find((o) => o.id === orderId);
       if (!ord) return;
       const win = window.open('', '_blank');
       win.document.write(`<pre>${JSON.stringify(ord, null, 2)}</pre>`);
     }
-
     // --- Offers ---
     function renderApplyOffers() {
       if (!applyOfferSelect) return;
@@ -1557,7 +1460,6 @@
         applyOfferSelect.appendChild(opt);
       });
     }
-
     function renderOffers() {
       if (!activeOffersList) return;
       activeOffersList.innerHTML = '';
@@ -1576,7 +1478,6 @@
       });
       renderApplyOffers();
     }
-
     function createOffer() {
       if (!checkEditAuth()) {
         notify('مطلوب صلاحية EPOT لإنشاء عروض', 'warning');
@@ -1592,7 +1493,6 @@
       const id = generateId('offer');
       const newOffer = { id, name, discount, created: new Date().toLocaleDateString('ar-EG') };
       offers.push(newOffer);
-
       database
         .ref('offers/' + id)
         .set(newOffer)
@@ -1606,10 +1506,8 @@
         .catch((error) => {
           notify('خطأ في إنشاء العرض: ' + error.message, 'error');
         });
-
       broadcast({ type: 'offer_update', payload: offers });
     }
-
     function removeOffer(id) {
       if (!checkEditAuth()) {
         notify('مطلوب صلاحية EPOT لإلغاء العروض', 'warning');
@@ -1617,7 +1515,6 @@
         return;
       }
       offers = offers.filter((o) => o.id !== id);
-
       database
         .ref('offers/' + id)
         .remove()
@@ -1629,10 +1526,8 @@
         .catch((error) => {
           notify('خطأ في إلغاء العرض: ' + error.message, 'error');
         });
-
       broadcast({ type: 'offer_update', payload: offers });
     }
-
     // --- Manage Items ---
     function renderManageItems() {
       if (!manageItemsList) return;
@@ -1641,7 +1536,6 @@
         const catSection = document.createElement('div');
         catSection.style.marginBottom = '16px';
         catSection.innerHTML = `<h4 class="small" style="color: var(--gold); margin-bottom: 8px">${cat}</h4>`;
-
         menu[cat].forEach((item) => {
           const itemCard = document.createElement('div');
           itemCard.className = 'card small';
@@ -1669,7 +1563,6 @@
         });
       });
     }
-
     function addNewItem() {
       if (!checkEditAuth()) {
         notify('مطلوب صلاحية EPOT لإضافة أصناف', 'warning');
@@ -1687,7 +1580,6 @@
       const newItem = { id, name, price, available: true, sold: 0 };
       if (!menu[category]) menu[category] = [];
       menu[category].push(newItem);
-
       database
                .ref('menu/' + category)
         .set(menu[category])
@@ -1702,10 +1594,8 @@
         .catch((error) => {
           notify('خطأ في إضافة الصنف: ' + error.message, 'error');
         });
-
       broadcast({ type: 'menu_update', payload: menu });
     }
-
     function saveItemChanges(itemId) {
       if (!checkEditAuth()) {
         notify('مطلوب صلاحية EPOT لتعديل الأصناف', 'warning');
@@ -1726,7 +1616,6 @@
           break;
         }
       }
-
       database
         .ref('menu')
         .set(menu)
@@ -1739,10 +1628,8 @@
         .catch((error) => {
           notify('خطأ في تحديث الصنف: ' + error.message, 'error');
         });
-
       broadcast({ type: 'menu_update', payload: menu });
     }
-
     function removeItem(itemId) {
       if (!checkEditAuth()) {
         notify('مطلوب صلاحية EPOT لحذف الأصناف', 'warning');
@@ -1756,7 +1643,6 @@
           break;
         }
       }
-
       database
         .ref('menu')
         .set(menu)
@@ -1769,10 +1655,8 @@
         .catch((error) => {
           notify('خطأ في حذف الصنف: ' + error.message, 'error');
         });
-
       broadcast({ type: 'menu_update', payload: menu });
     }
-
     function populateCategories() {
       if (!newItemCategory) return;
       newItemCategory.innerHTML = '';
@@ -1783,7 +1667,6 @@
         newItemCategory.appendChild(opt);
       });
     }
-
     // --- Reports ---
     function updateReports() {
       if (!rToday || !rRevenue || !rTotal || !rTop || !popularList) return;
@@ -1792,7 +1675,6 @@
       rToday.textContent = todayOrders.length;
       rRevenue.textContent = todayOrders.reduce((s, o) => s + o.total, 0);
       rTotal.textContent = orders.length;
-
       const itemSales = {};
       orders.forEach((o) =>
         o.items.forEach((i) => {
@@ -1819,7 +1701,6 @@
           .join('')}</ul>`;
       }
     }
-
     // --- EPOT Orders ---
     function renderEpot() {
       if (!epotOrdersList || !epotTotal) return;
@@ -1843,7 +1724,6 @@
         epotOrdersList.appendChild(card);
       });
     }
-
     // --- Export ---
     function exportAllData() {
       const data = {
@@ -1865,7 +1745,6 @@
       URL.revokeObjectURL(url);
       notify('تم تصدير البيانات بنجاح', 'success');
     }
-
     // --- Helpers ---
     function findItemById(id) {
       for (const cat in menu) {
@@ -1874,14 +1753,12 @@
       }
       return null;
     }
-
     function saveState() {
       saveLS(LS_KEYS.MENU, menu);
       saveLS(LS_KEYS.ORDERS, orders);
       saveLS(LS_KEYS.OFFERS, offers);
       saveLS(LS_KEYS.CUST, currentCustomer);
     }
-
     function notify(msg, type = 'info') {
       const notifyEl = document.getElementById('notify');
       if (!notifyEl) return;
@@ -1890,11 +1767,9 @@
       notifyEl.style.display = 'block';
       setTimeout(() => (notifyEl.style.display = 'none'), 3000);
     }
-
     function checkEditAuth() {
       return isOperatorAuthenticated && epotAuthenticated;
     }
-
     function updateEditControls() {
       const editControls = [addItemBtn, newItemName, newItemPrice, newItemCategory, createOfferBtn, offerName, offerDiscount];
       editControls.forEach((el) => {
@@ -1902,7 +1777,6 @@
       });
       offerNotice.style.display = checkEditAuth() ? 'none' : 'block';
     }
-
     // --- Global event listeners ---
     window.cartIncrease = cartIncrease;
     window.cartDecrease = cartDecrease;
