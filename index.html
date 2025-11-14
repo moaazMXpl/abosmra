@@ -6,6 +6,11 @@
   <title>كشري أبو سمرة</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+
+  <!-- إضافة مكتبة Firebase (الحل للخطأ) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
   <style>
     :root {
       --bg: #1a120b;
@@ -33,7 +38,6 @@
     .brand h1 { font-size: 1.5rem; color: var(--gold); margin: 0; }
     .brand p { font-size: 0.8rem; color: var(--muted); }
 
-    /* أزرار الأيقونات */
     .icon-btn {
       width: 48px; height: 48px; border-radius: 50%; background: var(--accent);
       color: #fff; border: none; font-size: 20px; cursor: pointer;
@@ -136,7 +140,7 @@
       border: 1px solid var(--gold); background: rgba(255,255,255,0.1); color: var(--text);
     }
     .search-bar::after {
-      content: '\f002'; font-family: 'tabler-icons'; position: absolute; left: 12px; top: 10px;
+      content: 'search'; font-family: 'tabler-icons'; position: absolute; left: 12px; top: 10px;
       color: var(--gold); font-size: 18px;
     }
 
@@ -160,7 +164,6 @@
     </button>
   </div>
 
-  <!-- Tabs with horizontal scroll + icons -->
   <div class="tabs" id="categoryTabs"></div>
 
   <div id="menuContainer" class="menu-grid"></div>
@@ -176,21 +179,19 @@
     </select>
     <textarea id="orderNotes" class="input" placeholder="ملاحظات (اختياري)"></textarea>
     <div style="display:flex; gap:8px; margin-top:12px">
-      <button class="btn" id="confirmOrderBtn" style="flex:1"><i class="ti ti-check"></i> تأكيد</button>
-      <button class="btn secondary" id="cancelCheckoutBtn"><i class="ti ti-x"></i> إلغاء</button>
+      <button class="btn" id="confirmOrderBtn" style="flex:1">تأكيد</button>
+      <button class="btn secondary" id="cancelCheckoutBtn">إلغاء</button>
     </div>
   </div>
 </div>
 
-<!-- Cart Toggle -->
 <button class="cart-toggle" id="cartToggle" data-tooltip="سلة المشتريات">
   <i class="ti ti-shopping-cart"></i>
 </button>
 
-<!-- Cart Panel -->
-<div class="cart-panel" id="cartPanel">
+<div class="cart-panel" id-="cartPanel">
   <div style="font-weight:bold; font-size:1.2rem; margin-bottom:12px; display:flex; align-items:center; gap:8px">
-    <i class="ti ti-shopping-cart"></i> سلة المشتريات
+    سلة المشتريات
   </div>
   <div id="cartCustomerInfo" class="small" style="color:var(--muted)">ضيف</div>
   <div id="cartItems" style="margin:12px 0"></div>
@@ -198,21 +199,19 @@
     <div class="badge" id="cartTotal">0 ج</div>
     <select id="applyOffer" class="input" style="width:auto; padding:6px"></select>
   </div>
-  <button class="btn" id="checkoutBtn" style="width:100%"><i class="ti ti-credit-card"></i> إتمام الطلب</button>
-  <button class="btn secondary" id="clearCartBtn" style="width:100%; margin-top:8px"><i class="ti ti-trash"></i> تفريغ</button>
+  <button class="btn" id="checkoutBtn" style="width:100%">إتمام الطلب</button>
+  <button class="btn secondary" id="clearCartBtn" style="width:100%; margin-top:8px">تفريغ</button>
 </div>
 
-<!-- Profile Menu -->
 <div class="profile-menu" id="profileMenu">
-  <button class="btn secondary" id="operatorLoginBtn"><i class="ti ti-login"></i> دخول المشغل</button>
-  <button class="btn secondary" id="operatorLogoutBtn" style="display:none"><i class="ti ti-logout"></i> خروج</button>
+  <button class="btn secondary" id="operatorLoginBtn">دخول المشغل</button>
+  <button class="btn secondary" id="operatorLogoutBtn" style="display:none">خروج</button>
 </div>
 
-<!-- Operator Dashboard -->
 <div id="mainOperator" class="container" style="display:none; margin-top:20px">
   <div class="tabs" id="opTabs">
-    <div class="tab active" data-tab="ordersTab"><i class="ti ti-list"></i> الطلبات</div>
-    <div class="tab" data-tab="epotTab"><i class="ti ti-lock"></i> EPOT</div>
+    <div class="tab active" data-tab="ordersTab">الطلبات</div>
+    <div class="tab" data-tab="epotTab">EPOT</div>
   </div>
 
   <div id="ordersTab" class="tabContent">
@@ -221,8 +220,8 @@
   </div>
 
   <div id="epotTab" class="tabContent" style="display:none">
-    <button class="btn" id="endDayBtn" style="width:100%; margin-bottom:12px"><i class="ti ti-calendar-off"></i> إنهاء اليوم</button>
-    <div class="section-title"><i class="ti ti-archive"></i> طلبات مسبقة</div>
+    <button class="btn" id="endDayBtn" style="width:100%; margin-bottom:12px">إنهاء اليوم</button>
+    <div class="section-title">طلبات مسبقة</div>
     <div class="search-bar"><input type="text" id="searchArchived" placeholder="بحث..."></div>
     <div id="archivedOrders"></div>
   </div>
@@ -232,8 +231,16 @@
 <div class="order-status-badge" id="orderStatusBadge"></div>
 
 <script>
-  // --- Firebase ---
-  const firebaseConfig = { /* نفس الإعدادات */ };
+  // --- Firebase Config (استبدل ببياناتك الحقيقية) ---
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:abcdef123456"
+  };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
@@ -242,8 +249,10 @@
   let currentCustomer = null, isOperator = false, currentPhone = null;
   let bonCounter = Number(localStorage.getItem('bonCounter') || 1);
 
-  const LS = { save: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
-               load: (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch { return d; } } };
+  const LS = {
+    save: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+    load: (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch { return d; } }
+  };
 
   // --- DOM ---
   const profileBtn = document.getElementById('profileBtn');
@@ -283,7 +292,7 @@
     archivedOrders = LS.load('archivedOrders', []);
     offers = LS.load('offers', []);
     currentCustomer = LS.load('currentCustomer', null);
-    if (currentCustomer) document.getElementById('cartCustomerInfo').innerHTML = `<i class="ti ti-user"></i> ${currentCustomer.name}`;
+    if (currentCustomer) document.getElementById('cartCustomerInfo').innerHTML = `${currentCustomer.name}`;
   }
 
   function setupEvents() {
@@ -299,6 +308,7 @@
     searchOrders.oninput = renderOrders;
     searchArchived.oninput = renderArchived;
     opTabs.onclick = (e) => { if (e.target.closest('.tab')) switchTab(e.target.closest('.tab').dataset.tab); };
+    applyOfferSelect.onchange = updateCart;
   }
 
   function renderCategoryTabs() {
@@ -308,7 +318,7 @@
       const tab = document.createElement('div');
       tab.className = 'tab';
       tab.dataset.tab = cat;
-      tab.innerHTML = `<i class="ti ti-package"></i> ${cat}`;
+      tab.innerHTML = `${cat}`;
       tab.onclick = () => scrollToCategory(cat);
       tabs.appendChild(tab);
     });
@@ -324,7 +334,7 @@
     Object.entries(menu).forEach(([cat, items]) => {
       const sec = document.createElement('div');
       sec.id = `section-${cat}`;
-      sec.innerHTML = `<div class="section-title"><i class="ti ti-category"></i> ${cat}</div><div class="menu-grid"></div>`;
+      sec.innerHTML = `<div class="section-title">${cat}</div><div class="menu-grid"></div>`;
       menuContainer.appendChild(sec);
       const grid = sec.querySelector('.menu-grid');
       items.forEach(item => {
@@ -333,7 +343,7 @@
         card.innerHTML = `
           <h4>${item.name}</h4>
           <div class="price">${item.price} ج</div>
-          <button class="add-cart" ${!item.available ? 'disabled' : ''}><i class="ti ti-plus"></i> إضافة</button>
+          <button class="add-cart" ${!item.available ? 'disabled' : ''}>إضافة</button>
         `;
         card.onclick = () => { if (item.available) addToCart(item.id, 1); };
         grid.appendChild(card);
@@ -413,10 +423,10 @@
         </div>
         <div class="small" style="margin:6px 0">الإجمالي: ${o.total} ج</div>
         <div style="display:flex; gap:6px; flex-wrap:wrap">
-          ${o.status === 'received' ? `<button class="btn small" onclick="updateStatus('${o.id}', 'preparing')"><i class="ti ti-cooking-pot"></i></button>` : ''}
-          ${o.status === 'preparing' ? `<button class="btn small" onclick="updateStatus('${o.id}', 'ready')"><i class="ti ti-check"></i></button>` : ''}
-          ${o.status === 'ready' ? `<button class="btn secondary small" onclick="updateStatus('${o.id}', 'delivered')"><i class="ti ti-truck-delivery"></i></button>` : ''}
-          <button class="btn secondary small" style="background:#e74c3c" onclick="cancelOrder('${o.id}')"><i class="ti ti-x"></i></button>
+          ${o.status === 'received' ? `<button class="btn small" onclick="updateStatus('${o.id}', 'preparing')">تحضير</button>` : ''}
+          ${o.status === 'preparing' ? `<button class="btn small" onclick="updateStatus('${o.id}', 'ready')">جاهز</button>` : ''}
+          ${o.status === 'ready' ? `<button class="btn secondary small" onclick="updateStatus('${o.id}', 'delivered')">تم</button>` : ''}
+          <button class="btn secondary small" style="background:#e74c3c" onclick="cancelOrder('${o.id}')">إلغاء</button>
         </div>
       </div>
     `).join('');
@@ -442,7 +452,7 @@
 
   function showStatus(status) {
     const msg = status === 'preparing' ? 'قيد التحضير' : 'جاهز للتسليم!';
-    orderStatusBadge.innerHTML = `<i class="ti ti-alert-circle"></i> ${msg}`;
+    orderStatusBadge.innerHTML = `${msg}`;
     orderStatusBadge.style.display = 'block';
     setTimeout(() => orderStatusBadge.style.display = 'none', 5000);
   }
@@ -512,8 +522,33 @@
     setTimeout(() => n.style.display = 'none', 3000);
   }
 
+  function loginOperator() {
+    isOperator = true;
+    mainOperator.style.display = 'block';
+    operatorLogin1Btn.style.display = 'none';
+    operatorLogoutBtn.style.display = 'block';
+    switchTab('ordersTab');
+  }
+
+  function logoutOperator() {
+    isOperator = false;
+    mainOperator.style.display = 'none';
+    operatorLoginBtn.style.display = 'block';
+    operatorLogoutBtn.style.display = 'none';
+  }
+
   // --- Default Menu ---
-  const DEFAULT_MENU = { /* نفس القائمة الأصلية */ };
+  const DEFAULT_MENU = {
+    "كشري": [
+      { id: "k1", name: "كشري عادي", price: 15, available: true },
+      { id: "k2", name: "كشري وسط", price: 20, available: true },
+      { id: "k3", name: "كشري كبير", price: 25, available: true }
+    ],
+    "إضافات": [
+      { id: "a1", name: "بيض", price: 5, available: true },
+      { id: "a2", name: "سجق", price: 10, available: true }
+    ]
+  };
 
   // Global
   window.updateStatus = updateStatus;
