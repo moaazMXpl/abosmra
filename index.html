@@ -572,18 +572,19 @@
       cursor: pointer;
     }
     .profile-menu {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      margin-top: 8px;
-      background: var(--card);
-      border: 2px solid var(--accent);
-      border-radius: 12px;
-      min-width: 200px;
-      display: none;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-      z-index: 1000;
-    }
+  position: absolute;
+  top: 100%;
+  left: 0;       /* ← هنا التعديل المهم */
+  margin-top: 8px;
+  background: var(--card);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  min-width: 200px;
+  display: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  z-index: 1000;
+}
+
     .profile-menu.open {
       display: block;
     }
@@ -629,7 +630,6 @@
         </button>
         <div class="profile-menu" id="profileMenu">
           <div class="profile-menu-item" id="trackOrdersBtn">📦 متابعة حالة الطلب</div>
-          <div class="profile-menu-item" id="logoutCustomerBtn">🚪 تسجيل خروج</div>
         </div>
       </div>
     </div>
@@ -1379,39 +1379,52 @@
       checkCustomerOrders();
     }
 
-    function printReceipt(order) {
-      const printWindow = window.open('', '', 'width=300,height=600');
+        function printReceipt(order) {
+      const printWindow = window.open('', '', 'width=380,height=600');
+      let itemsHtml = '';
+      order.items.forEach(i => {
+        itemsHtml += `<div class="item"><span>${i.name} × ${i.qty}</span><span>${i.price * i.qty} ج</span></div>`;
+      });
+
       printWindow.document.write(`
+        <!DOCTYPE html>
         <html dir="rtl">
         <head>
-          <title>طلب #${order.receiptNo}</title>
+          <meta charset="utf-8">
+          <title>بون #${order.receiptNo}</title>
           <style>
-            body { font-family: Arial; padding: 10px; }
-            h2 { text-align: center; margin: 5px 0; }
-            .line { border-bottom: 1px dashed #000; margin: 10px 0; }
-            .item { display: flex; justify-content: space-between; margin: 5px 0; }
-            .total { font-weight: bold; font-size: 1.2em; margin-top: 10px; }
+            body { font-family: Arial, Helvetica, sans-serif; padding: 15px; font-size: 16px; line-height: 1.5; }
+            h2 { text-align: center; margin: 0 0 10px; font-size: 22px; }
+            .line { border-bottom: 2px dashed #000; margin: 15px 0; }
+            .item { display: flex; justify-content: space-between; margin: 8px 0; }
+            .total { font-weight: bold; font-size: 20px; text-align: center; margin: 20px 0 10px; }
+            .center { text-align: center; }
           </style>
         </head>
         <body>
-          <h2>كشري أبو سمرة</h2>
+          <h2>🍛 كشري أبو سمرة</h2>
+          <div class="center">بون رقم: ${order.receiptNo}</div>
           <div class="line"></div>
-          <p><strong>طلب رقم:</strong> ${order.receiptNo}</p>
-          <p><strong>العميل:</strong> ${order.customer.name}</p>
-          <p><strong>الهاتف:</strong> ${order.customer.phone}</p>
-          <p><strong>العنوان:</strong> ${order.customer.address}</p>
-          <p><strong>الوقت:</strong> ${order.createdAt}</p>
+          <div>الاسم: ${order.customer.name}</div>
+          <div>الهاتف: ${order.customer.phone}</div>
+          <div>العنوان: ${order.customer.address}</div>
+          <div>التاريخ: ${order.createdAt}</div>
           <div class="line"></div>
-          ${order.items.mapi => `<div class="item"><span>${i.name} × ${i.qty}</span><span>${i.price * i.qty} ج</span></div>`).join('')}
+          ${itemsHtml}
           <div class="line"></div>
-          <div class="total">الإجمالي: ${order.total} ج</div>
-          <p><strong>الدفع:</strong> ${order.payment}</p>
-          ${order.notes ? `<p><strong>ملاحظات:</strong> ${order.notes}</p>` : ''}
+          ${order.appliedOffer ? `<div>تم تطبيق عرض: ${order.appliedOffer.name}</div>` : ''}
+          <div class="total">الإجمالي: ${order.total} جنيه</div>
+          <div>طريقة الدفع: ${order.payment === 'cash' ? 'كاش' : 'فودافون كاش'}</div>
+          ${order.notes ? `<div><strong>ملاحظات:</strong> ${order.notes}</div>` : ''}
+          <div class="center" style="margin-top: 30px; font-size: 14px; color: #555;">
+            شكرًا لثقتكم 🍛 أبو سمرة دايمًا الأصلي
+          </div>
         </body>
         </html>
       `);
       printWindow.document.close();
-      printWindow.print();
+      printWindow.focus();
+      setTimeout(() => printWindow.print(), 500);
     }
 
     function checkCustomerOrders() {
@@ -2089,17 +2102,6 @@
         showMyOrders();
       };
 
-      document.getElementById('logoutCustomerBtn').onclick = () => {
-        if (confirm('هل تريد تسجيل الخروج؟')) {
-          userAccount = null;
-          userOrders = [];
-          saveState();
-          updateUserInfo();
-          document.getElementById('profileMenu').classList.remove('open');
-          notify('تم تسجيل الخروج', 'info');
-        }
-      };
-
       document.getElementById('sendOtpBtn').onclick = () => {
         sendOtp();
       };
@@ -2148,9 +2150,9 @@
       };
 
       document.querySelectorAll('.tab').forEach(tab => {
-        tab.onclick = (e) => {
-          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-          document.queryAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+  tab.onclick = (e) => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
           
           e.target.classList.add('active');
           const tabName = e.target.dataset.tab;
@@ -2256,7 +2258,7 @@
       updateStats();
       renderItemManagement();
       renderOffers();
-    }
+    } 
   </script>
 </body>
 </html>
