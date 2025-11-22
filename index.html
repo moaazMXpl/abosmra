@@ -557,9 +557,10 @@
       cursor: pointer;
     }
     .profile-menu {
-  position: fixed;
-  top: 70px;
-  right: 20px;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 260%;
+  transform: translateX(-50%);
   background: var(--card);
   border: 2px solid var(--accent);
   border-radius: 12px;
@@ -1623,9 +1624,22 @@
         return;
       }
 
-      const currentOrders = allUserOrders.filter(o => !o.cancelled && o.status !== 'delivered');
+      const currentOrders = allUserOrders.filter(o => {
+  // إذا كان الطلب في انتظار تأكيد الإلغاء من المشغل، يظهر في الطلبات الحالية
+  if (o.cancelRequested && !o.cancelConfirmedByOperator) {
+    return true;
+  }
+  // الطلبات العادية
+  return !o.cancelled && o.status !== 'delivered';
+});
       const deliveredOrders = allUserOrders.filter(o => o.status === 'delivered' && !o.cancelled);
-      const cancelledOrders = allUserOrders.filter(o => o.cancelled);
+      const cancelledOrders = allUserOrders.filter(o => {
+  // إذا كان الطلب ملغي ولكن لا يزال في حالة "تم الاستلام" ولم يتم تأكيد الإلغاء من المشغل
+  if (o.cancelled && o.status === 'received' && o.cancelRequestedBy === 'customer' && !o.cancelConfirmedByOperator) {
+    return false; // لا تعرضه في الملغاة
+  }
+  return o.cancelled;
+});
 
       if (currentOrders.length > 0) {
         const section = document.createElement('div');
@@ -1774,10 +1788,10 @@
       detailsHTML += '<div class="small" style="margin-top: 8px;">العنوان: ' + order.customer.address + '</div>';
       detailsHTML += '</div>';
       
-      if (canCancel && order.status !== 'delivered' && !order.cancelled) {
-  if (order.cancelRequested) {
+      if (canCancel && order.status !== 'delivered' && (!order.cancelled || order.cancelRequested)) {
+  if (order.cancelRequested && !order.cancelConfirmedByOperator) {
     detailsHTML += '<div style="background: var(--accent); color: #1a1410; padding: 12px; border-radius: 8px; margin-top: 12px; text-align: center; font-weight: bold;">⏳ في انتظار مراجعة طلب الإلغاء</div>';
-  } else {
+  } else if (!order.cancelled) {
     detailsHTML += '<button class="btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="requestCancelOrder(\'' + order.id + '\')">إلغاء الطلب</button>';
   }
 }
@@ -1819,17 +1833,40 @@
   let order = orders.find(o => o.id === orderToCancel);
   
   if (order) {
-    order.cancelRequested = true;
-    order.cancelRequestReason = reason;
-    order.cancelRequestedBy = 'customer';
-    order.cancelRequestedAt = new Date().toLocaleString('ar-EG');
-    
-    database.ref('orders/' + orderToCancel).update({
-      cancelRequested: true,
-      cancelRequestReason: reason,
-      cancelRequestedBy: 'customer',
-      cancelRequestedAt: new Date().toLocaleString('ar-EG')
-    });
+    // إذا كان الطلب لا يزال في حالة "تم الاستلام"
+    if (order.status === 'received') {
+      order.cancelRequested = true;
+      order.cancelRequestReason = reason;
+      order.cancelRequestedBy = 'customer';
+      order.cancelRequestedAt = new Date().toLocaleString('ar-EG');
+      order.cancelled = false; // لا نضع ملغي حتى يؤكد المشغل
+      
+      database.ref('orders/' + orderToCancel).update({
+        cancelRequested: true,
+        cancelRequestReason: reason,
+        cancelRequestedBy: 'customer',
+        cancelRequestedAt: new Date().toLocaleString('ar-EG'),
+        cancelled: false
+      });
+    } else {
+      // إذا كان الطلب في مرحلة متقدمة، يلغى مباشرة
+      order.cancelled = true;
+      order.cancelReason = reason;
+      order.status = 'cancelled';
+      order.cancelConfirmedByOperator = true;
+      
+      database.ref('orders/' + orderToCancel).update({
+        cancelled: true,
+        cancelReason: reason,
+        status: 'cancelled',
+        cancelConfirmedByOperator: true
+      });
+
+      if (!orderHistory.find(h => h.id === order.id)) {
+        orderHistory.unshift(order);
+        database.ref('history/' + orderToCancel).set(order);
+      }
+    }
 
     saveState();
     syncUserOrders();
@@ -2057,12 +2094,14 @@ window.confirmCancelFromOperator = function(orderId) {
   order.cancelled = true;
   order.cancelReason = order.cancelRequestReason;
   order.status = 'cancelled';
+  order.cancelConfirmedByOperator = true;
 
   database.ref('orders/' + orderId).update({ 
     cancelled: true, 
     cancelReason: order.cancelRequestReason,
     status: 'cancelled',
-    cancelRequested: false
+    cancelRequested: false,
+    cancelConfirmedByOperator: true
   });
 
   if (!orderHistory.find(h => h.id === order.id)) {
