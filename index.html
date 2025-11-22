@@ -500,14 +500,14 @@
       color: #1a1410;
     }
     .customer-status {
-      background: var(--card);
-      padding: 20px;
-      margin: 20px;
-      margin-top: 170px;
-      border-radius: 12px;
-      border: 2px solid var(--accent);
-      display: none;
-    }
+  background: var(--card);
+  padding: 20px;
+  margin: 20px;
+  margin-top: 170px;
+  border-radius: 12px;
+  border: 2px solid var(--accent);
+  display: none !important; /* إخفاء دائم */
+}
     .customer-status.show {
       display: block;
     }
@@ -979,14 +979,13 @@
     }
 
     window.onload = function() {
-      syncFromFirebase();
-      renderCategories();
-      renderMenu();
-      renderOffers();
-      updateCartDisplay();
-      checkCustomerOrders();
-      setupEventListeners();
-      updateUserInfo();
+  syncFromFirebase();
+  renderCategories();
+  renderMenu();
+  renderOffers();
+  updateCartDisplay();
+  setupEventListeners();
+  updateUserInfo();
       document.getElementById('autoPrintCheckbox').checked = autoPrint;
       
       if ('OTPCredential' in window) {
@@ -1074,12 +1073,21 @@ database.ref('orders').on('child_changed', (snapshot) => {
     }
 
     function syncUserOrders() {
-      if (userAccount) {
-        userOrders = [...orders, ...orderHistory].filter(o => o.customerPhone === userAccount.phone);
-        saveLS(LS_KEYS.USER_ORDERS, userOrders);
-        updateUserInfo();
+  if (userAccount || currentCustomer) {
+    const customerPhone = userAccount?.phone || currentCustomer?.phone;
+    if (customerPhone) {
+      userOrders = [...orders, ...orderHistory].filter(o => o.customerPhone === customerPhone);
+      saveLS(LS_KEYS.USER_ORDERS, userOrders);
+      updateUserInfo();
+      
+      // تحديث قائمة الطلبات إذا كانت مفتوحة
+      const panel = document.getElementById('ordersPanel');
+      if (panel && panel.classList.contains('open')) {
+        showMyOrders();
       }
     }
+  }
+}
 
     function renderCategories() {
       const container = document.getElementById('categoriesScroll');
@@ -1442,9 +1450,13 @@ database.ref('orders').on('child_changed', (snapshot) => {
     }
 
     function checkCustomerOrders() {
-  if (!userAccount || !userAccount.phone) return;
+  const customerPhone = userAccount?.phone || currentCustomer?.phone;
   
-  const activeOrders = userOrders.filter(o => 
+  if (!customerPhone) return;
+  
+  const allUserOrders = [...orders, ...orderHistory].filter(o => o.customerPhone === customerPhone);
+  
+  const activeOrders = allUserOrders.filter(o => 
     o.status !== 'delivered' && 
     !o.cancelled
   );
@@ -1474,20 +1486,13 @@ database.ref('orders').on('child_changed', (snapshot) => {
       statuses.slice(0, 3).forEach((status, idx) => {
         const isCompleted = idx <= currentStatusIndex;
         const bgColor = isCompleted ? 'var(--gold)' : 'var(--brown)';
-        progressHTML += `<div style="flex: 1; text-align: center; padding: 6px; background: ${bgColor}; color: #1a1410; font-size: 0.75rem; font-weight: bold;">${statusText[status]}</div>`;
+        progressHTML += '<div style="flex: 1; text-align: center; padding: 6px; background: ' + bgColor + '; color: #1a1410; font-size: 0.75rem; font-weight: bold;">' + statusText[status] + '</div>';
       });
       progressHTML += '</div>';
       
       const div = document.createElement('div');
       div.style.marginBottom = '12px';
-      div.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <strong>طلب رقم: ${order.receiptNo}</strong>
-          <span class="badge ${statusClass[order.status]}">${statusText[order.status]}</span>
-        </div>
-        ${progressHTML}
-        <div class="small">الإجمالي: ${order.total} ج</div>
-      `;
+      div.innerHTML = '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><strong>طلب رقم: ' + order.receiptNo + '</strong><span class="badge ' + statusClass[order.status] + '">' + statusText[order.status] + '</span></div>' + progressHTML + '<div class="small">الإجمالي: ' + order.total + ' ج</div>';
       statusContent.appendChild(div);
     });
   } else {
@@ -1496,72 +1501,116 @@ database.ref('orders').on('child_changed', (snapshot) => {
 }
 
     function showMyOrders() {
-      const panel = document.getElementById('ordersPanel');
-      const list = document.getElementById('myOrdersList');
-      
-      list.innerHTML = '';
-      
-      if (!userAccount) {
-        list.innerHTML = '<div class="small" style="text-align: center; padding: 20px;">يجب تسجيل الدخول أولاً</div>';
-        panel.classList.add('open');
-        return;
+  const panel = document.getElementById('ordersPanel');
+  const list = document.getElementById('myOrdersList');
+  
+  list.innerHTML = '';
+  
+  const customerPhone = userAccount?.phone || currentCustomer?.phone;
+  
+  if (!customerPhone) {
+    list.innerHTML = '<div class="small" style="text-align: center; padding: 20px;">لا توجد طلبات بعد. قم بإضافة طلبك الأول!</div>';
+    panel.classList.add('open');
+    return;
+  }
+
+  const allUserOrders = [...orders, ...orderHistory].filter(o => o.customerPhone === customerPhone);
+
+  if (allUserOrders.length === 0) {
+    list.innerHTML = '<div class="small" style="text-align: center; padding: 20px;">لا توجد طلبات بعد. قم بإضافة طلبك الأول!</div>';
+    panel.classList.add('open');
+    return;
+  }
+
+  const currentOrders = allUserOrders.filter(o => !o.cancelled && o.status !== 'delivered');
+  const deliveredOrders = allUserOrders.filter(o => o.status === 'delivered' && !o.cancelled);
+  const cancelledOrders = allUserOrders.filter(o => o.cancelled);
+
+  // الطلبات الحالية (مفتوحة دائماً)
+  if (currentOrders.length > 0) {
+    const section = document.createElement('div');
+    section.innerHTML = '<h3 style="color: var(--gold); margin-bottom: 12px;">الطلبات الحالية (' + currentOrders.length + ')</h3>';
+    
+    currentOrders.forEach(order => {
+      const card = createOrderCard(order, true);
+      section.appendChild(card);
+    });
+    
+    list.appendChild(section);
+  }
+
+  // الطلبات المكتملة (قابلة للطي)
+  if (deliveredOrders.length > 0) {
+    const section = document.createElement('div');
+    section.style.marginTop = '20px';
+    
+    const header = document.createElement('div');
+    header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: var(--brown); padding: 12px; border-radius: 8px; cursor: pointer; margin-bottom: 12px;';
+    header.innerHTML = '<h3 style="color: var(--gold); margin: 0;">الطلبات المكتملة (' + deliveredOrders.length + ')</h3><span style="font-size: 1.5rem; color: var(--gold);" id="delivered-arrow">▼</span>';
+    
+    const content = document.createElement('div');
+    content.id = 'delivered-content';
+    content.style.display = 'none';
+    
+    deliveredOrders.forEach(order => {
+      const card = createOrderCard(order, false);
+      content.appendChild(card);
+    });
+    
+    header.onclick = () => {
+      const arrow = document.getElementById('delivered-arrow');
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        arrow.textContent = '▲';
+      } else {
+        content.style.display = 'none';
+        arrow.textContent = '▼';
       }
+    };
+    
+    section.appendChild(header);
+    section.appendChild(content);
+    list.appendChild(section);
+  }
 
-      if (userOrders.length === 0) {
-        list.innerHTML = '<div class="small" style="text-align: center; padding: 20px;">لا توجد طلبات</div>';
-        panel.classList.add('open');
-        return;
+  // الطلبات الملغاة (قابلة للطي)
+  if (cancelledOrders.length > 0) {
+    const section = document.createElement('div');
+    section.style.marginTop = '20px';
+    
+    const header = document.createElement('div');
+    header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: var(--brown); padding: 12px; border-radius: 8px; cursor: pointer; margin-bottom: 12px;';
+    header.innerHTML = '<h3 style="color: var(--danger); margin: 0;">الطلبات الملغاة (' + cancelledOrders.length + ')</h3><span style="font-size: 1.5rem; color: var(--danger);" id="cancelled-arrow">▼</span>';
+    
+    const content = document.createElement('div');
+    content.id = 'cancelled-content';
+    content.style.display = 'none';
+    
+    cancelledOrders.forEach(order => {
+      const card = createOrderCard(order, false);
+      content.appendChild(card);
+    });
+    
+    header.onclick = () => {
+      const arrow = document.getElementById('cancelled-arrow');
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        arrow.textContent = '▲';
+      } else {
+        content.style.display = 'none';
+        arrow.textContent = '▼';
       }
+    };
+    
+    section.appendChild(header);
+    section.appendChild(content);
+    list.appendChild(section);
+  }
 
-      const currentOrders = userOrders.filter(o => !o.cancelled && o.status !== 'delivered');
-      const deliveredOrders = userOrders.filter(o => o.status === 'delivered' && !o.cancelled);
-      const cancelledOrders = userOrders.filter(o => o.cancelled);
+  panel.classList.add('open');
+}
 
-      if (currentOrders.length > 0) {
-        const section = document.createElement('div');
-        section.innerHTML = '<h3 style="color: var(--gold); margin-bottom: 12px;">الطلبات الحالية</h3>';
-        
-        currentOrders.forEach(order => {
-          const card = createOrderCard(order, true);
-          section.appendChild(card);
-        });
-        
-        list.appendChild(section);
-      }
-
-      if (deliveredOrders.length > 0) {
-        const section = document.createElement('div');
-        section.style.marginTop = '20px';
-        section.innerHTML = '<h3 style="color: var(--gold); margin-bottom: 12px;">الطلبات المكتملة</h3>';
-        
-        deliveredOrders.forEach(order => {
-          const card = createOrderCard(order, false);
-          section.appendChild(card);
-        });
-        
-        list.appendChild(section);
-      }
-
-      if (cancelledOrders.length > 0) {
-        const section = document.createElement('div');
-        section.style.marginTop = '20px';
-        section.innerHTML = '<h3 style="color: var(--gold); margin-bottom: 12px;">الطلبات الملغاة</h3>';
-        
-        cancelledOrders.forEach(order => {
-          const card = createOrderCard(order, false);
-          section.appendChild(card);
-        });
-        
-        list.appendChild(section);
-      }
-
-      panel.classList.add('open');
-    }
-
-    innerHTML = `
-
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
+    
             function createOrderCard(order, canCancel) {
   const statusText = {
     'received': 'تم الاستلام',
@@ -1585,12 +1634,32 @@ database.ref('orders').on('child_changed', (snapshot) => {
   card.className = 'order-card';
   if (order.cancelled) card.classList.add('cancelled');
   
-  let progressHTML = '<div style="margin: 12px 0; background: var(--brown-dark); border-radius: 8px; overflow: hidden;">';
+  // شريط تقدم جميل على شكل نقاط متصلة
+  let progressHTML = '<div style="margin: 16px 0; display: flex; align-items: center; justify-content: space-between;">';
+  
   statuses.forEach((status, idx) => {
     const isCompleted = idx <= currentStatusIndex;
-    const color = isCompleted ? 'var(--gold)' : 'var(--brown)';
-    progressHTML += '<div style="display: inline-block; width: 25%; text-align: center; padding: 8px; background: ' + color + '; color: #1a1410; font-size: 0.85rem; font-weight: bold;">' + statusText[status] + '</div>';
+    const isLast = idx === statuses.length - 1;
+    
+    // النقطة
+    const dotColor = isCompleted ? 'var(--gold)' : 'var(--brown)';
+    const dotSize = isCompleted ? '16px' : '12px';
+    
+    progressHTML += '<div style="display: flex; align-items: center; flex: 1;">';
+    progressHTML += '<div style="display: flex; flex-direction: column; align-items: center; position: relative;">';
+    progressHTML += '<div style="width: ' + dotSize + '; height: ' + dotSize + '; border-radius: 50%; background: ' + dotColor + '; border: 3px solid ' + (isCompleted ? 'var(--gold)' : 'var(--brown)') + '; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 2;"></div>';
+    progressHTML += '<div style="font-size: 0.7rem; color: ' + (isCompleted ? 'var(--gold)' : 'var(--muted)') + '; margin-top: 6px; text-align: center; font-weight: ' + (isCompleted ? 'bold' : 'normal') + ';">' + statusText[status] + '</div>';
+    progressHTML += '</div>';
+    
+    // الخط الموصل (إلا في آخر عنصر)
+    if (!isLast) {
+      const lineColor = (idx < currentStatusIndex) ? 'var(--gold)' : 'var(--brown)';
+      progressHTML += '<div style="flex: 1; height: 3px; background: ' + lineColor + '; margin: 0 4px; margin-bottom: 20px;"></div>';
+    }
+    
+    progressHTML += '</div>';
   });
+  
   progressHTML += '</div>';
   
   let detailsHTML = '<div style="margin-top: 12px; padding: 12px; background: var(--brown-dark); border-radius: 8px;">';
@@ -1611,7 +1680,7 @@ database.ref('orders').on('child_changed', (snapshot) => {
   detailsHTML += '<div class="small" style="margin-top: 8px;">العنوان: ' + order.customer.address + '</div>';
   detailsHTML += '</div>';
   
-  if (canCancel && order.status !== 'delivered') {
+  if (canCancel && order.status !== 'delivered' && !order.cancelled) {
     detailsHTML += '<button class="btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="requestCancelOrder(\'' + order.id + '\')">إلغاء الطلب</button>';
   }
   
@@ -1641,54 +1710,50 @@ database.ref('orders').on('child_changed', (snapshot) => {
 };
 
     function confirmCancelOrder() {
-      if (!orderToCancel) return;
-      
-      const reason = document.getElementById('cancelReason').value.trim();
-      if (!reason) {
-        notify('يرجى كتابة سبب الإلغاء', 'warning');
-        return;
-      }
+  if (!orderToCancel) return;
+  
+  const reason = document.getElementById('cancelReason').value.trim();
+  if (!reason) {
+    notify('يرجى كتابة سبب الإلغاء', 'warning');
+    return;
+  }
 
-      const order = orders.find(o => o.id === orderToCancel);
-      if (order) {
-        order.cancelled = true;
-        order.cancelReason = reason;
-        order.status = 'cancelled';
-        
-        database.ref('orders/' + orderToCancel).update({
-          cancelled: true,
-          cancelReason: reason,
-          status: 'cancelled'
-        });
+  // البحث في الطلبات الحالية
+  let order = orders.find(o => o.id === orderToCancel);
+  
+  if (order) {
+    order.cancelled = true;
+    order.cancelReason = reason;
+    order.status = 'cancelled';
+    
+    // تحديث Firebase
+    database.ref('orders/' + orderToCancel).update({
+      cancelled: true,
+      cancelReason: reason,
+      status: 'cancelled'
+    });
 
-        if (!orderHistory.find(h => h.id === order.id)) {
-          orderHistory.unshift(order);
-          database.ref('history/' + orderToCancel).set(order);
-        }
-
-        saveState();
-        syncUserOrders();
-      }
-
-      document.getElementById('cancelModal').classList.remove('open');
-      document.getElementById('cancelReason').value = '';
-      orderToCancel = null;
-      
-      notify('تم إلغاء الطلب', 'info');
-      showMyOrders();
+    // نقل إلى History
+    if (!orderHistory.find(h => h.id === order.id)) {
+      orderHistory.unshift(order);
+      database.ref('history/' + orderToCancel).set(order);
     }
 
-    function updateOperatorBadge() {
-      const badge = document.getElementById('orderBadge');
-      const activeOrders = orders.filter(o => !o.cancelled && o.status !== 'delivered').length;
-      
-      if (activeOrders > 0 && currentView === 'operator') {
-        badge.style.display = 'flex';
-        badge.textContent = activeOrders;
-      } else {
-        badge.style.display = 'none';
-      }
-    }
+    saveState();
+    syncUserOrders();
+  }
+
+  document.getElementById('cancelModal').classList.remove('open');
+  document.getElementById('cancelReason').value = '';
+  orderToCancel = null;
+  
+  notify('تم إلغاء الطلب بنجاح', 'info');
+  
+  // إعادة فتح القائمة
+  setTimeout(() => {
+    showMyOrders();
+  }, 300);
+}
 
     function renderOffers() {
       const select = document.getElementById('applyOffer');
@@ -2171,6 +2236,14 @@ database.ref('orders').on('child_changed', (snapshot) => {
         orderToCancel = null;
       };
 
+           // داخل setupEventListeners، أضف:
+document.getElementById('confirmCancelBtn').onclick = confirmCancelOrder;
+
+document.getElementById('closeCancelBtn').onclick = () => {
+  document.getElementById('cancelModal').classList.remove('open');
+  document.getElementById('cancelReason').value = '';
+  orderToCancel = null;
+};
       document.addEventListener('keydown', (e) => {
         if (currentView === 'customer') {
           secretCode += e.key;
