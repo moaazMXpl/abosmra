@@ -500,14 +500,8 @@
       color: #1a1410;
     }
     .customer-status {
-      background: var(--card);
-      padding: 20px;
-      margin: 20px;
-      margin-top: 170px;
-      border-radius: 12px;
-      border: 2px solid var(--accent);
-      display: none;
-    }
+  display: none !important;
+}
     .customer-status.show {
       display: block;
     }
@@ -563,18 +557,17 @@
       cursor: pointer;
     }
     .profile-menu {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      margin-top: 8px;
-      background: var(--card);
-      border: 2px solid var(--accent);
-      border-radius: 12px;
-      min-width: 200px;
-      display: none;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-      z-index: 1000;
-    }
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  background: var(--card);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  min-width: 200px;
+  display: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  z-index: 1000;
+}
     .profile-menu.open {
       display: block;
     }
@@ -1782,8 +1775,12 @@
       detailsHTML += '</div>';
       
       if (canCancel && order.status !== 'delivered' && !order.cancelled) {
-        detailsHTML += '<button class="btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="requestCancelOrder(\'' + order.id + '\')">إلغاء الطلب</button>';
-      }
+  if (order.cancelRequested) {
+    detailsHTML += '<div style="background: var(--accent); color: #1a1410; padding: 12px; border-radius: 8px; margin-top: 12px; text-align: center; font-weight: bold;">⏳ في انتظار مراجعة طلب الإلغاء</div>';
+  } else {
+    detailsHTML += '<button class="btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="requestCancelOrder(\'' + order.id + '\')">إلغاء الطلب</button>';
+  }
+}
       
       card.innerHTML = '<div style="display: flex; justify-content: space-between; align-items: center;"><div><strong>طلب #' + order.receiptNo + '</strong><div class="small">' + order.createdAt + '</div></div><span class="badge ' + statusClass[order.status || 'received'] + '">' + statusText[order.status || 'received'] + '</span></div>' + progressHTML + '<div class="order-details" id="user-order-' + order.id + '">' + detailsHTML + '</div>';
       
@@ -1811,46 +1808,43 @@
     };
 
     function confirmCancelOrder() {
-      if (!orderToCancel) return;
-      
-      const reason = document.getElementById('cancelReason').value.trim();
-      if (!reason) {
-        notify('يرجى كتابة سبب الإلغاء', 'warning');
-        return;
-      }
+  if (!orderToCancel) return;
+  
+  const reason = document.getElementById('cancelReason').value.trim();
+  if (!reason) {
+    notify('يرجى كتابة سبب الإلغاء', 'warning');
+    return;
+  }
 
-      let order = orders.find(o => o.id === orderToCancel);
-      
-      if (order) {
-        order.cancelled = true;
-        order.cancelReason = reason;
-        order.status = 'cancelled';
-        
-        database.ref('orders/' + orderToCancel).update({
-          cancelled: true,
-          cancelReason: reason,
-          status: 'cancelled'
-        });
+  let order = orders.find(o => o.id === orderToCancel);
+  
+  if (order) {
+    order.cancelRequested = true;
+    order.cancelRequestReason = reason;
+    order.cancelRequestedBy = 'customer';
+    order.cancelRequestedAt = new Date().toLocaleString('ar-EG');
+    
+    database.ref('orders/' + orderToCancel).update({
+      cancelRequested: true,
+      cancelRequestReason: reason,
+      cancelRequestedBy: 'customer',
+      cancelRequestedAt: new Date().toLocaleString('ar-EG')
+    });
 
-        if (!orderHistory.find(h => h.id === order.id)) {
-          orderHistory.unshift(order);
-          database.ref('history/' + orderToCancel).set(order);
-        }
+    saveState();
+    syncUserOrders();
+  }
 
-        saveState();
-        syncUserOrders();
-      }
-
-      document.getElementById('cancelModal').classList.remove('open');
-      document.getElementById('cancelReason').value = '';
-      orderToCancel = null;
-      
-      notify('تم إلغاء الطلب بنجاح', 'info');
-      
-      setTimeout(() => {
-        showMyOrders();
-      }, 300);
-    }
+  document.getElementById('cancelModal').classList.remove('open');
+  document.getElementById('cancelReason').value = '';
+  orderToCancel = null;
+  
+  notify('تم إرسال طلب الإلغاء للمراجعة', 'info');
+  
+  setTimeout(() => {
+    showMyOrders();
+  }, 300);
+}
 
     function renderOffers() {
       const select = document.getElementById('applyOffer');
@@ -1928,8 +1922,9 @@
       }
 
       ordersToShow.forEach(order => {
-        const card = document.createElement('div');
-        card.className = 'order-card';
+  const card = document.createElement('div');
+  card.className = 'order-card';
+  if (order.cancelRequested) card.classList.add('cancel-requested');
         const statusText = {
           'received': 'تم الاستلام',
           'preparing': 'قيد التحضير',
@@ -1943,19 +1938,27 @@
           'delivered': 'badge-delivered'
         };
         card.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong>طلب #${order.receiptNo}</strong>
-              <div class="small">${order.customer.name} — ${order.customer.phone}</div>
-              <div class="small">${order.createdAt}</div>
-            </div>
-            <span class="badge ${statusClass[order.status]}">${statusText[order.status]}</span>
-          </div>
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <strong>طلب #${order.receiptNo}</strong>
+      ${order.cancelRequested ? '<span class="badge badge-danger" style="margin-right: 8px;">⚠️ طلب إلغاء</span>' : ''}
+      <div class="small">${order.customer.name} — ${order.customer.phone}</div>
+      <div class="small">${order.createdAt}</div>
+    </div>
+    <span class="badge ${statusClass[order.status]}">${statusText[order.status]}</span>
+  </div>
           <div class="order-details" id="details-${order.id}">
             <div style="margin-top: 12px; padding: 12px; background: var(--brown-dark); border-radius: 8px;">
               <div><strong>العنوان:</strong> ${order.customer.address}</div>
               <div><strong>الدفع:</strong> ${order.payment}</div>
-              ${order.notes ? `<strong>ملاحظات:</strong> ${order.notes}</div>` : ''}
+${order.notes ? `<div><strong>ملاحظات:</strong> ${order.notes}</div>` : ''}
+${order.cancelRequested ? `
+  <div style="background: var(--danger); color: #fff; padding: 12px; border-radius: 8px; margin: 12px 0;">
+    <strong>⚠️ العميل طلب إلغاء هذا الطلب</strong>
+    <div style="margin-top: 8px;"><strong>السبب:</strong> ${order.cancelRequestReason}</div>
+    <div class="small">وقت الطلب: ${order.cancelRequestedAt}</div>
+  </div>
+` : ''}
               <div style="margin-top: 12px;">
                 ${order.items.map(i => `<div>${i.name} × ${i.qty} = ${i.price * i.qty} ج</div>`).join('')}
               </div>
@@ -1966,7 +1969,12 @@
               ${order.status === 'preparing' ? `<button class="btn btn-primary" onclick="changeStatus('${order.id}', 'ready')">جاهز للتسليم</button>` : ''}
               ${order.status === 'ready' ? `<button class="btn btn-primary" onclick="changeStatus('${order.id}', 'delivered')">تم التسليم</button>` : ''}
               <button class="btn btn-secondary" onclick="printReceiptById('${order.id}')">طباعة</button>
-              <button class="btn btn-danger" onclick="cancelOrderOperator('${order.id}')">إلغاء الطلب</button>
+              ${order.cancelRequested ? 
+  `<button class="btn btn-danger" onclick="confirmCancelFromOperator('${order.id}')" style="width: 100%; font-size: 1.1rem; padding: 12px;">✓ تأكيد الإلغاء</button>
+   <button class="btn btn-secondary" onclick="rejectCancelRequest('${order.id}')" style="width: 100%; margin-top: 8px;">✗ رفض طلب الإلغاء</button>` 
+  : 
+  `<button class="btn btn-danger" onclick="cancelOrderOperator('${order.id}')">إلغاء الطلب</button>`
+}
             </div>
           </div>
         `;
@@ -2038,6 +2046,58 @@
       syncUserOrders();
       notify('تم إلغاء الطلب', 'info');
     };
+
+window.confirmCancelFromOperator = function(orderId) {
+  if (!confirm('هل تريد تأكيد إلغاء هذا الطلب؟')) return;
+
+  const orderIndex = orders.findIndex(o => o.id === orderId);
+  if (orderIndex === -1) return;
+
+  const order = orders[orderIndex];
+  order.cancelled = true;
+  order.cancelReason = order.cancelRequestReason;
+  order.status = 'cancelled';
+
+  database.ref('orders/' + orderId).update({ 
+    cancelled: true, 
+    cancelReason: order.cancelRequestReason,
+    status: 'cancelled',
+    cancelRequested: false
+  });
+
+  if (!orderHistory.find(h => h.id === order.id)) {
+    orderHistory.unshift(order);
+    database.ref('history/' + orderId).set(order);
+  }
+
+  orders.splice(orderIndex, 1);
+  database.ref('orders/' + orderId).remove();
+
+  saveState();
+  renderOrders();
+  renderHistory();
+  syncUserOrders();
+  notify('تم تأكيد إلغاء الطلب', 'info');
+};
+
+window.rejectCancelRequest = function(orderId) {
+  if (!confirm('هل تريد رفض طلب الإلغاء؟')) return;
+
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+
+  database.ref('orders/' + orderId).update({
+    cancelRequested: false,
+    cancelRequestReason: null,
+    cancelRequestedBy: null,
+    cancelRequestedAt: null
+  });
+
+  saveState();
+  renderOrders();
+  syncUserOrders();
+  notify('تم رفض طلب الإلغاء', 'info');
+};
 
     function searchOrders() {
       const address = document.getElementById('searchOrderAddress').value.trim().toLowerCase();
