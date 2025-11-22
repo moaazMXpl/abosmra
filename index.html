@@ -764,62 +764,82 @@
         <div id="historyGrid"></div>
       </div>
       <div class="tab-content" id="epotContent">
-        <div id="epotLocked">
-          <div class="section-title">EPOT — الإيرادات وصلاحيات التعديل</div>
-          <p class="small">مقفول — للوصول اضغط فتح EPOT وأدخل كلمة المرور.</p>
-          <button class="btn btn-primary" id="openEpotBtn">فتح EPOT</button>
-        </div>
-        <div id="epotUnlocked" style="display: none;">
-          <div class="section-title">EPOT</div>
-          <button class="btn btn-secondary" id="lockEpotBtn" style="margin-bottom: 16px;">قفل EPOT</button>
-          <div class="checkbox-container">
-            <input type="checkbox" id="autoPrintCheckbox" />
-            <label for="autoPrintCheckbox">طباعة تلقائية عند وصول طلب جديد</label>
-          </div>
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-label">إجمالي الإيرادات</div>
-              <div class="stat-value" id="totalRevenue">0 ج</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">طلبات اليوم</div>
-              <div class="stat-value" id="todayOrders">0</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">إيراد اليوم</div>
-              <div class="stat-value" id="todayRevenue">0 ج</div>
-            </div>
-          </div>
-          <button class="btn btn-danger" id="endDayBtn" style="width: 100%; margin-bottom: 20px;">إنهاء اليوم</button>
-          <div style="margin-bottom: 20px;">
-            <h3 style="color: var(--gold);">تغيير كلمة مرور EPOT</h3>
-            <div style="display: flex; gap: 8px;">
-              <input id="newEpotPwd" class="input" type="password" placeholder="كلمة مرور جديدة" />
-              <button class="btn btn-primary" id="setEpotPwdBtn">تحديث</button>
-            </div>
-          </div>
-          <div style="margin-bottom: 20px;">
-            <h3 style="color: var(--gold);">إدارة الأصناف</h3>
-            <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-              <input id="newItemName" class="input" placeholder="اسم الصنف" style="flex: 1; min-width: 150px;" />
-              <input id="newItemPrice" class="input" type="number" placeholder="السعر" style="width: 100px;" />
-              <select id="newItemCategory" class="input" style="width: 150px;"></select>
-              <button class="btn btn-primary" id="addItemBtn">إضافة صنف</button>
-            </div>
-            <div id="manageItemsList"></div>
-          </div>
-          <div>
-            <h3 style="color: var(--gold);">إدارة العروض</h3>
-            <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-              <input id="offerName" class="input" placeholder="اسم العرض" style="flex: 1; min-width: 150px;" />
-              <input id="offerDiscount" class="input" type="number" placeholder="نسبة الخصم %" style="width: 100px;" />
-              <button class="btn btn-primary" id="createOfferBtn">إنشاء عرض</button>
-            </div>
-            <div id="offersList"></div>
-          </div>
-          <button class="btn btn-secondary" id="exportDataBtn" style="width: 100%; margin-top: 20px;">تصدير البيانات</button>
-        </div>
+  <div id="epotLocked">
+    <div class="section-title">EPOT — الإيرادات وصلاحيات التعديل</div>
+    <p class="small">مقفول — للوصول اضغط فتح EPOT وأدخل كلمة المرور.</p>
+    <button class="btn btn-primary" id="openEpotBtn">فتح EPOT</button>
+  </div>
+  <div id="epotUnlocked" style="display: none;">
+    <div class="section-title">EPOT</div>
+    <button class="btn btn-secondary" id="lockEpotBtn" style="margin-bottom: 16px;">قفل EPOT</button>
+    
+    <div class="checkbox-container">
+      <input type="checkbox" id="autoPrintCheckbox" />
+      <label for="autoPrintCheckbox">طباعة تلقائية عند وصول طلب جديد</label>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">إجمالي الإيرادات</div>
+        <div class="stat-value" id="totalRevenue">0 ج</div>
       </div>
+      <div class="stat-card">
+        <div class="stat-label">طلبات اليوم</div>
+        <div class="stat-value" id="todayOrders">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">إيراد اليوم</div>
+        <div class="stat-value" id="todayRevenue">0 ج</div>
+      </div>
+    </div>
+    
+    <button class="btn btn-danger" id="endDayBtn" style="width: 100%; margin-bottom: 20px;">إنهاء اليوم</button>
+    
+    <!-- قسم الطلبات السابقة داخل EPOT -->
+    <div style="margin-bottom: 30px;">
+      <div class="section-title">الطلبات السابقة (EPOT)</div>
+      <div class="search-bar">
+        <input class="input" id="searchEpotAddress" placeholder="البحث بالعنوان" />
+        <input class="input" id="searchEpotPhone" placeholder="البحث برقم العميل" />
+        <input class="input" id="searchEpotOrderId" placeholder="البحث برقم البون" />
+        <input class="input" id="searchEpotName" placeholder="البحث باسم العميل" />
+        <button class="btn btn-primary" id="searchEpotBtn">بحث</button>
+      </div>
+      <div id="epotHistoryGrid"></div>
+    </div>
+    
+    <div style="margin-bottom: 20px;">
+      <h3 style="color: var(--gold);">تغيير كلمة مرور EPOT</h3>
+      <div style="display: flex; gap: 8px;">
+        <input id="newEpotPwd" class="input" type="password" placeholder="كلمة مرور جديدة" />
+        <button class="btn btn-primary" id="setEpotPwdBtn">تحديث</button>
+      </div>
+    </div>
+    
+    <div style="margin-bottom: 20px;">
+      <h3 style="color: var(--gold);">إدارة الأصناف</h3>
+      <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+        <input id="newItemName" class="input" placeholder="اسم الصنف" style="flex: 1; min-width: 150px;" />
+        <input id="newItemPrice" class="input" type="number" placeholder="السعر" style="width: 100px;" />
+        <select id="newItemCategory" class="input" style="width: 150px;"></select>
+        <button class="btn btn-primary" id="addItemBtn">إضافة صنف</button>
+      </div>
+      <div id="manageItemsList"></div>
+    </div>
+    
+    <div>
+      <h3 style="color: var(--gold);">إدارة العروض</h3>
+      <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+        <input id="offerName" class="input" placeholder="اسم العرض" style="flex: 1; min-width: 150px;" />
+        <input id="offerDiscount" class="input" type="number" placeholder="نسبة الخصم %" style="width: 100px;" />
+        <button class="btn btn-primary" id="createOfferBtn">إنشاء عرض</button>
+      </div>
+      <div id="offersList"></div>
+    </div>
+    
+    <button class="btn btn-secondary" id="exportDataBtn" style="width: 100%; margin-top: 20px;">تصدير البيانات</button>
+  </div>
+</div>
     </div>
   </div>
 
@@ -979,6 +999,11 @@
     }
 
     window.onload = function() {
+  // استعادة حالة الواجهة
+  const savedView = sessionStorage.getItem('currentView');
+  const savedEpotAuth = sessionStorage.getItem('isEpotAuth') === 'true';
+  const savedOperatorAuth = sessionStorage.getItem('isOperatorAuth') === 'true';
+  
   syncFromFirebase();
   renderCategories();
   renderMenu();
@@ -986,12 +1011,22 @@
   updateCartDisplay();
   setupEventListeners();
   updateUserInfo();
-      document.getElementById('autoPrintCheckbox').checked = autoPrint;
-      
-      if ('OTPCredential' in window) {
-        setupWebOTP();
-      }
-    };
+  document.getElementById('autoPrintCheckbox').checked = autoPrint;
+  
+  if ('OTPCredential' in window) {
+    setupWebOTP();
+  }
+  
+  // استعادة الواجهة المحفوظة
+  if (savedOperatorAuth) {
+    isOperatorAuth = true;
+    showOperatorView();
+    if (savedEpotAuth) {
+      isEpotAuth = true;
+      showEpotPanel();
+    }
+  }
+};
 
     function setupWebOTP() {
       const otpInput = document.getElementById('otpCode');
@@ -1023,31 +1058,88 @@
     }
 
     function syncFromFirebase() {
-      database.ref('menu').on('value', (snapshot) => {
-        if (snapshot.val()) {
-          menu = snapshot.val();
-          saveLS(LS_KEYS.MENU, menu);
-          renderMenu();
-          renderCategories();
-        }
-      });
-      database.ref('offers').on('value', (snapshot) => {
-        if (snapshot.val()) {
-          offers = Object.values(snapshot.val());
-          saveLS(LS_KEYS.OFFERS, offers);
-          renderOffers();
-        }
-      });
-      database.ref('orders').on('value', (snapshot) => {
-  if (snapshot.val()) {
-    orders = Object.values(snapshot.val());
+  database.ref('menu').on('value', (snapshot) => {
+    if (snapshot.val()) {
+      menu = snapshot.val();
+      saveLS(LS_KEYS.MENU, menu);
+      renderMenu();
+      renderCategories();
+      if (isEpotAuth) renderItemManagement();
+    }
+  });
+
+  database.ref('offers').on('value', (snapshot) => {
+    offers = snapshot.val() ? Object.values(snapshot.val()) : [];
+    saveLS(LS_KEYS.OFFERS, offers);
+    renderOffers();
+  });
+
+  database.ref('orders').on('value', (snapshot) => {
+    orders = snapshot.val() ? Object.values(snapshot.val()) : [];
     saveLS(LS_KEYS.ORDERS, orders);
-    renderOrders();
+    if (currentView === 'operator') {
+      renderOrders();
+      updateOperatorBadge();
+    }
     checkCustomerOrders();
-    updateOperatorBadge();
     syncUserOrders();
-  }
-});
+    
+    const ordersPanel = document.getElementById('ordersPanel');
+    if (ordersPanel && ordersPanel.classList.contains('open')) {
+      showMyOrders();
+    }
+  });
+
+  database.ref('history').on('value', (snapshot) => {
+    orderHistory = snapshot.val() ? Object.values(snapshot.val()) : [];
+    saveLS(LS_KEYS.HISTORY, orderHistory);
+    if (currentView === 'operator') {
+      renderHistory();
+      if (isEpotAuth) {
+        renderEpotHistory();
+        updateStats();
+      }
+    }
+    syncUserOrders();
+  });
+}
+
+  database.ref('offers').on('value', (snapshot) => {
+    offers = snapshot.val() ? Object.values(snapshot.val()) : [];
+    saveLS(LS_KEYS.OFFERS, offers);
+    renderOffers();
+  });
+
+  database.ref('orders').on('value', (snapshot) => {
+    orders = snapshot.val() ? Object.values(snapshot.val()) : [];
+    saveLS(LS_KEYS.ORDERS, orders);
+    if (currentView === 'operator') {
+      renderOrders();
+      updateOperatorBadge();
+    }
+    checkCustomerOrders();
+    syncUserOrders();
+    
+    // تحديث لوحة طلباتي إذا كانت مفتوحة
+    const ordersPanel = document.getElementById('ordersPanel');
+    if (ordersPanel && ordersPanel.classList.contains('open')) {
+      showMyOrders();
+    }
+  });
+
+  database.ref('history').on('value', (snapshot) => {
+    orderHistory = snapshot.val() ? Object.values(snapshot.val()) : [];
+    saveLS(LS_KEYS.HISTORY, orderHistory);
+    if (currentView === 'operator') {
+      renderHistory();
+      if (isEpotAuth) {
+        renderEpotHistory();
+        updateStats();
+      }
+    }
+    syncUserOrders();
+  });
+}
 
 // تحديثات حية للطلبات الفردية
 database.ref('orders').on('child_changed', (snapshot) => {
@@ -1073,20 +1165,99 @@ database.ref('orders').on('child_changed', (snapshot) => {
     }
 
     function syncUserOrders() {
-  if (userAccount || currentCustomer) {
-    const customerPhone = userAccount?.phone || currentCustomer?.phone;
-    if (customerPhone) {
-      userOrders = [...orders, ...orderHistory].filter(o => o.customerPhone === customerPhone);
-      saveLS(LS_KEYS.USER_ORDERS, userOrders);
-      updateUserInfo();
-      
-      // تحديث قائمة الطلبات إذا كانت مفتوحة
-      const panel = document.getElementById('ordersPanel');
-      if (panel && panel.classList.contains('open')) {
-        showMyOrders();
-      }
-    }
+  const customerPhone = userAccount?.phone || currentCustomer?.phone;
+  if (!customerPhone) {
+    userOrders = [];
+    saveLS(LS_KEYS.USER_ORDERS, userOrders);
+    updateUserInfo();
+    return;
   }
+
+  // دمج الطلبات مع إعطاء أولوية للتاريخ (لأنه الأحدث)
+  const ordersMap = new Map();
+  
+  // أضف الطلبات الحالية أولاً
+  orders.forEach(o => {
+    if (o.customerPhone === customerPhone) {
+      ordersMap.set(o.id, o);
+    }
+  });
+  
+  // أضف/حدث من التاريخ (يستبدل إذا كان موجوداً)
+  orderHistory.forEach(o => {
+    if (o.customerPhone === customerPhone) {
+      ordersMap.set(o.id, o);
+    }
+  });
+  
+  userOrders = Array.from(ordersMap.values());
+  saveLS(LS_KEYS.USER_ORDERS, userOrders);
+  updateUserInfo();
+}
+
+function renderEpotHistory(filtered = null) {
+  const grid = document.getElementById('epotHistoryGrid');
+  if (!grid) return;
+
+  const historyToShow = filtered || orderHistory;
+
+  grid.innerHTML = '';
+  if (historyToShow.length === 0) {
+    grid.innerHTML = '<div class="small" style="text-align: center; padding: 20px;">لا توجد طلبات سابقة</div>';
+    return;
+  }
+
+  historyToShow.forEach(order => {
+    const card = document.createElement('div');
+    card.className = 'order-card';
+    if (order.cancelled) card.classList.add('cancelled');
+    
+    card.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <strong>طلب #${order.receiptNo}</strong>
+          ${order.cancelled ? '<span class="badge badge-cancelled">ملغي</span>' : '<span class="badge badge-delivered">تم التسليم</span>'}
+          <div class="small">${order.customer.name} — ${order.customer.phone}</div>
+          <div class="small">${order.createdAt}</div>
+        </div>
+        <div style="font-weight: bold; color: var(--gold);">${order.total} ج</div>
+      </div>
+      <div class="order-details" id="epot-hist-${order.id}">
+        <div style="margin-top: 12px; padding: 12px; background: var(--brown-dark); border-radius: 8px;">
+          <div><strong>العنوان:</strong> ${order.customer.address}</div>
+          <div><strong>الدفع:</strong> ${order.payment}</div>
+          ${order.cancelled && order.cancelReason ? `<div style="color: var(--danger);"><strong>سبب الإلغاء:</strong> ${order.cancelReason}</div>` : ''}
+          ${!order.cancelled && order.items && order.items.length > 0 ? `
+            <div style="margin-top: 12px;">
+              ${order.items.map(i => `<div>${i.name} × ${i.qty} = ${i.price * i.qty} ج</div>`).join('')}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+    card.onclick = () => {
+      const details = document.getElementById(`epot-hist-${order.id}`);
+      details.classList.toggle('open');
+    };
+    grid.appendChild(card);
+  });
+}
+
+function searchEpotHistory() {
+  const address = document.getElementById('searchEpotAddress').value.trim().toLowerCase();
+  const phone = document.getElementById('searchEpotPhone').value.trim();
+  const orderId = document.getElementById('searchEpotOrderId').value.trim();
+  const name = document.getElementById('searchEpotName').value.trim().toLowerCase();
+
+  const filtered = orderHistory.filter(o => {
+    if (address && !o.customer.address.toLowerCase().includes(address)) return false;
+    if (phone && !o.customer.phone.includes(phone)) return false;
+    if (orderId && !String(o.receiptNo).includes(orderId)) return false;
+    if (name && !o.customer.name.toLowerCase().includes(name)) return false;
+    return true;
+  });
+
+  renderEpotHistory(filtered);
 }
 
     function renderCategories() {
@@ -1315,91 +1486,82 @@ database.ref('orders').on('child_changed', (snapshot) => {
     }
 
     function processOrder(isNewAccount) {
-      currentCustomer = { 
-        name: pendingOrderData.name, 
-        phone: pendingOrderData.phone 
-      };
-      saveLS(LS_KEYS.CUST, currentCustomer);
+  currentCustomer = { 
+    name: pendingOrderData.name, 
+    phone: pendingOrderData.phone 
+  };
+  saveLS(LS_KEYS.CUST, currentCustomer);
 
-      const receiptNo = receiptCounter++;
-      localStorage.setItem(LS_KEYS.RECEIPT_COUNTER, String(receiptCounter));
+  const receiptNo = receiptCounter++;
+  localStorage.setItem(LS_KEYS.RECEIPT_COUNTER, String(receiptCounter));
 
-      const orderId = generateId('ORD');
-      let total = cart.reduce((s, c) => s + c.price * c.qty, 0);
-      const totalBefore = total;
-      let appliedOffer = null;
+  const orderId = generateId('ORD');
+  let total = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  const totalBefore = total;
+  let appliedOffer = null;
 
-      const offerId = document.getElementById('applyOffer').value;
-      if (offerId) {
-        const offer = offers.find(o => o.id === offerId);
-        if (offer) {
-          appliedOffer = { id: offer.id, name: offer.name, discount: offer.discount };
-          total = Math.round(total * (1 - offer.discount / 100));
-        }
-      }
-
-      const newOrder = {
-        id: orderId,
-        receiptNo,
-        customer: { 
-          name: pendingOrderData.name, 
-          phone: pendingOrderData.phone, 
-          address: pendingOrderData.address 
-        },
-        items: cart.map(c => ({ id: c.id, name: c.name, price: c.price, qty: c.qty })),
-        totalBefore,
-        total,
-        payment: pendingOrderData.payment,
-        notes: pendingOrderData.notes,
-        appliedOffer,
-        status: 'received',
-        createdAt: new Date().toLocaleString('ar-EG'),
-        date: new Date().toDateString(),
-        customerPhone: pendingOrderData.phone,
-        cancelled: false,
-        cancelReason: null
-      };
-
-      cart.forEach(c => {
-        const item = findItemById(c.id);
-        if (item) item.sold = (item.sold || 0) + c.qty;
-      });
-
-      database.ref('orders/' + orderId).set(newOrder);
-      database.ref('menu').set(menu);
-
-      orders.unshift(newOrder);
-      
-      if (userAccount) {
-        userOrders.unshift(newOrder);
-        saveLS(LS_KEYS.USER_ORDERS, userOrders);
-      }
-      
-      saveState();
-
-      if (autoPrint) {
-        printReceipt(newOrder);
-      }
-
-      cart = [];
-      updateCartDisplay();
-      document.getElementById('checkoutSection').style.display = 'none';
-      
-      if (isNewAccount) {
-        notify(`تم تسجيل حسابك وطلبك برقم ${receiptNo}`, 'info');
-      } else {
-        notify(`تم تسجيل طلبك برقم ${receiptNo}`, 'info');
-      }
-      
-      document.getElementById('orderAddress').value = '';
-      document.getElementById('orderNotes').value = '';
-      
-      pendingOrderData = null;
-      generatedOtp = null;
-      
-      updateUserInfo();
-      checkCustomerOrders();
+  const offerId = document.getElementById('applyOffer').value;
+  if (offerId) {
+    const offer = offers.find(o => o.id === offerId);
+    if (offer) {
+      appliedOffer = { id: offer.id, name: offer.name, discount: offer.discount };
+      total = Math.round(total * (1 - offer.discount / 100));
     }
+  }
+
+  const newOrder = {
+    id: orderId,
+    receiptNo,
+    customer: { 
+      name: pendingOrderData.name, 
+      phone: pendingOrderData.phone, 
+      address: pendingOrderData.address 
+    },
+    items: cart.map(c => ({ id: c.id, name: c.name, price: c.price, qty: c.qty })),
+    totalBefore,
+    total,
+    payment: pendingOrderData.payment,
+    notes: pendingOrderData.notes,
+    appliedOffer,
+    status: 'received',
+    createdAt: new Date().toLocaleString('ar-EG'),
+    date: new Date().toDateString(),
+    customerPhone: pendingOrderData.phone,
+    cancelled: false,
+    cancelReason: null
+  };
+
+  cart.forEach(c => {
+    const item = findItemById(c.id);
+    if (item) item.sold = (item.sold || 0) + c.qty;
+  });
+
+  // إرسال إلى Firebase فقط - لا نضيف للمصفوفة المحلية
+  database.ref('orders/' + orderId).set(newOrder);
+  database.ref('menu').set(menu);
+
+  if (autoPrint) {
+    printReceipt(newOrder);
+  }
+
+  cart = [];
+  updateCartDisplay();
+  document.getElementById('checkoutSection').style.display = 'none';
+  
+  if (isNewAccount) {
+    notify(`تم تسجيل حسابك وطلبك برقم ${receiptNo}`, 'info');
+  } else {
+    notify(`تم تسجيل طلبك برقم ${receiptNo}`, 'info');
+  }
+  
+  document.getElementById('orderAddress').value = '';
+  document.getElementById('orderNotes').value = '';
+  
+  pendingOrderData = null;
+  generatedOtp = null;
+  
+  updateUserInfo();
+}
 
         function printReceipt(order) {
       const printWindow = window.open('', '', 'width=380,height=600');
@@ -1886,24 +2048,32 @@ database.ref('orders').on('child_changed', (snapshot) => {
     }
 
     window.changeStatus = function(orderId, newStatus) {
-      const order = orders.find(o => o.id === orderId);
-      if (!order) return;
+  const orderIndex = orders.findIndex(o => o.id === orderId);
+  if (orderIndex === -1) return;
 
-      order.status = newStatus;
-      
-      if (newStatus === 'delivered') {
-        if (!orderHistory.find(h => h.id === order.id)) {
-          orderHistory.unshift(order);
-          database.ref('history/' + orderId).set(order);
-        }
-      }
-      
-      database.ref('orders/' + orderId).update({ status: newStatus });
-      saveState();
-      renderOrders();
-      syncUserOrders();
-      notify(`تم تغيير حالة الطلب`, 'info');
-    };
+  const order = orders[orderIndex];
+  order.status = newStatus;
+  
+  if (newStatus === 'delivered') {
+    // نقل هذا الطلب فقط إلى السجل
+    if (!orderHistory.find(h => h.id === order.id)) {
+      orderHistory.unshift(order);
+      database.ref('history/' + orderId).set(order);
+    }
+    
+    // حذف هذا الطلب فقط من قائمة الطلبات الحالية
+    orders.splice(orderIndex, 1);
+    database.ref('orders/' + orderId).remove();
+  } else {
+    // تحديث الحالة فقط بدون حذف
+    database.ref('orders/' + orderId).update({ status: newStatus });
+  }
+  
+  saveState();
+  renderOrders();
+  syncUserOrders();
+  notify(`تم تغيير حالة الطلب`, 'info');
+};
 
     window.cancelOrderOperator = function(orderId) {
       if (!confirm('هل أنت متأكد من إلغاء هذا الطلب؟')) return;
@@ -2016,22 +2186,31 @@ database.ref('orders').on('child_changed', (snapshot) => {
     }
 
     function endDay() {
-      if (!confirm('هل أنت متأكد من إنهاء اليوم؟ سيتم نقل جميع الطلبات إلى الطلبات السابقة.')) return;
+  // التحقق من وجود طلبات نشطة
+  const activeOrders = orders.filter(o => !o.cancelled && o.status !== 'delivered');
+  
+  if (activeOrders.length > 0) {
+    notify('لا يمكن إنهاء اليوم! يوجد ' + activeOrders.length + ' طلب في قائمة الطلبات', 'error');
+    return;
+  }
+  
+  if (!confirm('هل أنت متأكد من إنهاء اليوم؟ سيتم نقل جميع الطلبات إلى الطلبات السابقة.')) return;
 
-      orders.forEach(order => {
-        if (!orderHistory.find(h => h.id === order.id)) {
-          orderHistory.unshift(order);
-          database.ref('history/' + order.id).set(order);
-        }
-        database.ref('orders/' + order.id).remove();
-      });
-
-      orders = [];
-      saveState();
-      renderOrders();
-      renderHistory();
-      notify('تم إنهاء اليوم بنجاح', 'info');
+  orders.forEach(order => {
+    if (!orderHistory.find(h => h.id === order.id)) {
+      orderHistory.unshift(order);
+      database.ref('history/' + order.id).set(order);
     }
+    database.ref('orders/' + order.id).remove();
+  });
+
+  orders = [];
+  saveState();
+  renderOrders();
+  renderHistory();
+  renderEpotHistory();
+  notify('تم إنهاء اليوم بنجاح', 'info');
+}
 
     function updateStats() {
       if (!isEpotAuth) return;
@@ -2173,26 +2352,28 @@ database.ref('orders').on('child_changed', (snapshot) => {
     }
 
     function setupEventListeners() {
-      document.getElementById('cartToggle').onclick = () => {
-        document.getElementById('cartPanel').classList.add('open');
-      };
+  document.getElementById('cartToggle').onclick = () => {
+    document.getElementById('cartPanel').classList.add('open');
+  };
 
-      document.getElementById('closeCart').onclick = () => {
-        document.getElementById('cartPanel').classList.remove('open');
-      };
+  document.getElementById('closeCart').onclick = () => {
+    document.getElementById('cartPanel').classList.remove('open');
+  };
 
-      document.getElementById('closeOrders').onclick = () => {
-        document.getElementById('ordersPanel').classList.remove('open');
-      };
+  document.getElementById('closeOrders').onclick = () => {
+    document.getElementById('ordersPanel').classList.remove('open');
+  };
 
-      document.getElementById('clearCartBtn').onclick = () => {
-        if (confirm('هل تريد تفريغ السلة؟')) {
-          cart = [];
-          updateCartDisplay();
-        }
-      };
+  document.getElementById('clearCartBtn').onclick = () => {
+    if (confirm('هل تريد تفريغ السلة؟')) {
+      cart = [];
+      updateCartDisplay();
+    }
+  };
 
-      document.getElementById('checkoutBtn').onclick = openCheckout;
+  document.getElementById('searchEpotBtn').onclick = searchEpotHistory;
+
+  document.getElementById('checkoutBtn').onclick = openCheckout;
       document.getElementById('confirmOrderBtn').onclick = confirmOrder;
       document.getElementById('cancelCheckoutBtn').onclick = () => {
         document.getElementById('checkoutSection').style.display = 'none';
@@ -2341,40 +2522,54 @@ document.getElementById('closeCancelBtn').onclick = () => {
     }
 
     function showCustomerView() {
-      currentView = 'customer';
-      document.getElementById('operatorDashboard').style.display = 'none';
-      document.getElementById('menuContainer').style.display = 'block';
-      document.querySelector('.header').style.position = 'fixed';
-      document.querySelector('.categories-section').style.display = 'block';
-      document.getElementById('cartToggle').style.display = 'flex';
-      document.getElementById('customerStatus').style.display = 'none';
-      checkCustomerOrders();
-    }
+  currentView = 'customer';
+  sessionStorage.setItem('currentView', 'customer');
+  sessionStorage.setItem('isOperatorAuth', 'false');
+  sessionStorage.setItem('isEpotAuth', 'false');
+  
+  document.getElementById('operatorDashboard').style.display = 'none';
+  document.getElementById('menuContainer').style.display = 'block';
+  document.querySelector('.header').style.position = 'fixed';
+  document.querySelector('.categories-section').style.display = 'block';
+  document.getElementById('cartToggle').style.display = 'flex';
+  document.getElementById('customerStatus').style.display = 'none';
+  checkCustomerOrders();
+}
+
+function updateOperatorBadge() {
+  const activeOrders = orders.filter(o => !o.cancelled && o.status !== 'delivered');
+  // يمكنك إضافة badge للمشغل هنا إذا أردت
+}
 
     function showOperatorView() {
-      currentView = 'operator';
-      document.getElementById('menuContainer').style.display = 'none';
-      document.querySelector('.categories-section').style.display = 'none';
-      document.getElementById('cartToggle').style.display = 'none';
-      document.getElementById('cartPanel').classList.remove('open');
-      document.getElementById('ordersPanel').classList.remove('open');
-      document.getElementById('checkoutSection').style.display = 'none';
-      document.getElementById('customerStatus').style.display = 'none';
-      
-      document.getElementById('operatorDashboard').style.display = 'block';
-      document.querySelector('.header').style.position = 'fixed';
-      renderOrders();
-      renderHistory();
-      updateOperatorBadge();
-    }
+  currentView = 'operator';
+  sessionStorage.setItem('currentView', 'operator');
+  sessionStorage.setItem('isOperatorAuth', 'true');
+  
+  document.getElementById('menuContainer').style.display = 'none';
+  document.querySelector('.categories-section').style.display = 'none';
+  document.getElementById('cartToggle').style.display = 'none';
+  document.getElementById('cartPanel').classList.remove('open');
+  document.getElementById('ordersPanel').classList.remove('open');
+  document.getElementById('checkoutSection').style.display = 'none';
+  document.getElementById('customerStatus').style.display = 'none';
+  
+  document.getElementById('operatorDashboard').style.display = 'block';
+  document.querySelector('.header').style.position = 'fixed';
+  renderOrders();
+  renderHistory();
+  updateOperatorBadge();
+}
 
     function showEpotPanel() {
-      document.getElementById('epotLocked').style.display = 'none';
-      document.getElementById('epotUnlocked').style.display = 'block';
-      updateStats();
-      renderItemManagement();
-      renderOffers();
-    } 
+  sessionStorage.setItem('isEpotAuth', 'true');
+  document.getElementById('epotLocked').style.display = 'none';
+  document.getElementById('epotUnlocked').style.display = 'block';
+  updateStats();
+  renderItemManagement();
+  renderOffers();
+  renderEpotHistory();
+} 
   </script>
 </body>
 </html>
