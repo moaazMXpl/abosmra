@@ -1040,15 +1040,29 @@
         }
       });
       database.ref('orders').on('value', (snapshot) => {
-        if (snapshot.val()) {
-          orders = Object.values(snapshot.val());
-          saveLS(LS_KEYS.ORDERS, orders);
-          renderOrders();
-          checkCustomerOrders();
-          updateOperatorBadge();
-          syncUserOrders();
-        }
-      });
+  if (snapshot.val()) {
+    orders = Object.values(snapshot.val());
+    saveLS(LS_KEYS.ORDERS, orders);
+    renderOrders();
+    checkCustomerOrders();
+    updateOperatorBadge();
+    syncUserOrders();
+  }
+});
+
+// تحديثات حية للطلبات الفردية
+database.ref('orders').on('child_changed', (snapshot) => {
+  const updatedOrder = snapshot.val();
+  if (updatedOrder && userAccount && updatedOrder.customerPhone === userAccount.phone) {
+    const idx = userOrders.findIndex(o => o.id === updatedOrder.id);
+    if (idx !== -1) {
+      userOrders[idx] = updatedOrder;
+      saveLS(LS_KEYS.USER_ORDERS, userOrders);
+      checkCustomerOrders();
+      showMyOrders();
+    }
+  }
+});
       database.ref('history').on('value', (snapshot) => {
         if (snapshot.val()) {
           orderHistory = Object.values(snapshot.val());
@@ -1428,45 +1442,58 @@
     }
 
     function checkCustomerOrders() {
-      if (!userAccount || !userAccount.phone) return;
+  if (!userAccount || !userAccount.phone) return;
+  
+  const activeOrders = userOrders.filter(o => 
+    o.status !== 'delivered' && 
+    !o.cancelled
+  );
+
+  const statusDiv = document.getElementById('customerStatus');
+  const statusContent = document.getElementById('statusContent');
+
+  if (activeOrders.length > 0) {
+    statusDiv.classList.add('show');
+    statusContent.innerHTML = '';
+    activeOrders.forEach(order => {
+      const statusText = {
+        'received': 'تم استلام الطلب',
+        'preparing': 'قيد التحضير',
+        'ready': 'جاهز للتسليم'
+      };
+      const statusClass = {
+        'received': 'badge-received',
+        'preparing': 'badge-preparing',
+        'ready': 'badge-ready'
+      };
       
-      const activeOrders = userOrders.filter(o => 
-        o.status !== 'delivered' && 
-        !o.cancelled
-      );
-
-      const statusDiv = document.getElementById('customerStatus');
-      const statusContent = document.getElementById('statusContent');
-
-      if (activeOrders.length > 0) {
-        statusDiv.classList.add('show');
-        statusContent.innerHTML = '';
-        activeOrders.forEach(order => {
-          const statusText = {
-            'received': 'تم استلام الطلب',
-            'preparing': 'قيد التحضير',
-            'ready': 'جاهز للتسليم'
-          };
-          const statusClass = {
-            'received': 'badge-received',
-            'preparing': 'badge-preparing',
-            'ready': 'badge-ready'
-          };
-          const div = document.createElement('div');
-          div.style.marginBottom = '12px';
-          div.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <strong>طلب رقم: ${order.receiptNo}</strong>
-              <span class="badge ${statusClass[order.status]}">${statusText[order.status]}</span>
-            </div>
-            <div class="small">الإجمالي: ${order.total} ج</div>
-          `;
-          statusContent.appendChild(div);
-        });
-      } else {
-        statusDiv.classList.remove('show');
-      }
-    }
+      const statuses = ['received', 'preparing', 'ready', 'delivered'];
+      const currentStatusIndex = statuses.indexOf(order.status) || 0;
+      
+      let progressHTML = '<div style="margin: 8px 0; background: var(--brown-dark); border-radius: 8px; overflow: hidden; display: flex;">';
+      statuses.slice(0, 3).forEach((status, idx) => {
+        const isCompleted = idx <= currentStatusIndex;
+        const bgColor = isCompleted ? 'var(--gold)' : 'var(--brown)';
+        progressHTML += `<div style="flex: 1; text-align: center; padding: 6px; background: ${bgColor}; color: #1a1410; font-size: 0.75rem; font-weight: bold;">${statusText[status]}</div>`;
+      });
+      progressHTML += '</div>';
+      
+      const div = document.createElement('div');
+      div.style.marginBottom = '12px';
+      div.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <strong>طلب رقم: ${order.receiptNo}</strong>
+          <span class="badge ${statusClass[order.status]}">${statusText[order.status]}</span>
+        </div>
+        ${progressHTML}
+        <div class="small">الإجمالي: ${order.total} ج</div>
+      `;
+      statusContent.appendChild(div);
+    });
+  } else {
+    statusDiv.classList.remove('show');
+  }
+}
 
     function showMyOrders() {
       const panel = document.getElementById('ordersPanel');
@@ -1531,71 +1558,95 @@
       panel.classList.add('open');
     }
 
-    function createOrderCard(order, canCancel) {
-      const statusText = {
-        'received': 'تم الاستلام',
-        'preparing': 'قيد التحضير',
-        'ready': 'جاهز',
-        'delivered': 'تم التسليم',
-        'cancelled': 'ملغي'
-      };
-      const statusClass = {
-        'received': 'badge-received',
-        'preparing': 'badge-preparing',
-        'ready': 'badge-ready',
-        'delivered': 'badge-delivered',
-        'cancelled': 'badge-cancelled'
-      };
-
-      const card = document.createElement('div');
-      card.className = 'order-card';
-      if (order.cancelled) card.classList.add('cancelled');
-      
-      card.innerHTML = `
+    nnerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <strong>طلب #${order.receiptNo}</strong>
-            <div class="small">${order.createdAt}</div>
+            function createOrderCard(order, canCancel) {
+  const statusText = {
+    'received': 'تم الاستلام',
+    'preparing': 'قيد التحضير',
+    'ready': 'جاهز',
+    'delivered': 'تم التسليم',
+    'cancelled': 'ملغي'
+  };
+  const statusClass = {
+    'received': 'badge-received',
+    'preparing': 'badge-preparing',
+    'ready': 'badge-ready',
+    'delivered': 'badge-delivered',
+    'cancelled': 'badge-cancelled'
+  };
+
+  const statuses = ['received', 'preparing', 'ready', 'delivered'];
+  const currentStatusIndex = statuses.indexOf(order.status) || 0;
+  
+  const card = document.createElement('div');
+  card.className = 'order-card';
+  if (order.cancelled) card.classList.add('cancelled');
+  
+  // شريط التقدم
+  let progressHTML = '<div style="margin: 12px 0; background: var(--brown-dark); border-radius: 8px; overflow: hidden;">';
+  statuses.forEach((status, idx) => {
+    const isCompleted = idx <= currentStatusIndex;
+    const color = isCompleted ? 'var(--gold)' : 'var(--brown)';
+    progressHTML += `<div style="display: inline-block; width: 25%; text-align: center; padding: 8px; background: ${color}; color: #1a1410; font-size: 0.85rem; font-weight: bold;">${statusText[status]}</div>`;
+  });
+  progressHTML += '</div>';
+  
+  card.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong>طلب #${order.receiptNo}</strong>
+        <div class="small">${order.createdAt}</div>
+      </div>
+      <span class="badge ${statusClass[order.status || 'received']}">${statusText[order.status || 'received']}</span>
+    </div>
+    ${progressHTML}
+    <div class="order-details" id="user-order-${order.id}">
+      <div style="margin-top: 12px; padding: 12px; background: var(--brown-dark); border-radius: 8px;">
+        ${order.cancelled ? `
+          <div style="color: var(--danger); margin-bottom: 8px;">
+            <strong>سبب الإلغاء:</strong> ${order.cancelReason || 'غير محدد'}
           </div>
-          <span class="badge ${statusClass[order.status || 'received']}">${statusText[order.status || 'received']}</span>
-        </div>
-        <div class="order-details" id="user-order-${order.id}">
-          <div style="margin-top: 12px; padding: 12px; background: var(--brown-dark); border-radius: 8px;">
-            ${order.cancelled ? `
-              <div style="color: var(--danger); margin-bottom: 8px;">
-                <strong>سبب الإلغاء:</strong> ${order.cancelReason || 'غير محدد'}
-              </div>
-            ` : ''}
-            ${order.items && order.items.length > 0 ? `
-              <div style="margin-bottom: 12px;">
-                ${order.items.map(i => `<div>${i.name} × ${i.qty} = ${i.price * i.qty} ج</div>`).join('')}
-              </div>
-            ` : ''}
-            <div style="font-size: 1.2rem; font-weight: bold; color: var(--gold);">الإجمالي: ${order.total} ج</div>
-            <div class="small" style="margin-top: 8px;">العنوان: ${order.customer.address}</div>
+        ` : ''}
+        ${order.items && order.items.length > 0 ? `
+          <div style="margin-bottom: 12px;">
+            ${order.items.map(i => `<div>${i.name} × ${i.qty} = ${i.price * i.qty} ج</div>`).join('')}
           </div>
-          ${canCancel ? `
-            <button class="btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="requestCancelOrder('${order.id}')">
-              إلغاء الطلب
-            </button>
-          ` : ''}
-        </div>
-      `;
-      
-      card.onclick = (e) => {
-        if (e.target.tagName !== 'BUTTON') {
-          const details = document.getElementById(`user-order-${order.id}`);
-          details.classList.toggle('open');
-        }
-      };
-      
-      return card;
+        ` : ''}
+        <div style="font-size: 1.2rem; font-weight: bold; color: var(--gold);">الإجمالي: ${order.total} ج</div>
+        <div class="small" style="margin-top: 8px;">العنوان: ${order.customer.address}</div>
+      </div>
+      ${canCancel && order.status !== 'delivered' ? `
+        <button class="btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="requestCancelOrder('${order.id}')">
+          إلغاء الطلب
+        </button>
+      ` : ''}
+    </div>
+  `;
+  
+  card.onclick = (e) => {
+    if (e.target.tagName !== 'BUTTON') {
+      const details = document.getElementById(`user-order-${order.id}`);
+      details.classList.toggle('open');
     }
+  };
+  
+  return card;
+}
 
     window.requestCancelOrder = function(orderId) {
-      orderToCancel = orderId;
-      document.getElementById('cancelModal').classList.add('open');
-    };
+  const order = userOrders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  if (order.status === 'delivered') {
+    notify('لا يمكن إلغاء طلب تم تسليمه بالفعل', 'error');
+    return;
+  }
+  
+  orderToCancel = orderId;
+  document.getElementById('cancelModal').classList.add('open');
+};
 
     function confirmCancelOrder() {
       if (!orderToCancel) return;
