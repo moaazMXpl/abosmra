@@ -589,6 +589,40 @@
       font-size: 1.5rem;
       letter-spacing: 8px;
     }
+
+.order-menu-container button:hover ~ .order-context-menu,
+    .order-context-menu:hover {
+      display: block !important;
+    }
+    
+    .order-menu-item {
+      color: #f5f1e8;
+    }
+    
+    .order-menu-item:hover {
+      background: var(--brown) !important;
+    }
+    
+    .order-menu-item:last-child {
+      border-bottom: none;
+    }
+
+.op-menu-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--brown);
+      transition: background 0.2s;
+      color: #f5f1e8;
+    }
+    
+    .op-menu-item:hover {
+      background: var(--brown);
+    }
+    
+    .op-menu-item:last-child {
+      border-bottom: none;
+    }
+
     @media (max-width: 768px) {
       .menu-grid {
         grid-template-columns: 1fr;
@@ -756,6 +790,7 @@
         <div id="epotUnlocked" style="display: none;">
           <div class="section-title">EPOT</div>
           <button class="btn btn-secondary" id="lockEpotBtn" style="margin-bottom: 16px;">قفل EPOT</button>
+<button class="btn btn-danger" id="resetSystemBtn" style="margin-bottom: 16px; margin-right: 8px;">إعادة ضبط النظام</button>
           
           <div class="checkbox-container">
             <input type="checkbox" id="autoPrintCheckbox" />
@@ -833,6 +868,20 @@
       <div style="display: flex; gap: 8px; margin-top: 16px;">
         <button class="btn btn-primary" id="submitEpotBtn" style="flex: 1;">فتح</button>
         <button class="btn btn-secondary" id="cancelEpotBtn">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+<div class="modal" id="resetModal">
+    <div class="modal-content">
+      <div class="modal-title">إعادة ضبط النظام</div>
+      <p class="small" style="text-align: center; margin-bottom: 16px; color: var(--danger);">
+        ⚠️ تحذير: هذا سيمسح جميع الطلبات والبيانات! لا يمكن التراجع عن هذا الإجراء.
+      </p>
+      <input id="resetPassword" class="input" type="password" placeholder="أدخل كلمة المرور" />
+      <div style="display: flex; gap: 8px; margin-top: 16px;">
+        <button class="btn btn-danger" id="confirmResetBtn" style="flex: 1;">تأكيد الحذف</button>
+        <button class="btn btn-secondary" id="cancelResetBtn">إلغاء</button>
       </div>
     </div>
   </div>
@@ -1131,7 +1180,13 @@
         }
       });
       
-      userOrders = Array.from(ordersMap.values());
+      // حذف أي طلب عند العميل لا يوجد نسخة منه عند المشغل والتاريخ
+      userOrders = Array.from(ordersMap.values()).filter(order => {
+        const existsInOperator = orders.some(o => o.id === order.id);
+        const existsInHistory = orderHistory.some(o => o.id === order.id);
+        return existsInOperator || existsInHistory;
+      });
+      
       saveLS(LS_KEYS.USER_ORDERS, userOrders);
       updateUserInfo();
     }
@@ -1792,7 +1847,7 @@
   if (order.cancelRequested && !order.cancelConfirmedByOperator) {
     detailsHTML += '<div style="background: var(--accent); color: #1a1410; padding: 12px; border-radius: 8px; margin-top: 12px; text-align: center; font-weight: bold;">⏳ في انتظار مراجعة طلب الإلغاء</div>';
   } else if (!order.cancelled) {
-    detailsHTML += '<button class="btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="requestCancelOrder(\'' + order.id + '\')">إلغاء الطلب</button>';
+    detailsHTML += '<div style="display: flex; gap: 8px; margin-top: 12px; position: relative;" class="order-menu-container"><button class="btn btn-primary" style="flex: 1;">☰ إجراءات</button><div class="order-context-menu" style="display: none; position: absolute; top: 100%; right: 0; background: var(--card); border: 2px solid var(--accent); border-radius: 8px; min-width: 150px; box-shadow: 0 4px 16px rgba(0,0,0,0.5); z-index: 100;"><div class="order-menu-item" style="padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--brown); transition: background 0.2s;" onclick="requestCancelOrder(\'' + order.id + '\')">❌ إلغاء الطلب</div></div></div>';
   }
 }
       
@@ -1807,6 +1862,22 @@
       
       return card;
     }
+
+window.toggleOperatorMenu = function(orderId) {
+      const menu = document.getElementById('op-menu-' + orderId);
+      if (menu.style.display === 'none') {
+        document.querySelectorAll('.operator-context-menu').forEach(m => m.style.display = 'none');
+        menu.style.display = 'block';
+      } else {
+        menu.style.display = 'none';
+      }
+    };
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.operator-context-menu') && !e.target.closest('[onclick*="toggleOperatorMenu"]')) {
+        document.querySelectorAll('.operator-context-menu').forEach(m => m.style.display = 'none');
+      }
+    });
 
     window.requestCancelOrder = function(orderId) {
       const order = userOrders.find(o => o.id === orderId);
@@ -2006,12 +2077,17 @@ ${order.cancelRequested ? `
               ${order.status === 'preparing' ? `<button class="btn btn-primary" onclick="changeStatus('${order.id}', 'ready')">جاهز للتسليم</button>` : ''}
               ${order.status === 'ready' ? `<button class="btn btn-primary" onclick="changeStatus('${order.id}', 'delivered')">تم التسليم</button>` : ''}
               <button class="btn btn-secondary" onclick="printReceiptById('${order.id}')">طباعة</button>
-              ${order.cancelRequested ? 
-  `<button class="btn btn-danger" onclick="confirmCancelFromOperator('${order.id}')" style="width: 100%; font-size: 1.1rem; padding: 12px;">✓ تأكيد الإلغاء</button>
-   <button class="btn btn-secondary" onclick="rejectCancelRequest('${order.id}')" style="width: 100%; margin-top: 8px;">✗ رفض طلب الإلغاء</button>` 
-  : 
-  `<button class="btn btn-danger" onclick="cancelOrderOperator('${order.id}')">إلغاء الطلب</button>`
-}
+              <div style="position: relative; display: inline-block; width: 100%;">
+                <button class="btn btn-secondary" style="width: 100%;" onclick="toggleOperatorMenu('${order.id}')">☰ إجراءات</button>
+                <div class="operator-context-menu" id="op-menu-${order.id}" style="display: none; position: absolute; top: 100%; right: 0; background: var(--card); border: 2px solid var(--accent); border-radius: 8px; min-width: 200px; box-shadow: 0 4px 16px rgba(0,0,0,0.5); z-index: 100; margin-top: 4px;">
+                  ${order.cancelRequested ? 
+                    `<div class="op-menu-item" onclick="confirmCancelFromOperator('${order.id}'); toggleOperatorMenu('${order.id}')">✓ تأكيد الإلغاء</div>
+                     <div class="op-menu-item" onclick="rejectCancelRequest('${order.id}'); toggleOperatorMenu('${order.id}')">✗ رفض الإلغاء</div>` 
+                    : 
+                    `<div class="op-menu-item" onclick="cancelOrderOperator('${order.id}'); toggleOperatorMenu('${order.id}')">❌ إلغاء الطلب</div>`
+                  }
+                </div>
+              </div>
             </div>
           </div>
         `;
@@ -2537,6 +2613,36 @@ window.rejectCancelRequest = function(orderId) {
         autoPrint = e.target.checked;
         saveState();
         notify(autoPrint ? 'تم تفعيل الطباعة التلقائية' : 'تم إلغاء الطباعة التلقائية', 'info');
+      };
+
+document.getElementById('resetSystemBtn').onclick = () => {
+        document.getElementById('resetModal').classList.add('open');
+      };
+
+      document.getElementById('cancelResetBtn').onclick = () => {
+        document.getElementById('resetModal').classList.remove('open');
+        document.getElementById('resetPassword').value = '';
+      };
+
+      document.getElementById('confirmResetBtn').onclick = () => {
+        const pwd = document.getElementById('resetPassword').value;
+        if (pwd === 'abosamra123') {
+          orders = [];
+          orderHistory = [];
+          userOrders = [];
+          cart = [];
+          database.ref('orders').remove();
+          database.ref('history').remove();
+          saveState();
+          updateCartDisplay();
+          renderOrders();
+          renderHistory();
+          document.getElementById('resetModal').classList.remove('open');
+          document.getElementById('resetPassword').value = '';
+          notify('تم إعادة ضبط النظام بنجاح', 'info');
+        } else {
+          notify('كلمة مرور خاطئة', 'error');
+        }
       };
 
       document.addEventListener('click', (e) => {
