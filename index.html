@@ -1082,17 +1082,22 @@
     }
 
     function updateUserInfo() {
-      const info = document.getElementById('cartCustomerInfo');
-      if (userAccount) {
-        info.textContent = `👤 ${userAccount.name} — ${userAccount.phone}`;
-        const activeOrders = userOrders.filter(o => o.status !== 'delivered' && !o.cancelled).length;
-        document.getElementById('orderBadge').style.display = activeOrders > 0 ? 'flex' : 'none';
-        document.getElementById('orderBadge').textContent = activeOrders;
-      } else {
-        info.textContent = 'ضيف — لم تسجل بعد';
-        document.getElementById('orderBadge').style.display = 'none';
-      }
-    }
+  const info = document.getElementById('cartCustomerInfo');
+  if (userAccount) {
+    info.textContent = `👤 ${userAccount.name} — ${userAccount.phone}`;
+    // فلترة الطلبات النشطة للعميل الحالي فقط
+    const activeOrders = userOrders.filter(o => 
+      o.customerPhone === userAccount.phone && 
+      o.status !== 'delivered' && 
+      !o.cancelled
+    ).length;
+    document.getElementById('orderBadge').style.display = activeOrders > 0 ? 'flex' : 'none';
+    document.getElementById('orderBadge').textContent = activeOrders;
+  } else {
+    info.textContent = 'ضيف — لم تسجل بعد';
+    document.getElementById('orderBadge').style.display = 'none';
+  }
+}
 
     function syncFromFirebase() {
       database.ref('menu').on('value', (snapshot) => {
@@ -1158,38 +1163,38 @@
     }
 
     function syncUserOrders() {
-      const customerPhone = userAccount?.phone || currentCustomer?.phone;
-      if (!customerPhone) {
-        userOrders = [];
-        saveLS(LS_KEYS.USER_ORDERS, userOrders);
-        updateUserInfo();
-        return;
-      }
+  const customerPhone = userAccount?.phone || currentCustomer?.phone;
+  if (!customerPhone) {
+    userOrders = [];
+    saveLS(LS_KEYS.USER_ORDERS, userOrders);
+    updateUserInfo();
+    return;
+  }
 
-      const ordersMap = new Map();
-      
-      orders.forEach(o => {
-        if (o.customerPhone === customerPhone) {
-          ordersMap.set(o.id, o);
-        }
-      });
-      
-      orderHistory.forEach(o => {
-        if (o.customerPhone === customerPhone) {
-          ordersMap.set(o.id, o);
-        }
-      });
-      
-      // حذف أي طلب عند العميل لا يوجد نسخة منه عند المشغل والتاريخ
-      userOrders = Array.from(ordersMap.values()).filter(order => {
-        const existsInOperator = orders.some(o => o.id === order.id);
-        const existsInHistory = orderHistory.some(o => o.id === order.id);
-        return existsInOperator || existsInHistory;
-      });
-      
-      saveLS(LS_KEYS.USER_ORDERS, userOrders);
-      updateUserInfo();
+  const ordersMap = new Map();
+  
+  // فلترة الطلبات الخاصة بالعميل الحالي فقط
+  orders.forEach(o => {
+    if (o.customerPhone === customerPhone) {
+      ordersMap.set(o.id, o);
     }
+  });
+  
+  orderHistory.forEach(o => {
+    if (o.customerPhone === customerPhone) {
+      ordersMap.set(o.id, o);
+    }
+  });
+  
+  userOrders = Array.from(ordersMap.values()).filter(order => {
+    const existsInOperator = orders.some(o => o.id === order.id);
+    const existsInHistory = orderHistory.some(o => o.id === order.id);
+    return existsInOperator || existsInHistory;
+  });
+  
+  saveLS(LS_KEYS.USER_ORDERS, userOrders);
+  updateUserInfo();
+}
 
     function renderEpotHistory(filtered = null) {
       const grid = document.getElementById('epotHistoryGrid');
@@ -1607,55 +1612,58 @@
     }
 
     function checkCustomerOrders() {
-      const customerPhone = userAccount?.phone || currentCustomer?.phone;
-      
-      if (!customerPhone) return;
-      
-      const allUserOrders = [...orders, ...orderHistory].filter(o => o.customerPhone === customerPhone);
-      
-      const activeOrders = allUserOrders.filter(o => 
-        o.status !== 'delivered' && 
-        !o.cancelled
-      );
+  const customerPhone = userAccount?.phone || currentCustomer?.phone;
+  
+  if (!customerPhone) {
+    document.getElementById('customerStatus').classList.remove('show');
+    return;
+  }
+  
+  // فلترة الطلبات الخاصة بالعميل الحالي فقط
+  const customerActiveOrders = orders.filter(o => 
+    o.customerPhone === customerPhone && 
+    o.status !== 'delivered' && 
+    !o.cancelled
+  );
 
-      const statusDiv = document.getElementById('customerStatus');
-      const statusContent = document.getElementById('statusContent');
+  const statusDiv = document.getElementById('customerStatus');
+  const statusContent = document.getElementById('statusContent');
 
-      if (activeOrders.length > 0) {
-        statusDiv.classList.add('show');
-        statusContent.innerHTML = '';
-        activeOrders.forEach(order => {
-          const statusText = {
-            'received': 'تم استلام الطلب',
-            'preparing': 'قيد التحضير',
-            'ready': 'جاهز للتسليم'
-          };
-          const statusClass = {
-            'received': 'badge-received',
-            'preparing': 'badge-preparing',
-            'ready': 'badge-ready'
-          };
-          
-          const statuses = ['received', 'preparing', 'ready', 'delivered'];
-          const currentStatusIndex = statuses.indexOf(order.status) || 0;
-          
-          let progressHTML = '<div style="margin: 8px 0; background: var(--brown-dark); border-radius: 8px; overflow: hidden; display: flex;">';
-          statuses.slice(0, 3).forEach((status, idx) => {
-            const isCompleted = idx <= currentStatusIndex;
-            const bgColor = isCompleted ? 'var(--gold)' : 'var(--brown)';
-            progressHTML += '<div style="flex: 1; text-align: center; padding: 6px; background: ' + bgColor + '; color: #1a1410; font-size: 0.75rem; font-weight: bold;">' + statusText[status] + '</div>';
-          });
-          progressHTML += '</div>';
-          
-          const div = document.createElement('div');
-          div.style.marginBottom = '12px';
-          div.innerHTML = '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><strong>طلب رقم: ' + order.receiptNo + '</strong><span class="badge ' + statusClass[order.status] + '">' + statusText[order.status] + '</span></div>' + progressHTML + '<div class="small">الإجمالي: ' + order.total + ' ج</div>';
-          statusContent.appendChild(div);
-        });
-      } else {
-        statusDiv.classList.remove('show');
-      }
-    }
+  if (customerActiveOrders.length > 0) {
+    statusDiv.classList.add('show');
+    statusContent.innerHTML = '';
+    customerActiveOrders.forEach(order => {
+      const statusText = {
+        'received': 'تم استلام الطلب',
+        'preparing': 'قيد التحضير',
+        'ready': 'جاهز للتسليم'
+      };
+      const statusClass = {
+        'received': 'badge-received',
+        'preparing': 'badge-preparing',
+        'ready': 'badge-ready'
+      };
+      
+      const statuses = ['received', 'preparing', 'ready', 'delivered'];
+      const currentStatusIndex = statuses.indexOf(order.status) || 0;
+      
+      let progressHTML = '<div style="margin: 8px 0; background: var(--brown-dark); border-radius: 8px; overflow: hidden; display: flex;">';
+      statuses.slice(0, 3).forEach((status, idx) => {
+        const isCompleted = idx <= currentStatusIndex;
+        const bgColor = isCompleted ? 'var(--gold)' : 'var(--brown)';
+        progressHTML += '<div style="flex: 1; text-align: center; padding: 6px; background: ' + bgColor + '; color: #1a1410; font-size: 0.75rem; font-weight: bold;">' + statusText[status] + '</div>';
+      });
+      progressHTML += '</div>';
+      
+      const div = document.createElement('div');
+      div.style.marginBottom = '12px';
+      div.innerHTML = '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><strong>طلب رقم: ' + order.receiptNo + '</strong><span class="badge ' + statusClass[order.status] + '">' + statusText[order.status] + '</span></div>' + progressHTML + '<div class="small">الإجمالي: ' + order.total + ' ج</div>';
+      statusContent.appendChild(div);
+    });
+  } else {
+    statusDiv.classList.remove('show');
+  }
+}
 
     function showMyOrders() {
       const panel = document.getElementById('ordersPanel');
