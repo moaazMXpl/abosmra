@@ -1100,37 +1100,53 @@
 }
 
     function syncFromFirebase() {
-      database.ref('menu').on('value', (snapshot) => {
-        if (snapshot.val()) {
-          menu = snapshot.val();
-          saveLS(LS_KEYS.MENU, menu);
-          renderMenu();
-          renderCategories();
-          if (isEpotAuth) renderItemManagement();
+  console.log('🔄 بدء المزامنة مع Firebase...');
+  
+  // مزامنة الطلبات
+  database.ref('orders').on('value', (snapshot) => {
+    console.log('📦 استلام بيانات الطلبات...');
+    const data = snapshot.val();
+    console.log('البيانات الخام:', data);
+    
+    if (data) {
+      // تحويل البيانات إلى مصفوفة والتحقق من صحتها
+      orders = Object.keys(data).map(key => {
+        const order = data[key];
+        // التأكد من وجود ID
+        if (!order.id) order.id = key;
+        return order;
+      }).filter(order => {
+        // التحقق من صحة البيانات الأساسية
+        const isValid = order.id && order.customer;
+        if (!isValid) {
+          console.warn('⚠️ طلب غير صالح:', order);
         }
+        return isValid;
       });
+      
+      console.log('✅ تم تحميل الطلبات:', orders.length);
+      console.log('الطلبات:', orders);
+    } else {
+      orders = [];
+      console.log('⚠️ لا توجد طلبات في Firebase');
+    }
+    
+    saveLS(LS_KEYS.ORDERS, orders);
+    
+    if (currentView === 'operator') {
+      console.log('🎨 عرض الطلبات في لوحة المشغل...');
+      renderOrders();
+      updateOperatorBadge();
+    }
+    checkCustomerOrders();
+    syncUserOrders();
+  }, (error) => {
+    console.error('❌ خطأ في تحميل الطلبات:', error);
+    notify('خطأ في تحميل الطلبات', 'error');
+  });
 
-      database.ref('offers').on('value', (snapshot) => {
-        offers = snapshot.val() ? Object.values(snapshot.val()) : [];
-        saveLS(LS_KEYS.OFFERS, offers);
-        renderOffers();
-      });
-
-      database.ref('orders').on('value', (snapshot) => {
-        orders = snapshot.val() ? Object.values(snapshot.val()) : [];
-        saveLS(LS_KEYS.ORDERS, orders);
-        if (currentView === 'operator') {
-          renderOrders();
-          updateOperatorBadge();
-        }
-        checkCustomerOrders();
-        syncUserOrders();
-        
-        const ordersPanel = document.getElementById('ordersPanel');
-        if (ordersPanel && ordersPanel.classList.contains('open')) {
-          showMyOrders();
-        }
-      });
+  // باقي الكود كما هو...
+       
 
       database.ref('history').on('value', (snapshot) => {
         orderHistory = snapshot.val() ? Object.values(snapshot.val()) : [];
@@ -2026,90 +2042,111 @@ window.toggleOperatorMenu = function(orderId) {
     };
 
     function renderOrders(filtered = null) {
-      const grid = document.getElementById('ordersGrid');
-      if (!grid) return;
+  const grid = document.getElementById('ordersGrid');
+  if (!grid) return;
 
-      const ordersToShow = filtered || orders.filter(o => !o.cancelled && o.status !== 'delivered');
-      
-      grid.innerHTML = '';
-      if (ordersToShow.length === 0) {
-        grid.innerHTML = '<div class="small" style="text-align: center; padding: 20px;">لا توجد طلبات</div>';
-        return;
-      }
+  const ordersToShow = filtered || orders.filter(o => !o.cancelled && o.status !== 'delivered');
+  
+  grid.innerHTML = '';
+  if (ordersToShow.length === 0) {
+    grid.innerHTML = '<div class="small" style="text-align: center; padding: 20px;">لا توجد طلبات</div>';
+    return;
+  }
 
-      ordersToShow.forEach(order => {
-  const card = document.createElement('div');
-  card.className = 'order-card';
-  if (order.cancelRequested) card.classList.add('cancel-requested');
-        const statusText = {
-          'received': 'تم الاستلام',
-          'preparing': 'قيد التحضير',
-          'ready': 'جاهز',
-          'delivered': 'تم التسليم'
-        };
-        const statusClass = {
-          'received': 'badge-received',
-          'preparing': 'badge-preparing',
-          'ready': 'badge-ready',
-          'delivered': 'badge-delivered'
-        };
-        card.innerHTML = `
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <div>
-      <strong>طلب #${order.receiptNo}</strong>
-      ${order.cancelRequested ? '<span class="badge badge-danger" style="margin-right: 8px;">⚠️ طلب إلغاء</span>' : ''}
-      <div class="small">${order.customer.name} — ${order.customer.phone}</div>
-      <div class="small">${order.createdAt}</div>
-    </div>
-    <span class="badge ${statusClass[order.status]}">${statusText[order.status]}</span>
-  </div>
-          <div class="order-details" id="details-${order.id}">
-            <div style="margin-top: 12px; padding: 12px; background: var(--brown-dark); border-radius: 8px;">
-              <div><strong>العنوان:</strong> ${order.customer.address}</div>
-              <div><strong>الدفع:</strong> ${order.payment}</div>
-${order.notes ? `<div><strong>ملاحظات:</strong> ${order.notes}</div>` : ''}
-${order.cancelRequested ? `
-  <div style="background: var(--danger); color: #fff; padding: 12px; border-radius: 8px; margin: 12px 0;">
-    <strong>⚠️ العميل طلب إلغاء هذا الطلب</strong>
-    <div style="margin-top: 8px;"><strong>السبب:</strong> ${order.cancelRequestReason}</div>
-    <div class="small">وقت الطلب: ${order.cancelRequestedAt}</div>
-  </div>
-` : ''}
-              <div style="margin-top: 12px;">
-                ${order.items.map(i => `<div>${i.name} × ${i.qty} = ${i.price * i.qty} ج</div>`).join('')}
-              </div>
-              <div style="margin-top: 8px; font-size: 1.2rem; font-weight: bold; color: var(--gold);">الإجمالي: ${order.total} ج</div>
+  ordersToShow.forEach(order => {
+    // التحقق من وجود البيانات المطلوبة
+    if (!order || !order.id) {
+      console.warn('طلب غير صالح:', order);
+      return;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'order-card';
+    if (order.cancelRequested) card.classList.add('cancel-requested');
+    
+    const statusText = {
+      'received': 'تم الاستلام',
+      'preparing': 'قيد التحضير',
+      'ready': 'جاهز',
+      'delivered': 'تم التسليم'
+    };
+    const statusClass = {
+      'received': 'badge-received',
+      'preparing': 'badge-preparing',
+      'ready': 'badge-ready',
+      'delivered': 'badge-delivered'
+    };
+    
+    // التأكد من وجود بيانات العميل
+    const customerName = order.customer?.name || 'غير محدد';
+    const customerPhone = order.customer?.phone || 'غير محدد';
+    const customerAddress = order.customer?.address || 'غير محدد';
+    const orderStatus = order.status || 'received';
+    const orderPayment = order.payment || 'نقدي';
+    const orderNotes = order.notes || '';
+    const orderItems = order.items || [];
+    const orderTotal = order.total || 0;
+    const receiptNo = order.receiptNo || 'غير محدد';
+    const createdAt = order.createdAt || 'غير محدد';
+    
+    card.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <strong>طلب #${receiptNo}</strong>
+          ${order.cancelRequested ? '<span class="badge badge-danger" style="margin-right: 8px;">⚠️ طلب إلغاء</span>' : ''}
+          <div class="small">${customerName} — ${customerPhone}</div>
+          <div class="small">${createdAt}</div>
+        </div>
+        <span class="badge ${statusClass[orderStatus]}">${statusText[orderStatus]}</span>
+      </div>
+      <div class="order-details" id="details-${order.id}">
+        <div style="margin-top: 12px; padding: 12px; background: var(--brown-dark); border-radius: 8px;">
+          <div><strong>العنوان:</strong> ${customerAddress}</div>
+          <div><strong>الدفع:</strong> ${orderPayment}</div>
+          ${orderNotes ? `<div><strong>ملاحظات:</strong> ${orderNotes}</div>` : ''}
+          ${order.cancelRequested ? `
+            <div style="background: var(--danger); color: #fff; padding: 12px; border-radius: 8px; margin: 12px 0;">
+              <strong>⚠️ العميل طلب إلغاء هذا الطلب</strong>
+              <div style="margin-top: 8px;"><strong>السبب:</strong> ${order.cancelRequestReason || 'غير محدد'}</div>
+              <div class="small">وقت الطلب: ${order.cancelRequestedAt || 'غير محدد'}</div>
             </div>
-            <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
-              ${order.status === 'received' ? `<button class="btn btn-primary" onclick="changeStatus('${order.id}', 'preparing')">قيد التحضير</button>` : ''}
-              ${order.status === 'preparing' ? `<button class="btn btn-primary" onclick="changeStatus('${order.id}', 'ready')">جاهز للتسليم</button>` : ''}
-              ${order.status === 'ready' ? `<button class="btn btn-primary" onclick="changeStatus('${order.id}', 'delivered')">تم التسليم</button>` : ''}
-              <button class="btn btn-secondary" onclick="printReceiptById('${order.id}')">طباعة</button>
-              <div style="position: relative; display: inline-block; width: 100%;">
-                <button class="btn btn-secondary" style="width: 100%;" onclick="toggleOperatorMenu('${order.id}')">☰ إجراءات</button>
-                <div class="operator-context-menu" id="op-menu-${order.id}" style="display: none; position: absolute; top: 100%; right: 0; background: var(--card); border: 2px solid var(--accent); border-radius: 8px; min-width: 200px; box-shadow: 0 4px 16px rgba(0,0,0,0.5); z-index: 100; margin-top: 4px;">
-                  ${order.cancelRequested ? 
-                    `<div class="op-menu-item" onclick="confirmCancelFromOperator('${order.id}'); toggleOperatorMenu('${order.id}')">✓ تأكيد الإلغاء</div>
-                     <div class="op-menu-item" onclick="rejectCancelRequest('${order.id}'); toggleOperatorMenu('${order.id}')">✗ رفض الإلغاء</div>` 
-                    : 
-                    `<div class="op-menu-item" onclick="cancelOrderOperator('${order.id}'); toggleOperatorMenu('${order.id}')">❌ إلغاء الطلب</div>`
-                  }
-                </div>
-              </div>
+          ` : ''}
+          <div style="margin-top: 12px;">
+            ${orderItems.map(i => `<div>${i.name || 'صنف'} × ${i.qty || 0} = ${(i.price || 0) * (i.qty || 0)} ج</div>`).join('')}
+          </div>
+          <div style="margin-top: 8px; font-size: 1.2rem; font-weight: bold; color: var(--gold);">الإجمالي: ${orderTotal} ج</div>
+        </div>
+        <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+          ${orderStatus === 'received' ? `<button class="btn btn-primary" onclick="changeStatus('${order.id}', 'preparing')">قيد التحضير</button>` : ''}
+          ${orderStatus === 'preparing' ? `<button class="btn btn-primary" onclick="changeStatus('${order.id}', 'ready')">جاهز للتسليم</button>` : ''}
+          ${orderStatus === 'ready' ? `<button class="btn btn-primary" onclick="changeStatus('${order.id}', 'delivered')">تم التسليم</button>` : ''}
+          <button class="btn btn-secondary" onclick="printReceiptById('${order.id}')">طباعة</button>
+          <div style="position: relative; display: inline-block; width: 100%;">
+            <button class="btn btn-secondary" style="width: 100%;" onclick="toggleOperatorMenu('${order.id}')">☰ إجراءات</button>
+            <div class="operator-context-menu" id="op-menu-${order.id}" style="display: none; position: absolute; top: 100%; right: 0; background: var(--card); border: 2px solid var(--accent); border-radius: 8px; min-width: 200px; box-shadow: 0 4px 16px rgba(0,0,0,0.5); z-index: 100; margin-top: 4px;">
+              ${order.cancelRequested ? 
+                `<div class="op-menu-item" onclick="confirmCancelFromOperator('${order.id}'); toggleOperatorMenu('${order.id}')">✓ تأكيد الإلغاء</div>
+                 <div class="op-menu-item" onclick="rejectCancelRequest('${order.id}'); toggleOperatorMenu('${order.id}')">✗ رفض الإلغاء</div>` 
+                : 
+                `<div class="op-menu-item" onclick="cancelOrderOperator('${order.id}'); toggleOperatorMenu('${order.id}')">❌ إلغاء الطلب</div>`
+              }
             </div>
           </div>
-        `;
-        card.onclick = (e) => {
-          if (e.target.tagName !== 'BUTTON') {
-            const details = document.getElementById(`details-${order.id}`);
-            details.classList.toggle('open');
-          }
-        };
-        grid.appendChild(card);
-      });
+        </div>
+      </div>
+    `;
+    
+    card.onclick = (e) => {
+      if (e.target.tagName !== 'BUTTON') {
+        const details = document.getElementById(`details-${order.id}`);
+        if (details) details.classList.toggle('open');
+      }
+    };
+    grid.appendChild(card);
+  });
 
-      updateStats();
-    }
+  updateStats();
+}
 
     window.printReceiptById = function(orderId) {
       const order = orders.find(o => o.id === orderId);
