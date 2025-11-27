@@ -16,6 +16,68 @@
       --success: #7c9b3e;
       --danger: #c4402e;
     }
+
+.order-window {
+  position: fixed;
+  background: var(--card);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  z-index: 99999;
+  min-width: 400px;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: none;
+}
+
+.order-window.active {
+  display: block;
+}
+
+.order-window-header {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--accent) 100%);
+  color: #1a1410;
+  padding: 12px 16px;
+  cursor: move;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+
+.order-window-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.order-window-close {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #1a1410;
+  line-height: 1;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.order-window-close:hover {
+  background: rgba(0,0,0,0.1);
+}
+
+.order-window-content {
+  padding: 16px;
+  overflow-y: auto;
+  max-height: calc(80vh - 60px);
+}
+
     * {
       box-sizing: border-box;
     }
@@ -766,6 +828,8 @@
           <input class="input" id="searchOrderPhone" placeholder="البحث برقم العميل" />
           <input class="input" id="searchOrderId" placeholder="البحث برقم البون" />
           <input class="input" id="searchOrderName" placeholder="البحث باسم العميل" />
+          <input class="input" id="searchOrderAmount" placeholder="البحث بالمبلغ" type="number" />
+          <input class="input" id="searchOrderDate" placeholder="11/27/2025" />
           <button class="btn btn-primary" id="searchOrderBtn">بحث</button>
         </div>
         <div id="ordersGrid"></div>
@@ -773,17 +837,19 @@
       <div class="tab-content" id="historyContent">
         <div class="section-title">طلبات سابقة</div>
         <div class="search-bar">
-          <input class="input" id="searchAddress" placeholder="البحث بالعنوان" />
-          <input class="input" id="searchPhone" placeholder="البحث برقم العميل" />
-          <input class="input" id="searchOrderIdHist" placeholder="البحث برقم البون" />
-          <input class="input" id="searchName" placeholder="البحث باسم العميل" />
-          <button class="btn btn-primary" id="searchBtn">بحث</button>
-        </div>
+              <input class="input" id="searchEpotAddress" placeholder="البحث بالعنوان" />
+              <input class="input" id="searchEpotPhone" placeholder="البحث برقم العميل" />
+              <input class="input" id="searchEpotOrderId" placeholder="البحث برقم البون" />
+              <input class="input" id="searchEpotName" placeholder="البحث باسم العميل" />
+              <input class="input" id="searchEpotAmount" placeholder="البحث بالمبلغ" type="number" />
+              <input class="input" id="searchEpotDate" placeholder="11/27/2025" />
+              <button class="btn btn-primary" id="searchEpotBtn">بحث</button>
+            </div>
         <div id="historyGrid"></div>
       </div>
       <div class="tab-content" id="epotContent">
         <div id="epotLocked">
-          <div class="section-title">EPOT — الإيرادات وصلاحيات التعديل</div>
+          <div class="section-title">EPOT</div>
           <p class="small">مقفول — للوصول اضغط فتح EPOT وأدخل كلمة المرور.</p>
           <button class="btn btn-primary" id="openEpotBtn">فتح EPOT</button>
         </div>
@@ -817,12 +883,14 @@
           <div style="margin-bottom: 30px;">
             <div class="section-title">الطلبات السابقة (EPOT)</div>
             <div class="search-bar">
-              <input class="input" id="searchEpotAddress" placeholder="البحث بالعنوان" />
-              <input class="input" id="searchEpotPhone" placeholder="البحث برقم العميل" />
-              <input class="input" id="searchEpotOrderId" placeholder="البحث برقم البون" />
-              <input class="input" id="searchEpotName" placeholder="البحث باسم العميل" />
-              <button class="btn btn-primary" id="searchEpotBtn">بحث</button>
-            </div>
+          <input class="input" id="searchAddress" placeholder="البحث بالعنوان" />
+          <input class="input" id="searchPhone" placeholder="البحث برقم العميل" />
+          <input class="input" id="searchOrderIdHist" placeholder="البحث برقم البون" />
+          <input class="input" id="searchName" placeholder="البحث باسم العميل" />
+          <input class="input" id="searchAmount" placeholder="البحث بالمبلغ" type="number" />
+          <input class="input" id="searchDate" placeholder="11/27/2025" />
+          <button class="btn btn-primary" id="searchBtn">بحث</button>
+        </div>
             <div id="epotHistoryGrid"></div>
           </div>
           
@@ -978,7 +1046,7 @@
     let currentCustomer = loadLS(LS_KEYS.CUST, null);
     let userAccount = loadLS(LS_KEYS.USER_ACCOUNT, null);
     let userOrders = loadLS(LS_KEYS.USER_ORDERS, []);
-    let receiptCounter = Number(localStorage.getItem(LS_KEYS.RECEIPT_COUNTER) || 1);
+    let receiptCounter = 0; // سيتم حسابه تلقائيًا
     let operatorPassword = localStorage.getItem(LS_KEYS.OP_PWD) || 'admin123';
     let epotPassword = localStorage.getItem(LS_KEYS.EPOT_PWD) || 'epot123';
     let isOperatorAuth = false;
@@ -987,8 +1055,28 @@
     let secretCode = '';
     let autoPrint = localStorage.getItem(LS_KEYS.AUTO_PRINT) === 'true';
     let pendingOrderData = null;
-    let generatedOtp = null;
     let orderToCancel = null;
+
+function getEnglishDateTime() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = now.getHours();
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const hour12 = hours % 12 || 12;
+  return `${month}/${day}/${year}, ${hour12}:${minutes}:${seconds} ${period}`;
+}
+
+function getEnglishDateOnly() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${month}/${day}/${year}`;
+}
 
     function saveLS(key, data) { 
       localStorage.setItem(key, JSON.stringify(data)); 
@@ -1062,6 +1150,7 @@
           isEpotAuth = true;
           showEpotPanel();
         }
+        restoreOpenWindows();
       }
     };
 
@@ -1261,21 +1350,46 @@
     }
 
     function searchEpotHistory() {
-      const address = document.getElementById('searchEpotAddress').value.trim().toLowerCase();
-      const phone = document.getElementById('searchEpotPhone').value.trim();
-      const orderId = document.getElementById('searchEpotOrderId').value.trim();
-      const name = document.getElementById('searchEpotName').value.trim().toLowerCase();
+  const address = document.getElementById('searchEpotAddress').value.trim().toLowerCase();
+  const phone = document.getElementById('searchEpotPhone').value.trim();
+  const orderId = document.getElementById('searchEpotOrderId').value.trim();
+  const name = document.getElementById('searchEpotName').value.trim().toLowerCase();
+  const amount = document.getElementById('searchEpotAmount').value.trim();
+  const dateInput = document.getElementById('searchEpotDate').value.trim();
 
-      const filtered = orderHistory.filter(o => {
-        if (address && !o.customer.address.toLowerCase().includes(address)) return false;
-        if (phone && !o.customer.phone.includes(phone)) return false;
-        if (orderId && !String(o.receiptNo).includes(orderId)) return false;
-        if (name && !o.customer.name.toLowerCase().includes(name)) return false;
-        return true;
-      });
+  const filtered = orderHistory.filter(o => {
+    if (address && !o.customer.address.toLowerCase().includes(address)) return false;
+    if (phone && !o.customer.phone.includes(phone)) return false;
+    if (orderId && !String(o.receiptNo).includes(orderId)) return false;
+    if (name && !o.customer.name.toLowerCase().includes(name)) return false;
+    if (amount && o.total !== Number(amount)) return false;
 
-      renderEpotHistory(filtered);
+    if (dateInput) {
+      const orderDate = o.createdAt;
+      const parts = orderDate.split(',')[0].trim().split('/');
+      const day = parts[0];
+      const month = parts[1];
+      const year = parts[2]?.split(' ')[0] || parts[2];
+
+      if (dateInput.length <= 2) {
+        if (!day.includes(dateInput) && !month.includes(dateInput)) return false;
+      } else if (dateInput.length <= 4 && !dateInput.includes('/')) {
+        if (!year.includes(dateInput)) return false;
+      } else if (dateInput.includes('/')) {
+        const [d, m, y] = dateInput.split('/');
+        if (d && !day.includes(d)) return false;
+        if (m && !month.includes(m)) return false;
+        if (y && !year.includes(y)) return false;
+      } else {
+        if (!orderDate.includes(dateInput)) return false;
+      }
     }
+
+    return true;
+  });
+
+  renderEpotHistory(filtered);
+}
 
     function renderCategories() {
       const container = document.getElementById('categoriesScroll');
@@ -1410,97 +1524,84 @@
     };
 
     function openCheckout() {
-      if (cart.length === 0) {
-        notify('السلة فارغة', 'warning');
-        return;
-      }
-      document.getElementById('cartPanel').classList.remove('open');
-      const section = document.getElementById('checkoutSection');
-      section.style.display = 'block';
-      section.scrollIntoView({ behavior: 'smooth' });
-      
-      if (userAccount) {
-        document.getElementById('orderName').value = userAccount.name || '';
-        document.getElementById('orderPhone').value = userAccount.phone || '';
-        document.getElementById('orderAddress').value = userAccount.address || '';
-        document.getElementById('orderNotes').value = userAccount.notes || '';
-      } else if (currentCustomer) {
-        document.getElementById('orderName').value = currentCustomer.name || '';
-        document.getElementById('orderPhone').value = currentCustomer.phone || '';
-      }
-    }
+  if (cart.length === 0) {
+    notify('السلة فارغة', 'warning');
+    return;
+  }
+  document.getElementById('cartPanel').classList.remove('open');
+  const section = document.getElementById('checkoutSection');
+  section.style.display = 'block';
+  section.scrollIntoView({ behavior: 'smooth' });
+  
+  if (userAccount) {
+    document.getElementById('orderName').value = userAccount.name || '';
+    document.getElementById('orderPhone').value = userAccount.phone || '';
+    document.getElementById('orderAddress').value = userAccount.address || '';
+    document.getElementById('orderNotes').value = userAccount.notes || '';
+    notify('تم ملء البيانات تلقائيًا من حسابك المحفوظ ✓', 'info');
+  } else if (currentCustomer) {
+    document.getElementById('orderName').value = currentCustomer.name || '';
+    document.getElementById('orderPhone').value = currentCustomer.phone || '';
+  }
+}
 
     function confirmOrder() {
-      const name = document.getElementById('orderName').value.trim();
-      const phone = document.getElementById('orderPhone').value.trim();
-      const address = document.getElementById('orderAddress').value.trim();
-      const payment = document.getElementById('orderPayment').value;
-      const notes = document.getElementById('orderNotes').value.trim();
+  const name = document.getElementById('orderName').value.trim();
+  const phone = document.getElementById('orderPhone').value.trim();
+  const address = document.getElementById('orderAddress').value.trim();
+  const payment = document.getElementById('orderPayment').value;
+  const notes = document.getElementById('orderNotes').value.trim();
 
-      if (!name || !phone || !address) {
-        notify('يرجى إكمال جميع البيانات', 'warning');
-        return;
-      }
+  if (!name || !phone || !address) {
+    notify('يرجى إكمال جميع البيانات', 'warning');
+    return;
+  }
 
-      if (phone.length < 10) {
-        notify('يرجى إدخال رقم هاتف صحيح', 'warning');
-        return;
-      }
+  if (phone.length < 10) {
+    notify('يرجى إدخال رقم هاتف صحيح', 'warning');
+    return;
+  }
 
-      pendingOrderData = {
-        name,
-        phone,
-        address,
-        payment,
-        notes
-      };
+  pendingOrderData = {
+    name,
+    phone,
+    address,
+    payment,
+    notes
+  };
 
-      if (userAccount && userAccount.phone === phone) {
-        processOrder(false);
-      } else {
-        document.getElementById('otpPhoneDisplay').textContent = phone;
-        document.getElementById('otpModal').classList.add('open');
-        document.getElementById('otpInputSection').style.display = 'none';
-      }
-    }
+  // إذا كان الحساب موجود بنفس الرقم، أكمل الطلب مباشرة
+  if (userAccount && userAccount.phone === phone) {
+    processOrder(false);
+  } else {
+    // اسأل المستخدم إذا أراد حفظ البيانات
+    showSaveDataConfirmation();
+  }
+}
 
-    function sendOtp() {
-      const phone = pendingOrderData.phone;
-      generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      
-      console.log('OTP Code:', generatedOtp, 'for phone:', phone);
-      
-      setTimeout(() => {
-        notify('تم إرسال كود التحقق إلى هاتفك', 'info');
-      }, 500);
+function showSaveDataConfirmation() {
+  document.getElementById('otpModal').classList.add('open');
+  document.getElementById('otpInputSection').style.display = 'none';
+  document.querySelector('#otpModal .modal-title').textContent = 'حفظ البيانات';
+  document.querySelector('#otpModal p').innerHTML = 'هل تريد حفظ بياناتك (الاسم، العنوان، رقم الهاتف) لتسهيل الطلبات المستقبلية؟';
+}
 
-      document.getElementById('otpInputSection').style.display = 'block';
-      setupWebOTP();
-    }
-
-    function verifyOtp() {
-      const enteredOtp = document.getElementById('otpCode').value.trim();
-      
-      if (enteredOtp === generatedOtp) {
-        userAccount = {
-          phone: pendingOrderData.phone,
-          name: pendingOrderData.name,
-          address: pendingOrderData.address,
-          notes: pendingOrderData.notes,
-          createdAt: new Date().toISOString()
-        };
-        
-        saveState();
-        updateUserInfo();
-        
-        document.getElementById('otpModal').classList.remove('open');
-        document.getElementById('otpCode').value = '';
-        
-        processOrder(true);
-      } else {
-        notify('كود التحقق غير صحيح', 'error');
-      }
-    }
+    function saveUserDataAndOrder() {
+  userAccount = {
+    phone: pendingOrderData.phone,
+    name: pendingOrderData.name,
+    address: pendingOrderData.address,
+    notes: pendingOrderData.notes,
+    createdAt: new Date().toISOString()
+  };
+  
+  saveState();
+  updateUserInfo();
+  
+  document.getElementById('otpModal').classList.remove('open');
+  
+  processOrder(true);
+}
 
     function processOrder(isNewAccount) {
       currentCustomer = { 
@@ -1509,8 +1610,9 @@
       };
       saveLS(LS_KEYS.CUST, currentCustomer);
 
-      const receiptNo = receiptCounter++;
-      localStorage.setItem(LS_KEYS.RECEIPT_COUNTER, String(receiptCounter));
+      // حساب رقم الطلب التلقائي
+      const allOrdersCount = orders.length + orderHistory.length;
+      const receiptNo = allOrdersCount + 1;
 
       const orderId = generateId('ORD');
       let total = cart.reduce((s, c) => s + c.price * c.qty, 0);
@@ -1541,8 +1643,8 @@
         notes: pendingOrderData.notes,
         appliedOffer,
         status: 'received',
-        createdAt: new Date().toLocaleString('ar-EG'),
-        date: new Date().toDateString(),
+        createdAt: getEnglishDateTime(),
+date: getEnglishDateOnly(),
         customerPhone: pendingOrderData.phone,
         cancelled: false,
         cancelReason: null
@@ -1695,7 +1797,9 @@
         return;
       }
 
-      const allUserOrders = [...orders, ...orderHistory].filter(o => o.customerPhone === customerPhone);
+      const allUserOrders = [...orders, ...orderHistory]
+  .filter(o => o.customerPhone === customerPhone)
+  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // الأحدث أولاً
 
       if (allUserOrders.length === 0) {
         list.innerHTML = '<div class="small" style="text-align: center; padding: 20px;">لا توجد طلبات بعد. قم بإضافة طلبك الأول!</div>';
@@ -1940,7 +2044,7 @@ window.toggleOperatorMenu = function(orderId) {
         cancelRequested: true,
         cancelRequestReason: reason,
         cancelRequestedBy: 'customer',
-        cancelRequestedAt: new Date().toLocaleString('ar-EG'),
+        cancelRequestedAt: getEnglishDateTime(),
         cancelled: false
       });
     } else {
@@ -2054,9 +2158,8 @@ window.toggleOperatorMenu = function(orderId) {
   }
 
   ordersToShow.forEach(order => {
-    // التحقق من وجود البيانات المطلوبة
     if (!order || !order.id) {
-      console.warn('طلب غير صالح:', order);
+      console.warn('⚠️ طلب غير صالح:', order);
       return;
     }
 
@@ -2077,14 +2180,9 @@ window.toggleOperatorMenu = function(orderId) {
       'delivered': 'badge-delivered'
     };
     
-    // التأكد من وجود بيانات العميل
     const customerName = order.customer?.name || 'غير محدد';
     const customerPhone = order.customer?.phone || 'غير محدد';
-    const customerAddress = order.customer?.address || 'غير محدد';
     const orderStatus = order.status || 'received';
-    const orderPayment = order.payment || 'نقدي';
-    const orderNotes = order.notes || '';
-    const orderItems = order.items || [];
     const orderTotal = order.total || 0;
     const receiptNo = order.receiptNo || 'غير محدد';
     const createdAt = order.createdAt || 'غير محدد';
@@ -2097,51 +2195,14 @@ window.toggleOperatorMenu = function(orderId) {
           <div class="small">${customerName} — ${customerPhone}</div>
           <div class="small">${createdAt}</div>
         </div>
-        <span class="badge ${statusClass[orderStatus]}">${statusText[orderStatus]}</span>
-      </div>
-      <div class="order-details" id="details-${order.id}">
-        <div style="margin-top: 12px; padding: 12px; background: var(--brown-dark); border-radius: 8px;">
-          <div><strong>العنوان:</strong> ${customerAddress}</div>
-          <div><strong>الدفع:</strong> ${orderPayment}</div>
-          ${orderNotes ? `<div><strong>ملاحظات:</strong> ${orderNotes}</div>` : ''}
-          ${order.cancelRequested ? `
-            <div style="background: var(--danger); color: #fff; padding: 12px; border-radius: 8px; margin: 12px 0;">
-              <strong>⚠️ العميل طلب إلغاء هذا الطلب</strong>
-              <div style="margin-top: 8px;"><strong>السبب:</strong> ${order.cancelRequestReason || 'غير محدد'}</div>
-              <div class="small">وقت الطلب: ${order.cancelRequestedAt || 'غير محدد'}</div>
-            </div>
-          ` : ''}
-          <div style="margin-top: 12px;">
-            ${orderItems.map(i => `<div>${i.name || 'صنف'} × ${i.qty || 0} = ${(i.price || 0) * (i.qty || 0)} ج</div>`).join('')}
-          </div>
-          <div style="margin-top: 8px; font-size: 1.2rem; font-weight: bold; color: var(--gold);">الإجمالي: ${orderTotal} ج</div>
-        </div>
-        <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
-          ${orderStatus === 'received' ? `<button class="btn btn-primary" onclick="changeStatus('${order.id}', 'preparing')">قيد التحضير</button>` : ''}
-          ${orderStatus === 'preparing' ? `<button class="btn btn-primary" onclick="changeStatus('${order.id}', 'ready')">جاهز للتسليم</button>` : ''}
-          ${orderStatus === 'ready' ? `<button class="btn btn-primary" onclick="changeStatus('${order.id}', 'delivered')">تم التسليم</button>` : ''}
-          <button class="btn btn-secondary" onclick="printReceiptById('${order.id}')">طباعة</button>
-          <div style="position: relative; display: inline-block; width: 100%;">
-            <button class="btn btn-secondary" style="width: 100%;" onclick="toggleOperatorMenu('${order.id}')">☰ إجراءات</button>
-            <div class="operator-context-menu" id="op-menu-${order.id}" style="display: none; position: absolute; top: 100%; right: 0; background: var(--card); border: 2px solid var(--accent); border-radius: 8px; min-width: 200px; box-shadow: 0 4px 16px rgba(0,0,0,0.5); z-index: 100; margin-top: 4px;">
-              ${order.cancelRequested ? 
-                `<div class="op-menu-item" onclick="confirmCancelFromOperator('${order.id}'); toggleOperatorMenu('${order.id}')">✓ تأكيد الإلغاء</div>
-                 <div class="op-menu-item" onclick="rejectCancelRequest('${order.id}'); toggleOperatorMenu('${order.id}')">✗ رفض الإلغاء</div>` 
-                : 
-                `<div class="op-menu-item" onclick="cancelOrderOperator('${order.id}'); toggleOperatorMenu('${order.id}')">❌ إلغاء الطلب</div>`
-              }
-            </div>
-          </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+          <span class="badge ${statusClass[orderStatus]}">${statusText[orderStatus]}</span>
+          <div style="font-weight: bold; color: var(--gold); font-size: 1.1rem;">${orderTotal} ج</div>
         </div>
       </div>
     `;
     
-    card.onclick = (e) => {
-      if (e.target.tagName !== 'BUTTON') {
-        const details = document.getElementById(`details-${order.id}`);
-        if (details) details.classList.toggle('open');
-      }
-    };
+    card.onclick = () => openOperatorOrderWindow(order);
     grid.appendChild(card);
   });
 
@@ -2153,7 +2214,7 @@ window.toggleOperatorMenu = function(orderId) {
       if (order) printReceipt(order);
     };
 
-    window.changeStatus = function(orderId, newStatus) {
+    window.changeStatus = function(orderId, newStatus, windowId) {
       const orderIndex = orders.findIndex(o => o.id === orderId);
       if (orderIndex === -1) return;
 
@@ -2168,8 +2229,10 @@ window.toggleOperatorMenu = function(orderId) {
         
         orders.splice(orderIndex, 1);
         database.ref('orders/' + orderId).remove();
+        if (windowId) closeOrderWindow(windowId);
       } else {
         database.ref('orders/' + orderId).update({ status: newStatus });
+        if (windowId) updateOrderWindow(windowId, order);
       }
       
       saveState();
@@ -2177,6 +2240,85 @@ window.toggleOperatorMenu = function(orderId) {
       syncUserOrders();
       notify(`تم تغيير حالة الطلب`, 'info');
     };
+
+     window.closeOrderWindow = function(windowId) {
+  const window = document.getElementById(windowId);
+  if (window) {
+    window.remove();
+    saveOpenWindows();
+  }
+};
+
+window.updateOrderWindow = function(windowId, order) {
+  const windowElement = document.getElementById(windowId);
+  if (!windowElement) return;
+  
+  // حفظ موقع النافذة الحالي
+  const currentLeft = windowElement.style.left;
+  const currentTop = windowElement.style.top;
+  const currentZIndex = windowElement.style.zIndex;
+  
+  // إعادة إنشاء المحتوى
+  closeOrderWindow(windowId);
+  openOperatorOrderWindow(order);
+  
+  // استعادة الموقع
+  const newWindow = document.getElementById(windowId);
+  if (newWindow) {
+    newWindow.style.left = currentLeft;
+    newWindow.style.top = currentTop;
+    newWindow.style.zIndex = currentZIndex;
+  }
+};
+
+window.toggleWindowMenu = function(windowId) {
+  const menu = document.getElementById('window-menu-' + windowId);
+  const allMenus = document.querySelectorAll('[id^="window-menu-"]');
+  allMenus.forEach(m => {
+    if (m.id !== 'window-menu-' + windowId) m.style.display = 'none';
+  });
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+  event.stopPropagation();
+};
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.operator-context-menu') && !e.target.closest('[onclick*="toggleWindowMenu"]')) {
+    document.querySelectorAll('[id^="window-menu-"]').forEach(m => m.style.display = 'none');
+  }
+});
+
+function saveOpenWindows() {
+  const windows = [];
+  document.querySelectorAll('.order-window').forEach(w => {
+    windows.push({
+      id: w.id,
+      left: w.style.left,
+      top: w.style.top,
+      zIndex: w.style.zIndex
+    });
+  });
+  sessionStorage.setItem('openWindows', JSON.stringify(windows));
+}
+
+function restoreOpenWindows() {
+  const saved = sessionStorage.getItem('openWindows');
+  if (!saved) return;
+  
+  const windows = JSON.parse(saved);
+  windows.forEach(w => {
+    const orderId = w.id.replace('order-window-', '');
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+      openOperatorOrderWindow(order);
+      const windowElement = document.getElementById(w.id);
+      if (windowElement) {
+        windowElement.style.left = w.left;
+        windowElement.style.top = w.top;
+        windowElement.style.zIndex = w.zIndex;
+      }
+    }
+  });
+}
 
     window.cancelOrderOperator = function(orderId) {
       if (!confirm('هل أنت متأكد من إلغاء هذا الطلب؟')) return;
@@ -2259,23 +2401,213 @@ window.rejectCancelRequest = function(orderId) {
   notify('تم رفض طلب الإلغاء', 'info');
 };
 
+function openOperatorOrderWindow(order) {
+  const windowId = 'order-window-' + order.id;
+  
+  let existingWindow = document.getElementById(windowId);
+  if (existingWindow) {
+    existingWindow.style.zIndex = getTopZIndex() + 1;
+    return;
+  }
+
+  const statusText = {
+    'received': 'تم الاستلام',
+    'preparing': 'قيد التحضير',
+    'ready': 'جاهز',
+    'delivered': 'تم التسليم'
+  };
+  const statusClass = {
+    'received': 'badge-received',
+    'preparing': 'badge-preparing',
+    'ready': 'badge-ready',
+    'delivered': 'badge-delivered'
+  };
+
+  const customerName = order.customer?.name || 'غير محدد';
+  const customerPhone = order.customer?.phone || 'غير محدد';
+  const customerAddress = order.customer?.address || 'غير محدد';
+  const orderStatus = order.status || 'received';
+  const orderPayment = order.payment || 'نقدي';
+  const orderNotes = order.notes || '';
+  const orderItems = order.items || [];
+  const orderTotal = order.total || 0;
+  
+  let contentHTML = '<div style="padding: 12px; background: var(--brown-dark); border-radius: 8px; margin-bottom: 12px;">';
+  contentHTML += '<div style="margin-bottom: 8px;"><strong> العميل:</strong> ' + customerName + '</div>';
+  contentHTML += '<div style="margin-bottom: 8px;"><strong> الهاتف:</strong> ' + customerPhone + '</div>';
+  contentHTML += '<div style="margin-bottom: 8px;"><strong> العنوان:</strong> ' + customerAddress + '</div>';
+  contentHTML += '<div style="margin-bottom: 8px;"><strong> الدفع:</strong> ' + orderPayment + '</div>';
+  if (orderNotes) {
+    contentHTML += '<div style="margin-bottom: 8px;"><strong>📝 ملاحظات:</strong> ' + orderNotes + '</div>';
+  }
+  contentHTML += '</div>';
+  
+  if (order.cancelRequested) {
+    contentHTML += '<div style="background: var(--danger); color: #fff; padding: 12px; border-radius: 8px; margin-bottom: 12px;">';
+    contentHTML += '<strong>⚠️ العميل طلب إلغاء هذا الطلب</strong>';
+    contentHTML += '<div style="margin-top: 8px;"><strong>السبب:</strong> ' + (order.cancelRequestReason || 'غير محدد') + '</div>';
+    contentHTML += '<div class="small">وقت الطلب: ' + (order.cancelRequestedAt || 'غير محدد') + '</div>';
+    contentHTML += '</div>';
+  }
+  
+  contentHTML += '<div style="background: var(--brown-dark); padding: 12px; border-radius: 8px; margin-bottom: 12px;">';
+  contentHTML += '<strong style="color: var(--gold); margin-bottom: 8px; display: block;"> الطلبات:</strong>';
+  orderItems.forEach(i => {
+    contentHTML += '<div style="display: flex; justify-content: space-between; margin: 4px 0;">';
+    contentHTML += '<span>' + (i.name || 'صنف') + ' × ' + (i.qty || 0) + '</span>';
+    contentHTML += '<span style="color: var(--gold); font-weight: bold;">' + ((i.price || 0) * (i.qty || 0)) + ' ج</span>';
+    contentHTML += '</div>';
+  });
+  contentHTML += '<div style="margin-top: 12px; padding-top: 12px; border-top: 2px solid var(--brown); font-size: 1.3rem; font-weight: bold; color: var(--gold); text-align: center;">الإجمالي: ' + orderTotal + ' ج</div>';
+  contentHTML += '</div>';
+  
+  contentHTML += '<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">';
+  if (orderStatus === 'received') {
+    contentHTML += '<button class="btn btn-primary" style="flex: 1;" onclick="changeStatus(\'' + order.id + '\', \'preparing\', \'' + windowId + '\')">قيد التحضير</button>';
+  }
+  if (orderStatus === 'preparing') {
+    contentHTML += '<button class="btn btn-primary" style="flex: 1;" onclick="changeStatus(\'' + order.id + '\', \'ready\', \'' + windowId + '\')">جاهز للتسليم</button>';
+  }
+  if (orderStatus === 'ready') {
+    contentHTML += '<button class="btn btn-primary" style="flex: 1;" onclick="changeStatus(\'' + order.id + '\', \'delivered\', \'' + windowId + '\')">تم التسليم</button>';
+  }
+  contentHTML += '</div>';
+  
+  contentHTML += '<div style="display: flex; gap: 8px; flex-wrap: wrap; position: relative;">';
+  contentHTML += '<button class="btn btn-secondary" style="flex: 1;" onclick="printReceiptById(\'' + order.id + '\')">طباعة</button>';
+  
+  contentHTML += '<div style="position: relative;"><button class="btn btn-secondary" onclick="toggleWindowMenu(\'' + windowId + '\')">⋮</button>';
+  contentHTML += '<div id="window-menu-' + windowId + '" class="operator-context-menu" style="display: none; position: absolute; top: 100%; left: 0; background: var(--card); border: 2px solid var(--accent); border-radius: 8px; min-width: 180px; box-shadow: 0 4px 16px rgba(0,0,0,0.5); z-index: 10000;">';
+  
+  if (order.cancelRequested) {
+    contentHTML += '<div class="op-menu-item" onclick="confirmCancelFromOperator(\'' + order.id + '\'); closeOrderWindow(\'' + windowId + '\')">تأكيد الإلغاء</div>';
+    contentHTML += '<div class="op-menu-item" onclick="rejectCancelRequest(\'' + order.id + '\'); closeOrderWindow(\'' + windowId + '\')">رفض الإلغاء</div>';
+  } else {
+    contentHTML += '<div class="op-menu-item" onclick="if(confirm(\'هل أنت متأكد من إلغاء هذا الطلب؟\')) { cancelOrderOperator(\'' + order.id + '\'); closeOrderWindow(\'' + windowId + '\'); }">إلغاء الطلب</div>';
+  }
+  
+  contentHTML += '</div></div>';
+  contentHTML += '</div>';
+
+  const orderWindow = document.createElement('div');
+  orderWindow.id = windowId;
+  orderWindow.className = 'order-window active';
+  orderWindow.style.left = (100 + (document.querySelectorAll('.order-window').length * 30)) + 'px';
+  orderWindow.style.top = (100 + (document.querySelectorAll('.order-window').length * 30)) + 'px';
+  orderWindow.style.zIndex = getTopZIndex() + 1;
+  
+  orderWindow.innerHTML = `
+    <div class="order-window-header">
+      <div class="order-window-title">
+        طلب #${order.receiptNo}
+        <span class="badge ${statusClass[orderStatus]}" style="margin-right: 8px; font-size: 0.85rem;">${statusText[orderStatus]}</span>
+      </div>
+      <button class="order-window-close" onclick="closeOrderWindow('${windowId}')">×</button>
+    </div>
+    <div class="order-window-content">
+      ${contentHTML}
+    </div>
+  `;
+  
+  document.body.appendChild(orderWindow);
+  makeDraggable(orderWindow);
+  
+  orderWindow.onclick = () => {
+    orderWindow.style.zIndex = getTopZIndex() + 1;
+  };
+}
+
+function getTopZIndex() {
+  const windows = document.querySelectorAll('.order-window');
+  let maxZ = 99999;
+  windows.forEach(w => {
+    const z = parseInt(w.style.zIndex || 99999);
+    if (z > maxZ) maxZ = z;
+  });
+  return maxZ;
+}
+
+function makeDraggable(element) {
+  let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  const header = element.querySelector('.order-window-header');
+  
+  header.onmousedown = dragMouseDown;
+
+  function dragMouseDown(e) {
+    e.preventDefault();
+    element.style.zIndex = getTopZIndex() + 1; // رفع النافذة للأعلى عند بدء السحب
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e.preventDefault();
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    element.style.top = (element.offsetTop - pos2) + "px";
+    element.style.left = (element.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+
     function searchOrders() {
-      const address = document.getElementById('searchOrderAddress').value.trim().toLowerCase();
-      const phone = document.getElementById('searchOrderPhone').value.trim();
-      const orderId = document.getElementById('searchOrderId').value.trim();
-      const name = document.getElementById('searchOrderName').value.trim().toLowerCase();
+  const address = document.getElementById('searchOrderAddress').value.trim().toLowerCase();
+  const phone = document.getElementById('searchOrderPhone').value.trim();
+  const orderId = document.getElementById('searchOrderId').value.trim();
+  const name = document.getElementById('searchOrderName').value.trim().toLowerCase();
+  const amount = document.getElementById('searchOrderAmount').value.trim();
+  const dateInput = document.getElementById('searchOrderDate').value.trim(); // مثال: 11/27 أو 11 أو 27 أو 2025
 
-      const filtered = orders.filter(o => {
-        if (o.cancelled) return false;
-        if (address && !o.customer.address.toLowerCase().includes(address)) return false;
-        if (phone && !o.customer.phone.includes(phone)) return false;
-        if (orderId && !String(o.receiptNo).includes(orderId)) return false;
-        if (name && !o.customer.name.toLowerCase().includes(name)) return false;
-        return true;
-      });
+  const filtered = orders.filter(o => {
+    if (o.cancelled) return false;
 
-      renderOrders(filtered);
+    if (address && !o.customer.address.toLowerCase().includes(address)) return false;
+    if (phone && !o.customer.phone.includes(phone)) return false;
+    if (orderId && !String(o.receiptNo).includes(orderId)) return false;
+    if (name && !o.customer.name.toLowerCase().includes(name)) return false;
+    if (amount && o.total !== Number(amount)) return false;
+
+    // بحث جزئي في التاريخ
+    if (dateInput) {
+      const orderDate = o.createdAt; // مثال: "11/27/2025, 3:45:22 PM"
+      const parts = orderDate.split(',')[0].trim().split('/'); // ["11", "27", "2025"]
+      const day = parts[0];
+      const month = parts[1];
+      const year = parts[2]?.split(' ')[0] || parts[2];
+
+      const hasDay = dateInput.includes('/') ? dateInput.split('/')[0] : dateInput;
+      const hasMonth = dateInput.includes('/') ? dateInput.split('/')[1] : null;
+
+      if (dateInput.length <= 2) {
+        // بحث باليوم فقط (مثل 27)
+        if (!day.includes(dateInput) && !month.includes(dateInput)) return false;
+      } else if (dateInput.length <= 4 && !dateInput.includes('/')) {
+        // بحث بالسنة فقط (مثل 2025 أو 2024)
+        if (!year.includes(dateInput)) return false;
+      } else if (dateInput.includes('/')) {
+        // صيغة 11/27 أو 11/27/2025
+        const [inputDay, inputMonth, inputYear] = dateInput.split('/');
+        if (inputDay && !day.includes(inputDay)) return false;
+        if (inputMonth && !month.includes(inputMonth)) return false;
+        if (inputYear && !year.includes(inputYear)) return false;
+      } else {
+        if (!orderDate.includes(dateInput)) return false;
+      }
     }
+
+    return true;
+  });
+
+  renderOrders(filtered);
+}
 
     function renderHistory(filtered = null) {
       const grid = document.getElementById('historyGrid');
@@ -2326,21 +2658,46 @@ window.rejectCancelRequest = function(orderId) {
     }
 
     function searchHistory() {
-      const address = document.getElementById('searchAddress').value.trim().toLowerCase();
-      const phone = document.getElementById('searchPhone').value.trim();
-      const orderId = document.getElementById('searchOrderIdHist').value.trim();
-      const name = document.getElementById('searchName').value.trim().toLowerCase();
+  const address = document.getElementById('searchAddress').value.trim().toLowerCase();
+  const phone = document.getElementById('searchPhone').value.trim();
+  const orderId = document.getElementById('searchOrderIdHist').value.trim();
+  const name = document.getElementById('searchName').value.trim().toLowerCase();
+  const amount = document.getElementById('searchAmount').value.trim();
+  const dateInput = document.getElementById('searchDate').value.trim();
 
-      const filtered = orderHistory.filter(o => {
-        if (address && !o.customer.address.toLowerCase().includes(address)) return false;
-        if (phone && !o.customer.phone.includes(phone)) return false;
-        if (orderId && !String(o.receiptNo).includes(orderId)) return false;
-        if (name && !o.customer.name.toLowerCase().includes(name)) return false;
-        return true;
-      });
+  const filtered = orderHistory.filter(o => {
+    if (address && !o.customer.address.toLowerCase().includes(address)) return false;
+    if (phone && !o.customer.phone.includes(phone)) return false;
+    if (orderId && !String(o.receiptNo).includes(orderId)) return false;
+    if (name && !o.customer.name.toLowerCase().includes(name)) return false;
+    if (amount && o.total !== Number(amount)) return false;
 
-      renderHistory(filtered);
+    if (dateInput) {
+      const orderDate = o.createdAt;
+      const parts = orderDate.split(',')[0].trim().split('/');
+      const day = parts[0];
+      const month = parts[1];
+      const year = parts[2]?.split(' ')[0] || parts[2];
+
+      if (dateInput.length <= 2) {
+        if (!day.includes(dateInput) && !month.includes(dateInput)) return false;
+      } else if (dateInput.length <= 4 && !dateInput.includes('/')) {
+        if (!year.includes(dateInput)) return false;
+      } else if (dateInput.includes('/')) {
+        const [d, m, y] = dateInput.split('/');
+        if (d && !day.includes(d)) return false;
+        if (m && !month.includes(m)) return false;
+        if (y && !year.includes(y)) return false;
+      } else {
+        if (!orderDate.includes(dateInput)) return false;
+      }
     }
+
+    return true;
+  });
+
+  renderHistory(filtered);
+}
 
     function endDay() {
       const activeOrders = orders.filter(o => !o.cancelled && o.status !== 'delivered');
@@ -2508,196 +2865,179 @@ window.rejectCancelRequest = function(orderId) {
     }
 
     function setupEventListeners() {
-      document.getElementById('cartToggle').onclick = () => {
-        document.getElementById('cartPanel').classList.add('open');
-      };
-
-      document.getElementById('closeCart').onclick = () => {
-        document.getElementById('cartPanel').classList.remove('open');
-      };
-
-      document.getElementById('closeOrders').onclick = () => {
-        document.getElementById('ordersPanel').classList.remove('open');
-      };
-
-      document.getElementById('clearCartBtn').onclick = () => {
-        if (confirm('هل تريد تفريغ السلة؟')) {
-          cart = [];
-          updateCartDisplay();
-        }
-      };
-
-      document.getElementById('searchEpotBtn').onclick = searchEpotHistory;
-      document.getElementById('checkoutBtn').onclick = openCheckout;
-      document.getElementById('confirmOrderBtn').onclick = confirmOrder;
-      document.getElementById('cancelCheckoutBtn').onclick = () => {
-        document.getElementById('checkoutSection').style.display = 'none';
-      };
-
-      document.getElementById('applyOffer').onchange = updateCartDisplay;
-
-      document.getElementById('profileBtn').onclick = () => {
-        const menu = document.getElementById('profileMenu');
-        menu.classList.toggle('open');
-      };
-
-      document.getElementById('trackOrdersBtn').onclick = () => {
-        document.getElementById('profileMenu').classList.remove('open');
-        showMyOrders();
-      };
-
-      document.getElementById('sendOtpBtn').onclick = () => {
-        sendOtp();
-      };
-
-      document.getElementById('skipOtpBtn').onclick = () => {
-        document.getElementById('otpModal').classList.remove('open');
-        processOrder(false);
-      };
-
-      document.getElementById('verifyOtpBtn').onclick = () => {
-        verifyOtp();
-      };
-
-      document.getElementById('resendOtpBtn').onclick = () => {
-        sendOtp();
-        notify('تم إعادة إرسال الكود', 'info');
-      };
-
-      document.getElementById('confirmCancelBtn').onclick = confirmCancelOrder;
-      
-      document.getElementById('closeCancelBtn').onclick = () => {
-        document.getElementById('cancelModal').classList.remove('open');
-        document.getElementById('cancelReason').value = '';
-        orderToCancel = null;
-      };
-
-      document.addEventListener('keydown', (e) => {
-        if (currentView === 'customer') {
-          secretCode += e.key;
-          if (secretCode.length > 20) {
-            secretCode = secretCode.slice(-20);
-          }
-          if (secretCode.includes('admin123')) {
-            secretCode = '';
-            isOperatorAuth = true;
-            showOperatorView();
-          }
-        }
-      });
-
-      document.getElementById('logoutBtn').onclick = () => {
-        isOperatorAuth = false;
-        isEpotAuth = false;
-        secretCode = '';
-        showCustomerView();
-      };
-
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.onclick = (e) => {
-          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-          document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-          
-          e.target.classList.add('active');
-          const tabName = e.target.dataset.tab;
-          document.getElementById(tabName + 'Content').classList.add('active');
-
-          if (tabName === 'history') renderHistory();
-          if (tabName === 'orders') renderOrders();
-        };
-      });
-
-      document.getElementById('searchOrderBtn').onclick = searchOrders;
-      document.getElementById('searchBtn').onclick = searchHistory;
-
-      document.getElementById('openEpotBtn').onclick = () => {
-        document.getElementById('epotModal').classList.add('open');
-      };
-
-      document.getElementById('cancelEpotBtn').onclick = () => {
-        document.getElementById('epotModal').classList.remove('open');
-      };
-
-      document.getElementById('submitEpotBtn').onclick = () => {
-        const pwd = document.getElementById('epotPassword').value;
-        if (pwd === epotPassword) {
-          isEpotAuth = true;
-          document.getElementById('epotModal').classList.remove('open');
-          showEpotPanel();
-        } else {
-          notify('كلمة مرور خاطئة', 'error');
-        }
-        document.getElementById('epotPassword').value = '';
-      };
-
-      document.getElementById('lockEpotBtn').onclick = () => {
-        isEpotAuth = false;
-        sessionStorage.setItem('isEpotAuth', 'false');
-        document.getElementById('epotUnlocked').style.display = 'none';
-        document.getElementById('epotLocked').style.display = 'block';
-      };
-
-      document.getElementById('setEpotPwdBtn').onclick = () => {
-        const newPwd = document.getElementById('newEpotPwd').value.trim();
-        if (!newPwd) {
-          notify('يرجى إدخال كلمة مرور', 'warning');
-          return;
-        }
-        epotPassword = newPwd;
-        localStorage.setItem(LS_KEYS.EPOT_PWD, epotPassword);
-        document.getElementById('newEpotPwd').value = '';
-        notify('تم تحديث كلمة المرور', 'info');
-      };
-
-      document.getElementById('addItemBtn').onclick = addNewItem;
-      document.getElementById('createOfferBtn').onclick = createOffer;
-      document.getElementById('exportDataBtn').onclick = exportData;
-      document.getElementById('endDayBtn').onclick = endDay;
-
-      document.getElementById('autoPrintCheckbox').onchange = (e) => {
-        autoPrint = e.target.checked;
-        saveState();
-        notify(autoPrint ? 'تم تفعيل الطباعة التلقائية' : 'تم إلغاء الطباعة التلقائية', 'info');
-      };
-
-document.getElementById('resetSystemBtn').onclick = () => {
-        document.getElementById('resetModal').classList.add('open');
-      };
-
-      document.getElementById('cancelResetBtn').onclick = () => {
-        document.getElementById('resetModal').classList.remove('open');
-        document.getElementById('resetPassword').value = '';
-      };
-
-      document.getElementById('confirmResetBtn').onclick = () => {
-        const pwd = document.getElementById('resetPassword').value;
-        if (pwd === 'abosamra123') {
-          orders = [];
-          orderHistory = [];
-          userOrders = [];
-          cart = [];
-          database.ref('orders').remove();
-          database.ref('history').remove();
-          saveState();
-          updateCartDisplay();
-          renderOrders();
-          renderHistory();
-          document.getElementById('resetModal').classList.remove('open');
-          document.getElementById('resetPassword').value = '';
-          notify('تم إعادة ضبط النظام بنجاح', 'info');
-        } else {
-          notify('كلمة مرور خاطئة', 'error');
-        }
-      };
-
-      document.addEventListener('click', (e) => {
-        const profileMenu = document.getElementById('profileMenu');
-        const profileBtn = document.getElementById('profileBtn');
-        if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
-          profileMenu.classList.remove('open');
-        }
-      });
+  document.getElementById('cartToggle').onclick = () => {
+    document.getElementById('cartPanel').classList.add('open');
+  };
+  document.getElementById('closeCart').onclick = () => {
+    document.getElementById('cartPanel').classList.remove('open');
+  };
+  document.getElementById('closeOrders').onclick = () => {
+    document.getElementById('ordersPanel').classList.remove('open');
+  };
+  document.getElementById('clearCartBtn').onclick = () => {
+    if (confirm('هل تريد تفريغ السلة؟')) {
+      cart = [];
+      updateCartDisplay();
     }
+  };
+  document.getElementById('checkoutBtn').onclick = openCheckout;
+  document.getElementById('confirmOrderBtn').onclick = confirmOrder;
+  document.getElementById('cancelCheckoutBtn').onclick = () => {
+    document.getElementById('checkoutSection').style.display = 'none';
+  };
+  document.getElementById('applyOffer').onchange = updateCartDisplay;
+  document.getElementById('profileBtn').onclick = () => {
+    const menu = document.getElementById('profileMenu');
+    menu.classList.toggle('open');
+  };
+  document.getElementById('trackOrdersBtn').onclick = () => {
+    document.getElementById('profileMenu').classList.remove('open');
+    showMyOrders();
+  };
+  document.getElementById('sendOtpBtn').onclick = () => {
+    saveUserDataAndOrder();
+  };
+  document.getElementById('skipOtpBtn').onclick = () => {
+    document.getElementById('otpModal').classList.remove('open');
+    processOrder(false);
+  };
+  document.getElementById('confirmCancelBtn').onclick = confirmCancelOrder;
+  document.getElementById('closeCancelBtn').onclick = () => {
+    document.getElementById('cancelModal').classList.remove('open');
+    document.getElementById('cancelReason').value = '';
+    orderToCancel = null;
+  };
+
+  // كود الدخول السري للأوبريتور
+  document.addEventListener('keydown', (e) => {
+    if (currentView === 'customer') {
+      secretCode += e.key;
+      if (secretCode.length > 20) {
+        secretCode = secretCode.slice(-20);
+      }
+      if (secretCode.includes('admin123')) {
+        secretCode = '';
+        isOperatorAuth = true;
+        showOperatorView();
+      }
+    }
+  });
+
+  document.getElementById('logoutBtn').onclick = () => {
+    isOperatorAuth = false;
+    isEpotAuth = false;
+    secretCode = '';
+    showCustomerView();
+  };
+
+  // التبويبات داخل لوحة المشغل
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.onclick = (e) => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+      e.target.classList.add('active');
+      const tabName = e.target.dataset.tab;
+      document.getElementById(tabName + 'Content').classList.add('active');
+      if (tabName === 'history') renderHistory();
+      if (tabName === 'orders') renderOrders();
+    };
+  });
+
+  // فتح وقفل EPOT
+  document.getElementById('openEpotBtn').onclick = () => {
+    document.getElementById('epotModal').classList.add('open');
+  };
+  document.getElementById('cancelEpotBtn').onclick = () => {
+    document.getElementById('epotModal').classList.remove('open');
+  };
+  document.getElementById('submitEpotBtn').onclick = () => {
+    const pwd = document.getElementById('epotPassword').value;
+    if (pwd === epotPassword) {
+      isEpotAuth = true;
+      document.getElementById('epotModal').classList.remove('open');
+      showEpotPanel();
+    } else {
+      notify('كلمة مرور خاطئة', 'error');
+    }
+    document.getElementById('epotPassword').value = '';
+  };
+  document.getElementById('lockEpotBtn').onclick = () => {
+    isEpotAuth = false;
+    sessionStorage.setItem('isEpotAuth', 'false');
+    document.getElementById('epotUnlocked').style.display = 'none';
+    document.getElementById('epotLocked').style.display = 'block';
+  };
+
+  // باقي الأزرار
+  document.getElementById('setEpotPwdBtn').onclick = () => {
+    const newPwd = document.getElementById('newEpotPwd').value.trim();
+    if (!newPwd) {
+      notify('يرجى إدخال كلمة مرور', 'warning');
+      return;
+    }
+    epotPassword = newPwd;
+    localStorage.setItem(LS_KEYS.EPOT_PWD, epotPassword);
+    document.getElementById('newEpotPwd').value = '';
+    notify('تم تحديث كلمة المرور', 'info');
+  };
+  document.getElementById('addItemBtn').onclick = addNewItem;
+  document.getElementById('createOfferBtn').onclick = createOffer;
+  document.getElementById('exportDataBtn').onclick = exportData;
+  document.getElementById('endDayBtn').onclick = endDay;
+  document.getElementById('autoPrintCheckbox').onchange = (e) => {
+    autoPrint = e.target.checked;
+    saveState();
+    notify(autoPrint ? 'تم تفعيل الطباعة التلقائية' : 'تم إلغاء الطباعة التلقائية', 'info');
+  };
+  document.getElementById('resetSystemBtn').onclick = () => {
+    document.getElementById('resetModal').classList.add('open');
+  };
+  document.getElementById('cancelResetBtn').onclick = () => {
+    document.getElementById('resetModal').classList.remove('open');
+    document.getElementById('resetPassword').value = '';
+  };
+  document.getElementById('confirmResetBtn').onclick = () => {
+    const pwd = document.getElementById('resetPassword').value;
+    if (pwd === 'abosamra123') {
+      orders = [];
+      orderHistory = [];
+      userOrders = [];
+      cart = [];
+      database.ref('orders').remove();
+      database.ref('history').remove();
+      saveState();
+      updateCartDisplay();
+      renderOrders();
+      renderHistory();
+      document.getElementById('resetModal').classList.remove('open');
+      document.getElementById('resetPassword').value = '';
+      notify('تم إعادة ضبط النظام بنجاح', 'info');
+    } else {
+      notify('كلمة مرور خاطئة', 'error');
+    }
+  };
+
+  document.addEventListener('click', (e) => {
+    const profileMenu = document.getElementById('profileMenu');
+    const profileBtn = document.getElementById('profileBtn');
+    if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+      profileMenu.classList.remove('open');
+    }
+  });
+
+  // البحث الفوري في كل التبويبات (الطلب الجديد)
+  ['searchOrderAddress', 'searchOrderPhone', 'searchOrderId', 'searchOrderName', 'searchOrderAmount', 'searchOrderDate'].forEach(id => {
+    document.getElementById(id).addEventListener('input', searchOrders);
+  });
+
+  ['searchAddress', 'searchPhone', 'searchOrderIdHist', 'searchName', 'searchAmount', 'searchDate'].forEach(id => {
+    document.getElementById(id).addEventListener('input', searchHistory);
+  });
+
+  ['searchEpotAddress', 'searchEpotPhone', 'searchEpotOrderId', 'searchEpotName', 'searchEpotAmount', 'searchEpotDate'].forEach(id => {
+    document.getElementById(id).addEventListener('input', searchEpotHistory);
+  });
+}
 
     function showCustomerView() {
       currentView = 'customer';
