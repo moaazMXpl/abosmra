@@ -1247,22 +1247,21 @@ function getEnglishDateOnly() {
       database.ref('history').on('value', (snapshot) => {
   const historyData = snapshot.val();
   
+  // نحتفظ دائماً بـ orderHistory محلياً حتى يتم نقلها عبر endDay
+  // orderHistory المحلي = الطلبات المكتملة/الملغاة التي لم تُنقل بعد إلى EPOT
+  
   if (isEpotAuth) {
-    // في EPOT: نعرض كل البيانات من Firebase
-    orderHistory = historyData ? Object.values(historyData) : [];
-  } else {
-    // في المشغل العادي: orderHistory فارغ (لأنه تم نقله إلى EPOT)
-    orderHistory = [];
+    // في EPOT: نعرض البيانات من Firebase فقط
+    const epotData = historyData ? Object.values(historyData) : [];
+    renderEpotHistory(epotData);
+    updateStats();
   }
   
-  saveLS(LS_KEYS.HISTORY, orderHistory);
+  // لا نعدل orderHistory هنا - نتركه يحتفظ بالطلبات المحلية
+  // سيتم تفريغه فقط عند endDay
   
-  if (currentView === 'operator') {
+  if (currentView === 'operator' && !isEpotAuth) {
     renderHistory();
-    if (isEpotAuth) {
-      renderEpotHistory();
-      updateStats();
-    }
   }
   syncUserOrders();
 });
@@ -1314,11 +1313,11 @@ database.ref('customerNotes').on('value', (snapshot) => {
   updateUserInfo();
 }
 
-    function renderEpotHistory(filtered = null) {
-      const grid = document.getElementById('epotHistoryGrid');
-      if (!grid) return;
+    function renderEpotHistory(dataToShow = null) {
+  const grid = document.getElementById('epotHistoryGrid');
+  if (!grid) return;
 
-      const historyToShow = filtered || orderHistory;
+  const historyToShow = dataToShow || []; // ✅ صحيح
 
       grid.innerHTML = '';
       if (historyToShow.length === 0) {
@@ -1401,7 +1400,38 @@ database.ref('customerNotes').on('value', (snapshot) => {
     return true;
   });
 
-  renderEpotHistory(filtered);
+  // نحتاج لجلب البيانات من Firebase مباشرة للبحث
+database.ref('history').once('value').then((snapshot) => {
+  const allEpotData = snapshot.val() ? Object.values(snapshot.val()) : [];
+  const filteredData = allEpotData.filter(o => {
+    if (address && !o.customer.address.toLowerCase().includes(address)) return false;
+    if (phone && !o.customer.phone.includes(phone)) return false;
+    if (orderId && !String(o.receiptNo).includes(orderId)) return false;
+    if (name && !o.customer.name.toLowerCase().includes(name)) return false;
+    if (amount && o.total !== Number(amount)) return false;
+    if (dateInput) {
+      const orderDate = o.createdAt;
+      const parts = orderDate.split(',')[0].trim().split('/');
+      const day = parts[0];
+      const month = parts[1];
+      const year = parts[2]?.split(' ')[0] || parts[2];
+      if (dateInput.length <= 2) {
+        if (!day.includes(dateInput) && !month.includes(dateInput)) return false;
+      } else if (dateInput.length <= 4 && !dateInput.includes('/')) {
+        if (!year.includes(dateInput)) return false;
+      } else if (dateInput.includes('/')) {
+        const [d, m, y] = dateInput.split('/');
+        if (d && !day.includes(d)) return false;
+        if (m && !month.includes(m)) return false;
+        if (y && !year.includes(y)) return false;
+      } else {
+        if (!orderDate.includes(dateInput)) return false;
+      }
+    }
+    return true;
+  });
+  renderEpotHistory(filteredData);
+});
 }
 
     function renderCategories() {
