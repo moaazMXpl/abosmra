@@ -1822,9 +1822,15 @@ date: getEnglishDateOnly(),
       progressHTML += '</div>';
       
       const div = document.createElement('div');
-      div.style.marginBottom = '12px';
-      div.innerHTML = '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><strong>طلب رقم: ' + order.receiptNo + '</strong><span class="badge ' + statusClass[order.status] + '">' + statusText[order.status] + '</span></div>' + progressHTML + '<div class="small">الإجمالي: ' + order.total + ' ج</div>';
-      statusContent.appendChild(div);
+div.style.marginBottom = '12px';
+
+let noteHTML = '';
+if (order.customerNote) {
+  noteHTML = '<div style="background: #f59e0b; color: #1a1410; padding: 8px; border-radius: 6px; margin-top: 8px; font-weight: bold; font-size: 0.85rem; border: 2px solid #d97706;">⚠️ ملاحظة: ' + order.customerNote + '</div>';
+}
+
+div.innerHTML = '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><strong>طلب رقم: ' + order.receiptNo + '</strong><span class="badge ' + statusClass[order.status] + '">' + statusText[order.status] + '</span></div>' + progressHTML + '<div class="small">الإجمالي: ' + order.total + ' ج</div>' + noteHTML;
+statusContent.appendChild(div);
     });
   } else {
     statusDiv.classList.remove('show');
@@ -1984,12 +1990,19 @@ date: getEnglishDateOnly(),
       }
       
       if (order.items && order.items.length > 0) {
-        detailsHTML += '<div style="margin-bottom: 12px;">';
-        order.items.forEach(i => {
-          detailsHTML += '<div>' + i.name + ' × ' + i.qty + ' = ' + (i.price * i.qty) + ' ج</div>';
-        });
-        detailsHTML += '</div>';
-      }
+  detailsHTML += '<div style="margin-bottom: 12px;">';
+  order.items.forEach(i => {
+    detailsHTML += '<div>' + i.name + ' × ' + i.qty + ' = ' + (i.price * i.qty) + ' ج</div>';
+  });
+  detailsHTML += '</div>';
+}
+
+// عرض ملاحظة المشغل إن وجدت
+if (order.customerNote) {
+  detailsHTML += '<div style="background: #f59e0b; color: #1a1410; padding: 10px; border-radius: 6px; margin-bottom: 12px; font-weight: bold; border: 2px solid #d97706;">';
+  detailsHTML += '⚠️ ملاحظة من المطعم: ' + order.customerNote;
+  detailsHTML += '</div>';
+}
       
       detailsHTML += '<div style="font-size: 1.2rem; font-weight: bold; color: var(--gold);">الإجمالي: ' + order.total + ' ج</div>';
       detailsHTML += '<div class="small" style="margin-top: 8px;">العنوان: ' + order.customer.address + '</div>';
@@ -2100,6 +2113,17 @@ window.addCustomerNote = function(orderId) {
     // تحديث الطلب الحالي
     order.customerNote = note.trim();
     database.ref('orders/' + orderId).update({ customerNote: note.trim() });
+    
+    // تحديث جميع طلبات العميل النشطة بنفس الملاحظة
+    orders.forEach(o => {
+      if (o.customer.phone === order.customer.phone && o.id !== orderId) {
+        o.customerNote = note.trim();
+        database.ref('orders/' + o.id).update({ customerNote: note.trim() });
+      }
+    });
+    
+    saveState();
+    syncUserOrders(); // تحديث طلبات المستخدم
   }
 };
 
@@ -2117,6 +2141,17 @@ window.removeCustomerNote = function(orderId) {
   // تحديث الطلب الحالي
   order.customerNote = null;
   database.ref('orders/' + orderId).update({ customerNote: null });
+  
+  // حذف الملاحظة من جميع طلبات العميل النشطة
+  orders.forEach(o => {
+    if (o.customer.phone === order.customer.phone && o.id !== orderId) {
+      o.customerNote = null;
+      database.ref('orders/' + o.id).update({ customerNote: null });
+    }
+  });
+  
+  saveState();
+  syncUserOrders(); // تحديث طلبات المستخدم
 };
 
     function renderOffers() {
