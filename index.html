@@ -1180,7 +1180,7 @@ window.showAllCancelledOrders = function() {
   });
 };
 
-function findItemById(id) {
+function findeItemById(id) {
       for (const cat in menu) {
         const item = menu[cat].find(i => i.id === id);
         if (item) return item;
@@ -1239,11 +1239,23 @@ function findItemById(id) {
       const savedEpotAuth = sessionStorage.getItem('isEpotAuth') === 'true';
       const savedOperatorAuth = sessionStorage.getItem('isOperatorAuth') === 'true';
       
-      // ✅ تحميل الملاحظات من Firebase أولاً
-      database.ref('customerNotes').once('value').then((snapshot) => {
-        customerNotes = snapshot.val() || {};
-        saveLS(LS_KEYS.CUSTOMER_NOTES, customerNotes);
-        console.log('✅ تم تحميل ملاحظات العملاء:', customerNotes);
+      
+      // ✅ تحميل أعلى رقم طلب من Firebase EPOT
+      database.ref('history').once('value').then((snapshot) => {
+        const epotData = snapshot.val();
+        if (epotData) {
+          const epotOrders = Object.values(epotData);
+          console.log('📊 تم تحميل', epotOrders.length, 'طلب من EPOT للتحقق من الأرقام');
+          
+          // حفظ في localStorage للحفاظ على الأرقام
+          const currentHistory = loadLS(LS_KEYS.HISTORY, []);
+          epotOrders.forEach(order => {
+            if (!currentHistory.find(o => o.id === order.id)) {
+              currentHistory.push(order);
+            }
+          });
+          saveLS(LS_KEYS.HISTORY, currentHistory);
+        }
       });
       
       syncFromFirebase();
@@ -1447,29 +1459,20 @@ database.ref('customerNotes').on('value', (snapshot) => {
   customerNotes = snapshot.val() || {};
   saveLS(LS_KEYS.CUSTOMER_NOTES, customerNotes);
   
-  console.log('🔔 تحديث ملاحظات العملاء:', customerNotes);
-  
   // تحديث جميع الطلبات النشطة بالملاحظات المحدثة
   if (orders.length > 0) {
-    const updates = {};
     orders.forEach(order => {
-      const note = customerNotes[order.customer.phone] || null;
-      order.customerNote = note;
-      updates['orders/' + order.id + '/customerNote'] = note;
-      console.log(`✅ تحديث ملاحظة للطلب ${order.id}:`, note);
+      if (customerNotes[order.customer.phone]) {
+        order.customerNote = customerNotes[order.customer.phone];
+      } else {
+        order.customerNote = null;
+      }
     });
-    
-    // تحديث في Firebase
-    if (Object.keys(updates).length > 0) {
-      database.ref().update(updates);
-    }
-    
     saveState();
     if (currentView === 'operator') {
       renderOrders();
     }
     syncUserOrders();
-    checkCustomerOrders(); // ✅ تحديث واجهة العميل
   }
 });
 
@@ -1877,7 +1880,6 @@ function showSaveDataConfirmation() {
       // ✅ حساب رقم الطلب التلقائي من جميع المصادر
       const receiptNo = getNextReceiptNumber();
 
-
       const orderId = generateId('ORD');
       let total = cart.reduce((s, c) => s + c.price * c.qty, 0);
       const totalBefore = total;
@@ -1893,22 +1895,18 @@ function showSaveDataConfirmation() {
       }
 
       // ✅ جلب الملاحظة من customerNotes باستخدام رقم الهاتف
-      let customerNote = customerNotes[pendingOrderData.phone] || null;
-      
-      console.log('📝 البحث عن ملاحظة للرقم:', pendingOrderData.phone);
-      console.log('📝 الملاحظات المتاحة:', customerNotes);
-      console.log('📝 الملاحظة المستخرجة:', customerNote);
+const customerNote = customerNotes[pendingOrderData.phone] || null;
 
-      const newOrder = {
+const newOrder = {
   id: orderId,
-  receiptNo: finalReceiptNo || receiptNo,  // ✅ جديد
-        customer: { 
-          name: pendingOrderData.name, 
-          phone: pendingOrderData.phone, 
-          address: pendingOrderData.address 
-        },
-        customerNote: customerNote, // ✅ الملاحظة ستظهر تلقائياً في كل طلب جديد
-        items: cart.map(c => ({ id: c.id, name: c.name, price: c.price, qty: c.qty })),
+  receiptNo,
+  customer: { 
+    name: pendingOrderData.name, 
+    phone: pendingOrderData.phone, 
+    address: pendingOrderData.address 
+  },
+  customerNote, // ✅ الملاحظة ستظهر تلقائياً في كل طلب جديد
+  items: cart.map(c => ({ id: c.id, name: c.name, price: c.price, qty: c.qty })),
   // ... باقي الكود
         totalBefore,
         total,
