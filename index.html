@@ -1185,6 +1185,13 @@ window.showAllCancelledOrders = function() {
       const savedEpotAuth = sessionStorage.getItem('isEpotAuth') === 'true';
       const savedOperatorAuth = sessionStorage.getItem('isOperatorAuth') === 'true';
       
+      // ✅ تحميل الملاحظات من Firebase أولاً
+      database.ref('customerNotes').once('value').then((snapshot) => {
+        customerNotes = snapshot.val() || {};
+        saveLS(LS_KEYS.CUSTOMER_NOTES, customerNotes);
+        console.log('✅ تم تحميل ملاحظات العملاء:', customerNotes);
+      });
+      
       syncFromFirebase();
       renderCategories();
       renderMenu();
@@ -1320,7 +1327,16 @@ database.ref('orders').on('child_changed', (snapshot) => {
 // ✅ مراقبة حذف الطلبات (عند التسليم)
 database.ref('orders').on('child_removed', (snapshot) => {
   const removedOrder = snapshot.val();
-  console.log('🗑️ تم حذف الطلب:', removedOrder);
+  console.log('🗑️ تم حذف الطلب من Firebase:', removedOrder);
+  
+  // ✅ إذا كان الطلب مكتملاً، احفظه في orderHistory
+  if (removedOrder.status === 'delivered') {
+    if (!orderHistory.find(h => h.id === removedOrder.id)) {
+      orderHistory.unshift(removedOrder);
+      saveLS(LS_KEYS.HISTORY, orderHistory);
+      console.log('✅ تم نقل الطلب المكتمل إلى orderHistory:', removedOrder.id);
+    }
+  }
   
   // ✅ حذف من orders المحلي
   orders = orders.filter(o => o.id !== removedOrder.id);
@@ -1329,6 +1345,16 @@ database.ref('orders').on('child_removed', (snapshot) => {
   // ✅ تحديث العميل إذا كان الطلب له
   const customerPhone = userAccount?.phone || currentCustomer?.phone;
   if (customerPhone && removedOrder.customerPhone === customerPhone) {
+    // ✅ إذا كان الطلب مكتملاً، أضفه إلى userOrders
+    if (removedOrder.status === 'delivered') {
+      const savedUserOrders = loadLS(LS_KEYS.USER_ORDERS, []);
+      if (!savedUserOrders.find(o => o.id === removedOrder.id)) {
+        savedUserOrders.push(removedOrder);
+        saveLS(LS_KEYS.USER_ORDERS, savedUserOrders);
+        console.log('✅ تم حفظ الطلب المكتمل في userOrders:', removedOrder.id);
+      }
+    }
+    
     syncUserOrders();
     checkCustomerOrders();
     
@@ -1367,20 +1393,29 @@ database.ref('customerNotes').on('value', (snapshot) => {
   customerNotes = snapshot.val() || {};
   saveLS(LS_KEYS.CUSTOMER_NOTES, customerNotes);
   
+  console.log('🔔 تحديث ملاحظات العملاء:', customerNotes);
+  
   // تحديث جميع الطلبات النشطة بالملاحظات المحدثة
   if (orders.length > 0) {
+    const updates = {};
     orders.forEach(order => {
-      if (customerNotes[order.customer.phone]) {
-        order.customerNote = customerNotes[order.customer.phone];
-      } else {
-        order.customerNote = null;
-      }
+      const note = customerNotes[order.customer.phone] || null;
+      order.customerNote = note;
+      updates['orders/' + order.id + '/customerNote'] = note;
+      console.log(`✅ تحديث ملاحظة للطلب ${order.id}:`, note);
     });
+    
+    // تحديث في Firebase
+    if (Object.keys(updates).length > 0) {
+      database.ref().update(updates);
+    }
+    
     saveState();
     if (currentView === 'operator') {
       renderOrders();
     }
     syncUserOrders();
+    checkCustomerOrders(); // ✅ تحديث واجهة العميل
   }
 });
 
@@ -1410,12 +1445,24 @@ database.ref('customerNotes').on('value', (snapshot) => {
     return;
   }
 
-  const allRelevantOrders = [...orders, ...orderHistory]
+  // ✅ جلب الطلبات المكتملة من localStorage
+  const localHistory = loadLS(LS_KEYS.HISTORY, []);
+  
+  // ✅ دمج من orders + orderHistory + localStorage
+  const allRelevantOrders = [...orders, ...orderHistory, ...localHistory]
     .filter(o => o.customerPhone === customerPhone)
     .reduce((map, order) => {
-      // نأخذ أحدث نسخة من الطلب (من orders أولوية أعلى)
-      if (!map.has(order.id) || orders.some(o => o.id === order.id)) {
+      // نأخذ أحدث نسخة من الطلب
+      if (!map.has(order.id)) {
         map.set(order.id, order);
+      } else {
+        // إذا كان الطلب موجود، نأخذ النسخة الأحدث (من orders أولوية)
+        const existing = map.get(order.id);
+        if (orders.some(o => o.id === order.id)) {
+          map.set(order.id, order);
+        } else if (order.status === 'delivered' && existing.status !== 'delivered') {
+          map.set(order.id, order);
+        }
       }
       return map;
     }, new Map());
@@ -1423,6 +1470,14 @@ database.ref('customerNotes').on('value', (snapshot) => {
   userOrders = Array.from(allRelevantOrders.values());
   saveLS(LS_KEYS.USER_ORDERS, userOrders);
   updateUserInfo();
+  
+  console.log('🔄 تم مزامنة طلبات العميل:', {
+    phone: customerPhone,
+    total: userOrders.length,
+    active: userOrders.filter(o => !o.cancelled && o.status !== 'delivered').length,
+    delivered: userOrders.filter(o => o.status === 'delivered').length,
+    cancelled: userOrders.filter(o => o.cancelled).length
+  });
 }
 
     function renderEpotHistory(dataToShow = null) {
@@ -1784,18 +1839,22 @@ const receiptNo = allOrdersCount + 1;
       }
 
       // ✅ جلب الملاحظة من customerNotes باستخدام رقم الهاتف
-const customerNote = customerNotes[pendingOrderData.phone] || null;
+      let customerNote = customerNotes[pendingOrderData.phone] || null;
+      
+      console.log('📝 البحث عن ملاحظة للرقم:', pendingOrderData.phone);
+      console.log('📝 الملاحظات المتاحة:', customerNotes);
+      console.log('📝 الملاحظة المستخرجة:', customerNote);
 
-const newOrder = {
-  id: orderId,
-  receiptNo,
-  customer: { 
-    name: pendingOrderData.name, 
-    phone: pendingOrderData.phone, 
-    address: pendingOrderData.address 
-  },
-  customerNote, // ✅ الملاحظة ستظهر تلقائياً في كل طلب جديد
-  items: cart.map(c => ({ id: c.id, name: c.name, price: c.price, qty: c.qty })),
+      const newOrder = {
+        id: orderId,
+        receiptNo,
+        customer: { 
+          name: pendingOrderData.name, 
+          phone: pendingOrderData.phone, 
+          address: pendingOrderData.address 
+        },
+        customerNote: customerNote, // ✅ الملاحظة ستظهر تلقائياً في كل طلب جديد
+        items: cart.map(c => ({ id: c.id, name: c.name, price: c.price, qty: c.qty })),
   // ... باقي الكود
         totalBefore,
         total,
@@ -2439,6 +2498,19 @@ window.removeCustomerNote = function(orderId) {
       orderHistory.unshift(order);
     }
     
+    // ✅ إذا كان الطلب لعميل مسجل، احفظه في userOrders
+    const customerPhone = order.customerPhone;
+    if (customerPhone) {
+      // جلب طلبات العميل من localStorage
+      const savedUserOrders = loadLS(LS_KEYS.USER_ORDERS, []);
+      
+      // إضافة الطلب المكتمل إذا لم يكن موجوداً
+      if (!savedUserOrders.find(o => o.id === order.id)) {
+        savedUserOrders.push(order);
+        saveLS(LS_KEYS.USER_ORDERS, savedUserOrders);
+      }
+    }
+    
     // ✅ حذف من orders
     orders.splice(orderIndex, 1);
     database.ref('orders/' + orderId).remove();
@@ -2447,16 +2519,18 @@ window.removeCustomerNote = function(orderId) {
     syncUserOrders();
     
     if (windowId) closeOrderWindow(windowId);
+    
+    notify(`تم تسليم الطلب #${order.receiptNo} ✓`, 'info');
   } else {
     database.ref('orders/' + orderId).update({ status: newStatus });
     if (windowId) updateOrderWindow(windowId, order);
+    notify(`تم تغيير حالة الطلب إلى: ${newStatus}`, 'info');
   }
   
   saveState();
   renderOrders();
   renderHistory(); // تحديث طلبات سابقة
   syncUserOrders();
-  notify(`تم تغيير حالة الطلب`, 'info');
 };
 
      window.closeOrderWindow = function(windowId) {
