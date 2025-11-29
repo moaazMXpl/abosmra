@@ -1366,6 +1366,22 @@ database.ref('orders').on('child_removed', (snapshot) => {
 database.ref('customerNotes').on('value', (snapshot) => {
   customerNotes = snapshot.val() || {};
   saveLS(LS_KEYS.CUSTOMER_NOTES, customerNotes);
+  
+  // تحديث جميع الطلبات النشطة بالملاحظات المحدثة
+  if (orders.length > 0) {
+    orders.forEach(order => {
+      if (customerNotes[order.customer.phone]) {
+        order.customerNote = customerNotes[order.customer.phone];
+      } else {
+        order.customerNote = null;
+      }
+    });
+    saveState();
+    if (currentView === 'operator') {
+      renderOrders();
+    }
+    syncUserOrders();
+  }
 });
 
       database.ref('orders').on('child_changed', (snapshot) => {
@@ -2203,24 +2219,38 @@ window.addCustomerNote = function(orderId) {
   const note = prompt('أدخل ملاحظة للعميل ' + order.customer.name + ' (' + order.customer.phone + '):');
   if (note && note.trim()) {
     customerNotes[order.customer.phone] = note.trim();
-    database.ref('customerNotes/' + order.customer.phone).set(note.trim());
-    saveState();
-    notify('تم حفظ الملاحظة على العميل', 'info');
     
-    // تحديث الطلب الحالي
-    order.customerNote = note.trim();
-    database.ref('orders/' + orderId).update({ customerNote: note.trim() });
-    
-    // تحديث جميع طلبات العميل النشطة بنفس الملاحظة
-    orders.forEach(o => {
-      if (o.customer.phone === order.customer.phone && o.id !== orderId) {
-        o.customerNote = note.trim();
-        database.ref('orders/' + o.id).update({ customerNote: note.trim() });
+    // حفظ في Firebase وlocal storage
+    database.ref('customerNotes/' + order.customer.phone).set(note.trim()).then(() => {
+      saveState();
+      notify('تم حفظ الملاحظة على العميل', 'info');
+      
+      // تحديث الطلب الحالي
+      order.customerNote = note.trim();
+      database.ref('orders/' + orderId).update({ customerNote: note.trim() });
+      
+      // تحديث جميع طلبات العميل النشطة بنفس الملاحظة
+      const updates = {};
+      orders.forEach(o => {
+        if (o.customer.phone === order.customer.phone) {
+          o.customerNote = note.trim();
+          updates['orders/' + o.id + '/customerNote'] = note.trim();
+        }
+      });
+      
+      if (Object.keys(updates).length > 0) {
+        database.ref().update(updates);
       }
+      
+      saveState();
+      syncUserOrders();
+      renderOrders(); // إعادة رسم الطلبات
+      
+      // إغلاق وإعادة فتح النافذة المفتوحة
+      const windowId = 'order-window-' + orderId;
+      closeOrderWindow(windowId);
+      setTimeout(() => openOperatorOrderWindow(order), 100);
     });
-    
-    saveState();
-    syncUserOrders(); // تحديث طلبات المستخدم
   }
 };
 
@@ -2231,24 +2261,37 @@ window.removeCustomerNote = function(orderId) {
   if (!confirm('هل تريد حذف الملاحظة عن العميل ' + order.customer.name + '?')) return;
   
   delete customerNotes[order.customer.phone];
-  database.ref('customerNotes/' + order.customer.phone).remove();
-  saveState();
-  notify('تم حذف الملاحظة', 'info');
   
-  // تحديث الطلب الحالي
-  order.customerNote = null;
-  database.ref('orders/' + orderId).update({ customerNote: null });
-  
-  // حذف الملاحظة من جميع طلبات العميل النشطة
-  orders.forEach(o => {
-    if (o.customer.phone === order.customer.phone && o.id !== orderId) {
-      o.customerNote = null;
-      database.ref('orders/' + o.id).update({ customerNote: null });
+  // حذف من Firebase وlocal storage
+  database.ref('customerNotes/' + order.customer.phone).remove().then(() => {
+    saveState();
+    notify('تم حذف الملاحظة', 'info');
+    
+    // تحديث الطلب الحالي
+    order.customerNote = null;
+    
+    // حذف الملاحظة من جميع طلبات العميل النشطة
+    const updates = {};
+    orders.forEach(o => {
+      if (o.customer.phone === order.customer.phone) {
+        o.customerNote = null;
+        updates['orders/' + o.id + '/customerNote'] = null;
+      }
+    });
+    
+    if (Object.keys(updates).length > 0) {
+      database.ref().update(updates);
     }
+    
+    saveState();
+    syncUserOrders();
+    renderOrders();
+    
+    // إغلاق وإعادة فتح النافذة المفتوحة
+    const windowId = 'order-window-' + orderId;
+    closeOrderWindow(windowId);
+    setTimeout(() => openOperatorOrderWindow(order), 100);
   });
-  
-  saveState();
-  syncUserOrders(); // تحديث طلبات المستخدم
 };
 
     function renderOffers() {
@@ -2900,34 +2943,44 @@ function makeDraggable(element) {
 
   // 1. نقل جميع الطلبات من orderHistory (طلبات سابقة) إلى Firebase/history (EPOT)
   if (orderHistory.length > 0) {
+    const updates = {};
     orderHistory.forEach(order => {
-      database.ref('history/' + order.id).set(order);
+      updates['history/' + order.id] = order;
     });
-    notify('جاري نقل ' + orderHistory.length + ' طلب إلى EPOT...', 'info');
+    
+    database.ref().update(updates).then(() => {
+      notify('تم نقل ' + orderHistory.length + ' طلب إلى EPOT بنجاح', 'info');
+      
+      // 2. تفريغ orderHistory المحلي بعد النقل الناجح
+      orderHistory = [];
+      orders = [];
+      
+      // 3. حذف orders من Firebase
+      return database.ref('orders').remove();
+    }).then(() => {
+      // 4. حفظ الحالة
+      saveState();
+      
+      // 5. تحديث العرض
+      renderOrders();
+      renderHistory();
+      
+      if (isEpotAuth) {
+        renderEpotHistory();
+        updateStats();
+      }
+      
+      notify('تم إنهاء اليوم بنجاح ✓', 'info');
+    }).catch((error) => {
+      console.error('خطأ في إنهاء اليوم:', error);
+      notify('حدث خطأ أثناء إنهاء اليوم: ' + error.message, 'error');
+    });
+    
+    return;
   }
-
-  // 2. تفريغ orderHistory المحلي (طلبات سابقة)
-  orderHistory = [];
   
-  // 3. تفريغ orders أيضاً للتأكد
-  orders = [];
-  
-  // 4. حذف orders من Firebase
-  database.ref('orders').remove();
-  
-  // 5. حفظ الحالة
-  saveState();
-  
-  // 6. تحديث العرض
-  renderOrders();
-  renderHistory(); // سيظهر فارغاً
-  
-  if (isEpotAuth) {
-    renderEpotHistory(); // سيظهر كل الطلبات المنقولة
-    updateStats();
-  }
-  
-  notify('تم إنهاء اليوم بنجاح ✓', 'info');
+  // إذا لم يكن هناك طلبات في orderHistory
+  notify('لا توجد طلبات لنقلها', 'warning');
 }
 
     function updateStats() {
