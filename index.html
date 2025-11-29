@@ -1180,6 +1180,60 @@ window.showAllCancelledOrders = function() {
   });
 };
 
+function findItemById(id) {
+      for (const cat in menu) {
+        const item = menu[cat].find(i => i.id === id);
+        if (item) return item;
+      }
+      return null;
+    }
+
+    // ✅ دالة جديدة لحساب رقم الطلب التالي
+    function getNextReceiptNumber() {
+      let maxReceiptNo = 0;
+      
+      // 1. البحث في الطلبات الحالية (orders)
+      orders.forEach(order => {
+        if (order.receiptNo && order.receiptNo > maxReceiptNo) {
+          maxReceiptNo = order.receiptNo;
+        }
+      });
+      
+      // 2. البحث في الطلبات السابقة المحلية (orderHistory)
+      orderHistory.forEach(order => {
+        if (order.receiptNo && order.receiptNo > maxReceiptNo) {
+          maxReceiptNo = order.receiptNo;
+        }
+      });
+      
+      // 3. البحث في localStorage للتأكد
+      const localHistory = loadLS(LS_KEYS.HISTORY, []);
+      localHistory.forEach(order => {
+        if (order.receiptNo && order.receiptNo > maxReceiptNo) {
+          maxReceiptNo = order.receiptNo;
+        }
+      });
+      
+      // 4. البحث في userOrders
+      const localUserOrders = loadLS(LS_KEYS.USER_ORDERS, []);
+      localUserOrders.forEach(order => {
+        if (order.receiptNo && order.receiptNo > maxReceiptNo) {
+          maxReceiptNo = order.receiptNo;
+        }
+      });
+      
+      const nextNumber = maxReceiptNo + 1;
+      
+      console.log('🔢 حساب رقم الطلب التالي:', {
+        ordersCount: orders.length,
+        historyCount: orderHistory.length,
+        maxFound: maxReceiptNo,
+        nextNumber: nextNumber
+      });
+      
+      return nextNumber;
+    }
+
     window.onload = function() {
       const savedView = sessionStorage.getItem('currentView');
       const savedEpotAuth = sessionStorage.getItem('isEpotAuth') === 'true';
@@ -1820,9 +1874,9 @@ function showSaveDataConfirmation() {
       };
       saveLS(LS_KEYS.CUST, currentCustomer);
 
-      // حساب رقم الطلب التلقائي
-const allOrdersCount = orders.length + orderHistory.length;
-const receiptNo = allOrdersCount + 1;
+      // ✅ حساب رقم الطلب التلقائي من جميع المصادر
+      const receiptNo = getNextReceiptNumber();
+
 
       const orderId = generateId('ORD');
       let total = cart.reduce((s, c) => s + c.price * c.qty, 0);
@@ -1846,8 +1900,8 @@ const receiptNo = allOrdersCount + 1;
       console.log('📝 الملاحظة المستخرجة:', customerNote);
 
       const newOrder = {
-        id: orderId,
-        receiptNo,
+  id: orderId,
+  receiptNo: finalReceiptNo || receiptNo,  // ✅ جديد
         customer: { 
           name: pendingOrderData.name, 
           phone: pendingOrderData.phone, 
