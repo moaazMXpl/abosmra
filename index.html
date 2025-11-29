@@ -864,10 +864,11 @@
           <div style="margin-top: 30px; background: var(--card); padding: 20px; border-radius: 12px; border: 2px solid var(--danger);">
   <h3 style="color: var(--danger); margin-top: 0; margin-bottom: 16px;">📊 إحصائيات الطلبات الملغاة</h3>
   <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">إجمالي الطلبات الملغاة</div>
-      <div class="stat-value" style="color: var(--danger);" id="totalCancelled">0</div>
-    </div>
+    <div class="stat-card" onclick="showAllCancelledOrders()" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+  <div class="stat-label">إجمالي الطلبات الملغاة 👆</div>
+  <div class="stat-value" style="color: var(--danger);" id="totalCancelled">0</div>
+  <div class="small" style="margin-top: 8px; color: var(--muted);">اضغط لعرض التفاصيل</div>
+</div>
     <div class="stat-card">
       <div class="stat-label">ملغي: تم الاستلام</div>
       <div class="stat-value" style="color: #3b82f6; font-size: 1.5rem;" id="cancelledReceived">0</div>
@@ -1132,6 +1133,53 @@ function getEnglishDateOnly() {
       return null;
     }
 
+// ✅ عرض كل الطلبات الملغاة في نافذة منفصلة
+window.showAllCancelledOrders = function() {
+  database.ref('history').once('value').then((snapshot) => {
+    const epotData = snapshot.val() ? Object.values(snapshot.val()) : [];
+    const allCancelled = [...orders, ...orderHistory, ...epotData].filter(o => o.cancelled);
+    
+    if (allCancelled.length === 0) {
+      notify('لا توجد طلبات ملغاة', 'info');
+      return;
+    }
+
+    // إنشاء نافذة منبثقة
+    const modal = document.createElement('div');
+    modal.className = 'modal open';
+    modal.innerHTML = `
+      <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-title">📊 جميع الطلبات الملغاة (${allCancelled.length})</div>
+        <div style="max-height: 60vh; overflow-y: auto; margin: 16px 0;">
+          ${allCancelled.map(order => `
+            <div class="order-card cancelled" style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <strong>طلب #${order.receiptNo}</strong>
+                  <span class="badge badge-cancelled" style="margin-right: 8px;">${order.cancelledAtStatus ? `ملغي عند: ${order.cancelledAtStatus}` : 'ملغي'}</span>
+                  <div class="small">${order.customer.name} — ${order.customer.phone}</div>
+                  <div class="small">${order.createdAt}</div>
+                </div>
+                <div style="font-weight: bold; color: var(--danger);">${order.total} ج</div>
+              </div>
+              <div style="background: var(--brown-dark); padding: 12px; border-radius: 8px; margin-top: 12px;">
+                <div style="color: var(--danger);"><strong>سبب الإلغاء:</strong> ${order.cancelReason || 'غير محدد'}</div>
+                <div class="small" style="margin-top: 4px;">العنوان: ${order.customer.address}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <button class="btn btn-secondary" style="width: 100%;" onclick="this.closest('.modal').remove()">إغلاق</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    modal.onclick = (e) => {
+      if (e.target === modal) modal.remove();
+    };
+  });
+};
+
     window.onload = function() {
       const savedView = sessionStorage.getItem('currentView');
       const savedEpotAuth = sessionStorage.getItem('isEpotAuth') === 'true';
@@ -1242,6 +1290,54 @@ function getEnglishDateOnly() {
   });
 
   // باقي الكود كما هو...
+
+// ✅ مراقبة تحديثات الطلبات في الوقت الفعلي
+database.ref('orders').on('child_changed', (snapshot) => {
+  const updatedOrder = snapshot.val();
+  console.log('🔔 تم تحديث الطلب:', updatedOrder);
+  
+  // ✅ تحديث الطلب في orders
+  const idx = orders.findIndex(o => o.id === updatedOrder.id);
+  if (idx !== -1) {
+    orders[idx] = updatedOrder;
+    saveLS(LS_KEYS.ORDERS, orders);
+  }
+  
+  // ✅ إذا كان العميل الحالي له هذا الطلب، حدث userOrders
+  const customerPhone = userAccount?.phone || currentCustomer?.phone;
+  if (customerPhone && updatedOrder.customerPhone === customerPhone) {
+    syncUserOrders();
+    checkCustomerOrders(); // ✅ تحديث حالة الطلب في واجهة العميل فوراً
+    
+    // ✅ إذا كانت نافذة الطلبات مفتوحة، حدثها
+    const ordersPanel = document.getElementById('ordersPanel');
+    if (ordersPanel && ordersPanel.classList.contains('open')) {
+      showMyOrders();
+    }
+  }
+});
+
+// ✅ مراقبة حذف الطلبات (عند التسليم)
+database.ref('orders').on('child_removed', (snapshot) => {
+  const removedOrder = snapshot.val();
+  console.log('🗑️ تم حذف الطلب:', removedOrder);
+  
+  // ✅ حذف من orders المحلي
+  orders = orders.filter(o => o.id !== removedOrder.id);
+  saveLS(LS_KEYS.ORDERS, orders);
+  
+  // ✅ تحديث العميل إذا كان الطلب له
+  const customerPhone = userAccount?.phone || currentCustomer?.phone;
+  if (customerPhone && removedOrder.customerPhone === customerPhone) {
+    syncUserOrders();
+    checkCustomerOrders();
+    
+    const ordersPanel = document.getElementById('ordersPanel');
+    if (ordersPanel && ordersPanel.classList.contains('open')) {
+      showMyOrders();
+    }
+  }
+});
        
 
       database.ref('history').on('value', (snapshot) => {
@@ -1671,7 +1767,7 @@ const receiptNo = allOrdersCount + 1;
         }
       }
 
-      // التحقق من وجود ملاحظات للعميل
+      // ✅ جلب الملاحظة من customerNotes باستخدام رقم الهاتف
 const customerNote = customerNotes[pendingOrderData.phone] || null;
 
 const newOrder = {
@@ -1682,8 +1778,9 @@ const newOrder = {
     phone: pendingOrderData.phone, 
     address: pendingOrderData.address 
   },
-  customerNote, // إضافة الملاحظة للطلب
-        items: cart.map(c => ({ id: c.id, name: c.name, price: c.price, qty: c.qty })),
+  customerNote, // ✅ الملاحظة ستظهر تلقائياً في كل طلب جديد
+  items: cart.map(c => ({ id: c.id, name: c.name, price: c.price, qty: c.qty })),
+  // ... باقي الكود
         totalBefore,
         total,
         payment: pendingOrderData.payment,
@@ -1952,7 +2049,7 @@ statusContent.appendChild(div);
       };
 
       const statuses = ['received', 'preparing', 'ready', 'delivered'];
-      const currentStatusIndex = statuses.indexOf(order.status) || 0;
+  const currentStatusIndex = order.status === 'delivered' ? 3 : statuses.indexOf(order.status) || 0; // ✅ إصلاح
       
       const card = document.createElement('div');
       card.className = 'order-card';
@@ -2294,15 +2391,17 @@ window.removeCustomerNote = function(orderId) {
   order.status = newStatus;
   
   if (newStatus === 'delivered') {
-    // نقل الطلب إلى orderHistory (طلبات سابقة) محلياً فقط
-    // لن يتم حفظه في Firebase/history إلا عند endDay
+    // ✅ نقل الطلب إلى orderHistory
     if (!orderHistory.find(h => h.id === order.id)) {
       orderHistory.unshift(order);
     }
     
-    // حذف من orders
+    // ✅ حذف من orders
     orders.splice(orderIndex, 1);
     database.ref('orders/' + orderId).remove();
+    
+    // ✅ تحديث userOrders للعميل
+    syncUserOrders();
     
     if (windowId) closeOrderWindow(windowId);
   } else {
@@ -2397,13 +2496,19 @@ function restoreOpenWindows() {
 }
 
     window.cancelOrderOperator = function(orderId) {
-      if (!confirm('هل أنت متأكد من إلغاء هذا الطلب؟')) return;
+      // ✅ فتح نافذة إدخال سبب الإلغاء
+      const reason = prompt('⚠️ يرجى كتابة سبب إلغاء الطلب:');
+      if (!reason || !reason.trim()) {
+        notify('يجب كتابة سبب الإلغاء', 'warning');
+        return;
+      }
 
       const order = orders.find(o => o.id === orderId);
       if (!order) return;
 
       order.cancelled = true;
-      order.cancelReason = 'تم الإلغاء بواسطة المشغل';
+      order.cancelReason = reason.trim(); // ✅ حفظ السبب
+      order.cancelledAtStatus = order.status; // ✅ حفظ الحالة عند الإلغاء
       order.status = 'cancelled';
 
       database.ref('orders/' + orderId).update({ 
@@ -2828,44 +2933,51 @@ function makeDraggable(element) {
     function updateStats() {
   if (!isEpotAuth) return;
 
-  const totalRev = document.getElementById('totalRevenue');
-  const todayOrd = document.getElementById('todayOrders');
-  const todayRev = document.getElementById('todayRevenue');
-
-  // إحصائيات الإيرادات العادية
-  if (totalRev && todayOrd && todayRev) {
-    const allRevenue = orderHistory.filter(o => !o.cancelled).reduce((sum, o) => sum + o.total, 0);
-    totalRev.textContent = `${allRevenue} ج`;
-
-    const today = getEnglishDateOnly();
-    const todayOrders = [...orders.filter(o => !o.cancelled), ...orderHistory.filter(o => o.date === today && !o.cancelled)];
-    todayOrd.textContent = todayOrders.length;
-    todayRev.textContent = `${todayOrders.reduce((s, o) => s + o.total, 0)} ج`;
-  }
-
-  // إحصائيات الطلبات الملغاة (عدد فقط بدون مبالغ)
-  const totalCancelled = document.getElementById('totalCancelled');
-  const cancelledReceived = document.getElementById('cancelledReceived');
-  const cancelledPreparing = document.getElementById('cancelledPreparing');
-  const cancelledReady = document.getElementById('cancelledReady');
-
-  if (totalCancelled) {
-    // جمع كل الطلبات الملغاة من orders و orderHistory
-    const allCancelledOrders = [...orders, ...orderHistory].filter(o => o.cancelled);
+  // ✅ جلب كل البيانات من Firebase
+  database.ref('history').once('value').then((snapshot) => {
+    const epotData = snapshot.val() ? Object.values(snapshot.val()) : [];
     
-    // عدد الطلبات الملغاة حسب المرحلة
-    const cancelledByStatus = {
-      received: allCancelledOrders.filter(o => (o.cancelledAtStatus || o.status) === 'received' || (!o.cancelledAtStatus && o.status === 'cancelled')),
-      preparing: allCancelledOrders.filter(o => (o.cancelledAtStatus || o.status) === 'preparing'),
-      ready: allCancelledOrders.filter(o => (o.cancelledAtStatus || o.status) === 'ready')
-    };
+    const totalRev = document.getElementById('totalRevenue');
+    const todayOrd = document.getElementById('todayOrders');
+    const todayRev = document.getElementById('todayRevenue');
 
-    // تحديث العناصر (عدد الطلبات فقط)
-    totalCancelled.textContent = allCancelledOrders.length;
-    cancelledReceived.textContent = cancelledByStatus.received.length;
-    cancelledPreparing.textContent = cancelledByStatus.preparing.length;
-    cancelledReady.textContent = cancelledByStatus.ready.length;
-  }
+    // ✅ إحصائيات الإيرادات من EPOT
+    if (totalRev && todayOrd && todayRev) {
+      const allRevenue = epotData.filter(o => !o.cancelled).reduce((sum, o) => sum + o.total, 0);
+      totalRev.textContent = `${allRevenue} ج`;
+
+      const today = getEnglishDateOnly();
+      const todayOrders = epotData.filter(o => o.date === today && !o.cancelled);
+      todayOrd.textContent = todayOrders.length;
+      todayRev.textContent = `${todayOrders.reduce((s, o) => s + o.total, 0)} ج`;
+    }
+
+    // ✅ إحصائيات الطلبات الملغاة مع بيانات EPOT
+    const totalCancelled = document.getElementById('totalCancelled');
+    const cancelledReceived = document.getElementById('cancelledReceived');
+    const cancelledPreparing = document.getElementById('cancelledPreparing');
+    const cancelledReady = document.getElementById('cancelledReady');
+
+    if (totalCancelled) {
+      // ✅ جمع من orders + orderHistory + epotData
+      const allCancelledOrders = [...orders, ...orderHistory, ...epotData].filter(o => o.cancelled);
+  
+      // عدد الطلبات الملغاة حسب المرحلة
+      const cancelledByStatus = {
+        received: allCancelledOrders.filter(o => (o.cancelledAtStatus || o.status) === 'received' || (!o.cancelledAtStatus && o.status === 'cancelled')),
+        preparing: allCancelledOrders.filter(o => (o.cancelledAtStatus || o.status) === 'preparing'),
+        ready: allCancelledOrders.filter(o => (o.cancelledAtStatus || o.status) === 'ready')
+      };
+
+      // تحديث العناصر (عدد الطلبات فقط)
+      totalCancelled.textContent = allCancelledOrders.length;
+      cancelledReceived.textContent = cancelledByStatus.received.length;
+      cancelledPreparing.textContent = cancelledByStatus.preparing.length;
+      cancelledReady.textContent = cancelledByStatus.ready.length;
+    }
+  }).catch((error) => {
+    console.error('Error loading stats:', error);
+  });
 }
 
     function renderItemManagement() {
