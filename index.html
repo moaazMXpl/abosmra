@@ -830,7 +830,6 @@
           <input class="input" id="searchOrderName" placeholder="البحث باسم العميل" />
           <input class="input" id="searchOrderAmount" placeholder="البحث بالمبلغ" type="number" />
           <input class="input" id="searchOrderDate" placeholder="11/27/2025" />
-          <button class="btn btn-primary" id="searchOrderBtn">بحث</button>
         </div>
         <div id="ordersGrid"></div>
       </div>
@@ -843,7 +842,6 @@
               <input class="input" id="searchEpotName" placeholder="البحث باسم العميل" />
               <input class="input" id="searchEpotAmount" placeholder="البحث بالمبلغ" type="number" />
               <input class="input" id="searchEpotDate" placeholder="11/27/2025" />
-              <button class="btn btn-primary" id="searchEpotBtn">بحث</button>
             </div>
         <div id="historyGrid"></div>
       </div>
@@ -863,20 +861,27 @@
             <label for="autoPrintCheckbox">طباعة تلقائية عند وصول طلب جديد</label>
           </div>
           
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-label">إجمالي الإيرادات</div>
-              <div class="stat-value" id="totalRevenue">0 ج</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">طلبات اليوم</div>
-              <div class="stat-value" id="todayOrders">0</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">إيراد اليوم</div>
-              <div class="stat-value" id="todayRevenue">0 ج</div>
-            </div>
-          </div>
+          <div style="margin-top: 30px; background: var(--card); padding: 20px; border-radius: 12px; border: 2px solid var(--danger);">
+  <h3 style="color: var(--danger); margin-top: 0; margin-bottom: 16px;">📊 إحصائيات الطلبات الملغاة</h3>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">إجمالي الطلبات الملغاة</div>
+      <div class="stat-value" style="color: var(--danger);" id="totalCancelled">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">ملغي: تم الاستلام</div>
+      <div class="stat-value" style="color: #3b82f6; font-size: 1.5rem;" id="cancelledReceived">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">ملغي: قيد التحضير</div>
+      <div class="stat-value" style="color: #f59e0b; font-size: 1.5rem;" id="cancelledPreparing">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">ملغي: جاهز للتسليم</div>
+      <div class="stat-value" style="color: var(--success); font-size: 1.5rem;" id="cancelledReady">0</div>
+    </div>
+  </div>
+</div>
           
           <button class="btn btn-danger" id="endDayBtn" style="width: 100%; margin-bottom: 20px;">إنهاء اليوم</button>
           
@@ -889,7 +894,6 @@
           <input class="input" id="searchName" placeholder="البحث باسم العميل" />
           <input class="input" id="searchAmount" placeholder="البحث بالمبلغ" type="number" />
           <input class="input" id="searchDate" placeholder="11/27/2025" />
-          <button class="btn btn-primary" id="searchBtn">بحث</button>
         </div>
             <div id="epotHistoryGrid"></div>
           </div>
@@ -972,18 +976,19 @@
     const database = firebase.database();
 
     const LS_KEYS = {
-      MENU: 'tk_menu_v1',
-      ORDERS: 'tk_orders_v1',
-      HISTORY: 'tk_history_v1',
-      OFFERS: 'tk_offers_v1',
-      OP_PWD: 'tk_op_pwd_v1',
-      EPOT_PWD: 'tk_epot_pwd_v1',
-      CUST: 'tk_cust_v1',
-      RECEIPT_COUNTER: 'tk_receipt_v1',
-      AUTO_PRINT: 'tk_auto_print_v1',
-      USER_ACCOUNT: 'tk_user_account_v1',
-      USER_ORDERS: 'tk_user_orders_v1'
-    };
+  MENU: 'tk_menu_v1',
+  ORDERS: 'tk_orders_v1',
+  HISTORY: 'tk_history_v1',
+  OFFERS: 'tk_offers_v1',
+  OP_PWD: 'tk_op_pwd_v1',
+  EPOT_PWD: 'tk_epot_pwd_v1',
+  CUST: 'tk_cust_v1',
+  RECEIPT_COUNTER: 'tk_receipt_v1',
+  AUTO_PRINT: 'tk_auto_print_v1',
+  USER_ACCOUNT: 'tk_user_account_v1',
+  USER_ORDERS: 'tk_user_orders_v1',
+  CUSTOMER_NOTES: 'tk_customer_notes_v1' // جديد
+};
 
     const DEFAULT_MENU = {
       "الكشري": [
@@ -1046,6 +1051,7 @@
     let currentCustomer = loadLS(LS_KEYS.CUST, null);
     let userAccount = loadLS(LS_KEYS.USER_ACCOUNT, null);
     let userOrders = loadLS(LS_KEYS.USER_ORDERS, []);
+       let customerNotes = loadLS(LS_KEYS.CUSTOMER_NOTES, {}); // {phoneNumber: "ملاحظة"}
     let receiptCounter = 0; // سيتم حسابه تلقائيًا
     let operatorPassword = localStorage.getItem(LS_KEYS.OP_PWD) || 'admin123';
     let epotPassword = localStorage.getItem(LS_KEYS.EPOT_PWD) || 'epot123';
@@ -1096,16 +1102,17 @@ function getEnglishDateOnly() {
     }
     
     function saveState() {
-      saveLS(LS_KEYS.MENU, menu);
-      saveLS(LS_KEYS.ORDERS, orders);
-      saveLS(LS_KEYS.HISTORY, orderHistory);
-      saveLS(LS_KEYS.OFFERS, offers);
-      saveLS(LS_KEYS.CUST, currentCustomer);
-      saveLS(LS_KEYS.USER_ACCOUNT, userAccount);
-      saveLS(LS_KEYS.USER_ORDERS, userOrders);
-      localStorage.setItem(LS_KEYS.RECEIPT_COUNTER, String(receiptCounter));
-      localStorage.setItem(LS_KEYS.AUTO_PRINT, String(autoPrint));
-    }
+  saveLS(LS_KEYS.MENU, menu);
+  saveLS(LS_KEYS.ORDERS, orders);
+  saveLS(LS_KEYS.HISTORY, orderHistory);
+  saveLS(LS_KEYS.OFFERS, offers);
+  saveLS(LS_KEYS.CUST, currentCustomer);
+  saveLS(LS_KEYS.USER_ACCOUNT, userAccount);
+  saveLS(LS_KEYS.USER_ORDERS, userOrders);
+  saveLS(LS_KEYS.CUSTOMER_NOTES, customerNotes); // جديد
+  localStorage.setItem(LS_KEYS.RECEIPT_COUNTER, String(receiptCounter));
+  localStorage.setItem(LS_KEYS.AUTO_PRINT, String(autoPrint));
+}
     
     function notify(msg, type = 'info') {
       const notif = document.getElementById('notification');
@@ -1238,17 +1245,33 @@ function getEnglishDateOnly() {
        
 
       database.ref('history').on('value', (snapshot) => {
-        orderHistory = snapshot.val() ? Object.values(snapshot.val()) : [];
-        saveLS(LS_KEYS.HISTORY, orderHistory);
-        if (currentView === 'operator') {
-          renderHistory();
-          if (isEpotAuth) {
-            renderEpotHistory();
-            updateStats();
-          }
-        }
-        syncUserOrders();
-      });
+  const historyData = snapshot.val();
+  
+  if (isEpotAuth) {
+    // في EPOT: نعرض كل البيانات من Firebase
+    orderHistory = historyData ? Object.values(historyData) : [];
+  } else {
+    // في المشغل العادي: orderHistory فارغ (لأنه تم نقله إلى EPOT)
+    orderHistory = [];
+  }
+  
+  saveLS(LS_KEYS.HISTORY, orderHistory);
+  
+  if (currentView === 'operator') {
+    renderHistory();
+    if (isEpotAuth) {
+      renderEpotHistory();
+      updateStats();
+    }
+  }
+  syncUserOrders();
+});
+
+// مزامنة ملاحظات العملاء
+database.ref('customerNotes').on('value', (snapshot) => {
+  customerNotes = snapshot.val() || {};
+  saveLS(LS_KEYS.CUSTOMER_NOTES, customerNotes);
+});
 
       database.ref('orders').on('child_changed', (snapshot) => {
         const updatedOrder = snapshot.val();
@@ -1601,8 +1624,8 @@ function showSaveDataConfirmation() {
       saveLS(LS_KEYS.CUST, currentCustomer);
 
       // حساب رقم الطلب التلقائي
-      const allOrdersCount = orders.length + orderHistory.length;
-      const receiptNo = allOrdersCount + 1;
+const allOrdersCount = orders.length + orderHistory.length;
+const receiptNo = allOrdersCount + 1;
 
       const orderId = generateId('ORD');
       let total = cart.reduce((s, c) => s + c.price * c.qty, 0);
@@ -1618,14 +1641,18 @@ function showSaveDataConfirmation() {
         }
       }
 
-      const newOrder = {
-        id: orderId,
-        receiptNo,
-        customer: { 
-          name: pendingOrderData.name, 
-          phone: pendingOrderData.phone, 
-          address: pendingOrderData.address 
-        },
+      // التحقق من وجود ملاحظات للعميل
+const customerNote = customerNotes[pendingOrderData.phone] || null;
+
+const newOrder = {
+  id: orderId,
+  receiptNo,
+  customer: { 
+    name: pendingOrderData.name, 
+    phone: pendingOrderData.phone, 
+    address: pendingOrderData.address 
+  },
+  customerNote, // إضافة الملاحظة للطلب
         items: cart.map(c => ({ id: c.id, name: c.name, price: c.price, qty: c.qty })),
         totalBefore,
         total,
@@ -1999,40 +2026,20 @@ window.toggleOperatorMenu = function(orderId) {
   let order = orders.find(o => o.id === orderToCancel);
   
   if (order) {
-    // إذا كان الطلب لا يزال في حالة "تم الاستلام"
-    if (order.status === 'received') {
-      order.cancelRequested = true;
-      order.cancelRequestReason = reason;
-      order.cancelRequestedBy = 'customer';
-      order.cancelRequestedAt = new Date().toLocaleString('ar-EG');
-      order.cancelled = false; // لا نضع ملغي حتى يؤكد المشغل
-      
-      database.ref('orders/' + orderToCancel).update({
-        cancelRequested: true,
-        cancelRequestReason: reason,
-        cancelRequestedBy: 'customer',
-        cancelRequestedAt: getEnglishDateTime(),
-        cancelled: false
-      });
-    } else {
-      // إذا كان الطلب في مرحلة متقدمة، يلغى مباشرة
-      order.cancelled = true;
-      order.cancelReason = reason;
-      order.status = 'cancelled';
-      order.cancelConfirmedByOperator = true;
-      
-      database.ref('orders/' + orderToCancel).update({
-        cancelled: true,
-        cancelReason: reason,
-        status: 'cancelled',
-        cancelConfirmedByOperator: true
-      });
-
-      if (!orderHistory.find(h => h.id === order.id)) {
-        orderHistory.unshift(order);
-        database.ref('history/' + orderToCancel).set(order);
-      }
-    }
+    // طلب الإلغاء يتم إرساله للمشغل - لا يلغى مباشرة
+    order.cancelRequested = true;
+    order.cancelRequestReason = reason;
+    order.cancelRequestedBy = 'customer';
+    order.cancelRequestedAt = getEnglishDateTime();
+    order.cancelled = false;
+    
+    database.ref('orders/' + orderToCancel).update({
+      cancelRequested: true,
+      cancelRequestReason: reason,
+      cancelRequestedBy: 'customer',
+      cancelRequestedAt: getEnglishDateTime(),
+      cancelled: false
+    });
 
     saveState();
     syncUserOrders();
@@ -2048,6 +2055,39 @@ window.toggleOperatorMenu = function(orderId) {
     showMyOrders();
   }, 300);
 }
+
+window.addCustomerNote = function(orderId) {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  const note = prompt('أدخل ملاحظة للعميل ' + order.customer.name + ' (' + order.customer.phone + '):');
+  if (note && note.trim()) {
+    customerNotes[order.customer.phone] = note.trim();
+    database.ref('customerNotes/' + order.customer.phone).set(note.trim());
+    saveState();
+    notify('تم حفظ الملاحظة على العميل', 'info');
+    
+    // تحديث الطلب الحالي
+    order.customerNote = note.trim();
+    database.ref('orders/' + orderId).update({ customerNote: note.trim() });
+  }
+};
+
+window.removeCustomerNote = function(orderId) {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  if (!confirm('هل تريد حذف الملاحظة عن العميل ' + order.customer.name + '?')) return;
+  
+  delete customerNotes[order.customer.phone];
+  database.ref('customerNotes/' + order.customer.phone).remove();
+  saveState();
+  notify('تم حذف الملاحظة', 'info');
+  
+  // تحديث الطلب الحالي
+  order.customerNote = null;
+  database.ref('orders/' + orderId).update({ customerNote: null });
+};
 
     function renderOffers() {
       const select = document.getElementById('applyOffer');
@@ -2182,31 +2222,35 @@ window.toggleOperatorMenu = function(orderId) {
     };
 
     window.changeStatus = function(orderId, newStatus, windowId) {
-      const orderIndex = orders.findIndex(o => o.id === orderId);
-      if (orderIndex === -1) return;
+  const orderIndex = orders.findIndex(o => o.id === orderId);
+  if (orderIndex === -1) return;
 
-      const order = orders[orderIndex];
-      order.status = newStatus;
-      
-      if (newStatus === 'delivered') {
-        if (!orderHistory.find(h => h.id === order.id)) {
-          orderHistory.unshift(order);
-          database.ref('history/' + orderId).set(order);
-        }
-        
-        orders.splice(orderIndex, 1);
-        database.ref('orders/' + orderId).remove();
-        if (windowId) closeOrderWindow(windowId);
-      } else {
-        database.ref('orders/' + orderId).update({ status: newStatus });
-        if (windowId) updateOrderWindow(windowId, order);
-      }
-      
-      saveState();
-      renderOrders();
-      syncUserOrders();
-      notify(`تم تغيير حالة الطلب`, 'info');
-    };
+  const order = orders[orderIndex];
+  order.status = newStatus;
+  
+  if (newStatus === 'delivered') {
+    // نقل الطلب إلى orderHistory (طلبات سابقة) محلياً فقط
+    // لن يتم حفظه في Firebase/history إلا عند endDay
+    if (!orderHistory.find(h => h.id === order.id)) {
+      orderHistory.unshift(order);
+    }
+    
+    // حذف من orders
+    orders.splice(orderIndex, 1);
+    database.ref('orders/' + orderId).remove();
+    
+    if (windowId) closeOrderWindow(windowId);
+  } else {
+    database.ref('orders/' + orderId).update({ status: newStatus });
+    if (windowId) updateOrderWindow(windowId, order);
+  }
+  
+  saveState();
+  renderOrders();
+  renderHistory(); // تحديث طلبات سابقة
+  syncUserOrders();
+  notify(`تم تغيير حالة الطلب`, 'info');
+};
 
      window.closeOrderWindow = function(windowId) {
   const window = document.getElementById(windowId);
@@ -2322,30 +2366,25 @@ window.confirmCancelFromOperator = function(orderId) {
 
   const order = orders[orderIndex];
   order.cancelled = true;
-  order.cancelReason = order.cancelRequestReason;
+  order.cancelReason = order.cancelRequestReason || 'تم الإلغاء بواسطة المشغل';
+  order.cancelledAtStatus = order.status;
   order.status = 'cancelled';
   order.cancelConfirmedByOperator = true;
 
-  database.ref('orders/' + orderId).update({ 
-    cancelled: true, 
-    cancelReason: order.cancelRequestReason,
-    status: 'cancelled',
-    cancelRequested: false,
-    cancelConfirmedByOperator: true
-  });
-
+  // نقل إلى orderHistory محلياً فقط
   if (!orderHistory.find(h => h.id === order.id)) {
     orderHistory.unshift(order);
-    database.ref('history/' + orderId).set(order);
   }
 
+  // حذف من orders
   orders.splice(orderIndex, 1);
   database.ref('orders/' + orderId).remove();
 
   saveState();
   renderOrders();
-  renderHistory();
+  renderHistory(); // تحديث طلبات سابقة
   syncUserOrders();
+  updateStats();
   notify('تم تأكيد إلغاء الطلب', 'info');
 };
 
@@ -2400,7 +2439,12 @@ function openOperatorOrderWindow(order) {
   const orderTotal = order.total || 0;
   
   let contentHTML = '<div style="padding: 12px; background: var(--brown-dark); border-radius: 8px; margin-bottom: 12px;">';
-  contentHTML += '<div style="margin-bottom: 8px;"><strong> العميل:</strong> ' + customerName + '</div>';
+contentHTML += '<div style="margin-bottom: 8px;"><strong>📞 العميل:</strong> ' + customerName + '</div>';
+
+// عرض ملاحظة العميل إن وجدت
+if (order.customerNote) {
+  contentHTML += '<div style="background: #f59e0b; color: #1a1410; padding: 8px; border-radius: 6px; margin: 8px 0; font-weight: bold;">⚠️ ملاحظة: ' + order.customerNote + '</div>';
+}
   contentHTML += '<div style="margin-bottom: 8px;"><strong> الهاتف:</strong> ' + customerPhone + '</div>';
   contentHTML += '<div style="margin-bottom: 8px;"><strong> العنوان:</strong> ' + customerAddress + '</div>';
   contentHTML += '<div style="margin-bottom: 8px;"><strong> الدفع:</strong> ' + orderPayment + '</div>';
@@ -2447,11 +2491,19 @@ function openOperatorOrderWindow(order) {
   contentHTML += '<div id="window-menu-' + windowId + '" class="operator-context-menu" style="display: none; position: absolute; top: 100%; left: 0; background: var(--card); border: 2px solid var(--accent); border-radius: 8px; min-width: 180px; box-shadow: 0 4px 16px rgba(0,0,0,0.5); z-index: 10000;">';
   
   if (order.cancelRequested) {
-    contentHTML += '<div class="op-menu-item" onclick="confirmCancelFromOperator(\'' + order.id + '\'); closeOrderWindow(\'' + windowId + '\')">تأكيد الإلغاء</div>';
-    contentHTML += '<div class="op-menu-item" onclick="rejectCancelRequest(\'' + order.id + '\'); closeOrderWindow(\'' + windowId + '\')">رفض الإلغاء</div>';
-  } else {
-    contentHTML += '<div class="op-menu-item" onclick="if(confirm(\'هل أنت متأكد من إلغاء هذا الطلب؟\')) { cancelOrderOperator(\'' + order.id + '\'); closeOrderWindow(\'' + windowId + '\'); }">إلغاء الطلب</div>';
-  }
+  contentHTML += '<div class="op-menu-item" onclick="confirmCancelFromOperator(\'' + order.id + '\'); closeOrderWindow(\'' + windowId + '\')">✅ تأكيد الإلغاء</div>';
+  contentHTML += '<div class="op-menu-item" onclick="rejectCancelRequest(\'' + order.id + '\'); closeOrderWindow(\'' + windowId + '\')">❌ رفض الإلغاء</div>';
+} else {
+  contentHTML += '<div class="op-menu-item" onclick="if(confirm(\'هل أنت متأكد من إلغاء هذا الطلب؟\')) { cancelOrderOperator(\'' + order.id + '\'); closeOrderWindow(\'' + windowId + '\'); }">🗑️ إلغاء الطلب</div>';
+}
+
+// إضافة خيارات الملاحظات
+const hasNote = customerNotes[order.customer.phone];
+if (hasNote) {
+  contentHTML += '<div class="op-menu-item" onclick="removeCustomerNote(\'' + order.id + '\'); closeOrderWindow(\'' + windowId + '\')">🗑️ حذف ملاحظة العميل</div>';
+} else {
+  contentHTML += '<div class="op-menu-item" onclick="addCustomerNote(\'' + order.id + '\'); closeOrderWindow(\'' + windowId + '\')">📝 إضافة ملاحظة للعميل</div>';
+}
   
   contentHTML += '</div></div>';
   contentHTML += '</div>';
@@ -2667,48 +2719,89 @@ function makeDraggable(element) {
 }
 
     function endDay() {
-      const activeOrders = orders.filter(o => !o.cancelled && o.status !== 'delivered');
-      
-      if (activeOrders.length > 0) {
-        notify('لا يمكن إنهاء اليوم! يوجد ' + activeOrders.length + ' طلب في قائمة الطلبات', 'error');
-        return;
-      }
-      
-      if (!confirm('هل أنت متأكد من إنهاء اليوم؟ سيتم نقل جميع الطلبات إلى الطلبات السابقة.')) return;
+  const activeOrders = orders.filter(o => !o.cancelled && o.status !== 'delivered');
+  
+  if (activeOrders.length > 0) {
+    notify('لا يمكن إنهاء اليوم! يوجد ' + activeOrders.length + ' طلب في قائمة الطلبات', 'error');
+    return;
+  }
+  
+  if (!confirm('هل أنت متأكد من إنهاء اليوم؟ سيتم نقل جميع الطلبات من "طلبات سابقة" إلى EPOT وتفريغها.')) return;
 
-      orders.forEach(order => {
-        if (!orderHistory.find(h => h.id === order.id)) {
-          orderHistory.unshift(order);
-          database.ref('history/' + order.id).set(order);
-        }
-        database.ref('orders/' + order.id).remove();
-      });
+  // 1. نقل جميع الطلبات من orderHistory (طلبات سابقة) إلى Firebase/history (EPOT)
+  if (orderHistory.length > 0) {
+    orderHistory.forEach(order => {
+      database.ref('history/' + order.id).set(order);
+    });
+    notify('جاري نقل ' + orderHistory.length + ' طلب إلى EPOT...', 'info');
+  }
 
-      orders = [];
-      saveState();
-      renderOrders();
-      renderHistory();
-      renderEpotHistory();
-      notify('تم إنهاء اليوم بنجاح', 'info');
-    }
+  // 2. تفريغ orderHistory المحلي (طلبات سابقة)
+  orderHistory = [];
+  
+  // 3. تفريغ orders أيضاً للتأكد
+  orders = [];
+  
+  // 4. حذف orders من Firebase
+  database.ref('orders').remove();
+  
+  // 5. حفظ الحالة
+  saveState();
+  
+  // 6. تحديث العرض
+  renderOrders();
+  renderHistory(); // سيظهر فارغاً
+  
+  if (isEpotAuth) {
+    renderEpotHistory(); // سيظهر كل الطلبات المنقولة
+    updateStats();
+  }
+  
+  notify('تم إنهاء اليوم بنجاح ✓', 'info');
+}
 
     function updateStats() {
-      if (!isEpotAuth) return;
+  if (!isEpotAuth) return;
 
-      const totalRev = document.getElementById('totalRevenue');
-      const todayOrd = document.getElementById('todayOrders');
-      const todayRev = document.getElementById('todayRevenue');
+  const totalRev = document.getElementById('totalRevenue');
+  const todayOrd = document.getElementById('todayOrders');
+  const todayRev = document.getElementById('todayRevenue');
 
-      if (totalRev && todayOrd && todayRev) {
-        const allRevenue = orderHistory.filter(o => !o.cancelled).reduce((sum, o) => sum + o.total, 0);
-        totalRev.textContent = `${allRevenue} ج`;
+  // إحصائيات الإيرادات العادية
+  if (totalRev && todayOrd && todayRev) {
+    const allRevenue = orderHistory.filter(o => !o.cancelled).reduce((sum, o) => sum + o.total, 0);
+    totalRev.textContent = `${allRevenue} ج`;
 
-        const today = new Date().toDateString();
-        const todayOrders = [...orders, ...orderHistory].filter(o => o.date === today && !o.cancelled);
-        todayOrd.textContent = todayOrders.length;
-        todayRev.textContent = `${todayOrders.reduce((s, o) => s + o.total, 0)} ج`;
-      }
-    }
+    const today = getEnglishDateOnly();
+    const todayOrders = [...orders.filter(o => !o.cancelled), ...orderHistory.filter(o => o.date === today && !o.cancelled)];
+    todayOrd.textContent = todayOrders.length;
+    todayRev.textContent = `${todayOrders.reduce((s, o) => s + o.total, 0)} ج`;
+  }
+
+  // إحصائيات الطلبات الملغاة (عدد فقط بدون مبالغ)
+  const totalCancelled = document.getElementById('totalCancelled');
+  const cancelledReceived = document.getElementById('cancelledReceived');
+  const cancelledPreparing = document.getElementById('cancelledPreparing');
+  const cancelledReady = document.getElementById('cancelledReady');
+
+  if (totalCancelled) {
+    // جمع كل الطلبات الملغاة من orders و orderHistory
+    const allCancelledOrders = [...orders, ...orderHistory].filter(o => o.cancelled);
+    
+    // عدد الطلبات الملغاة حسب المرحلة
+    const cancelledByStatus = {
+      received: allCancelledOrders.filter(o => (o.cancelledAtStatus || o.status) === 'received' || (!o.cancelledAtStatus && o.status === 'cancelled')),
+      preparing: allCancelledOrders.filter(o => (o.cancelledAtStatus || o.status) === 'preparing'),
+      ready: allCancelledOrders.filter(o => (o.cancelledAtStatus || o.status) === 'ready')
+    };
+
+    // تحديث العناصر (عدد الطلبات فقط)
+    totalCancelled.textContent = allCancelledOrders.length;
+    cancelledReceived.textContent = cancelledByStatus.received.length;
+    cancelledPreparing.textContent = cancelledByStatus.preparing.length;
+    cancelledReady.textContent = cancelledByStatus.ready.length;
+  }
+}
 
     function renderItemManagement() {
       const list = document.getElementById('manageItemsList');
@@ -2992,18 +3085,24 @@ function makeDraggable(element) {
     }
   });
 
-  // البحث الفوري في كل التبويبات (الطلب الجديد)
-  ['searchOrderAddress', 'searchOrderPhone', 'searchOrderId', 'searchOrderName', 'searchOrderAmount', 'searchOrderDate'].forEach(id => {
-    document.getElementById(id).addEventListener('input', searchOrders);
-  });
+  // البحث الفوري في كل التبويبات
+// تبويب الطلبات الحالية
+['searchOrderAddress', 'searchOrderPhone', 'searchOrderId', 'searchOrderName', 'searchOrderAmount', 'searchOrderDate'].forEach(id => {
+  const element = document.getElementById(id);
+  if (element) element.addEventListener('input', searchOrders);
+});
 
-  ['searchAddress', 'searchPhone', 'searchOrderIdHist', 'searchName', 'searchAmount', 'searchDate'].forEach(id => {
-    document.getElementById(id).addEventListener('input', searchHistory);
-  });
+// تبويب الطلبات السابقة
+['searchEpotAddress', 'searchEpotPhone', 'searchEpotOrderId', 'searchEpotName', 'searchEpotAmount', 'searchEpotDate'].forEach(id => {
+  const element = document.getElementById(id);
+  if (element) element.addEventListener('input', searchHistory);
+});
 
-  ['searchEpotAddress', 'searchEpotPhone', 'searchEpotOrderId', 'searchEpotName', 'searchEpotAmount', 'searchEpotDate'].forEach(id => {
-    document.getElementById(id).addEventListener('input', searchEpotHistory);
-  });
+// تبويب EPOT
+['searchAddress', 'searchPhone', 'searchOrderIdHist', 'searchName', 'searchAmount', 'searchDate'].forEach(id => {
+  const element = document.getElementById(id);
+  if (element) element.addEventListener('input', searchEpotHistory);
+});
 }
 
     function showCustomerView() {
